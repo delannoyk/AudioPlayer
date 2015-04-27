@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
     :git => 'https://github.com/delannoyk/AudioPlayer.git',
     :tag => s.version.to_s
   }
-  s.source_files = 'sources/AudioPlayer/**/*.swift'
+  s.source_files = 'AudioPlayer/**/*.swift'
   s.framework    =  'UIKit', 'AVFoundation', 'MediaPlayer'
 
   s.requires_arc = true
