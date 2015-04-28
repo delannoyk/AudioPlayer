@@ -367,5 +367,54 @@ public class AudioPlayer: NSObject {
 
     // MARK: Events
 
+    public override func observeValueForKeyPath(keyPath: String, ofObject object: AnyObject, change: [NSObject : AnyObject], context: UnsafeMutablePointer<Void>) {
+        if let player = player where player == object as! NSObject {
+            switch keyPath {
+            case "currentItem.duration":
+                //Duration is available
+                updateNowPlayingInfoCenter()
+                //TODO: maybe call a delegate?
+                break
 
+            case "currentItem.playbackBufferEmpty":
+                //The buffer is empty and player is loading
+                //TODO: increment interruption count and maybe change the current sound quality
+                state = .Buffering
+                beginBackgroundTask()
+                break
+
+            case "currentItem.playbackLikelyToKeepUp":
+                //There is enough data in the buffer
+                //TODO: Update state
+                //TODO: Auto-play? under certain conditions
+                endBackgroundTask()
+                break
+
+            default:
+                break
+            }
+        }
+    }
+
+
+    // MARK: Background
+
+    private var backgroundTaskIdentifier: Int?
+
+    private func beginBackgroundTask() {
+        if backgroundTaskIdentifier == nil {
+            UIApplication.sharedApplication().beginBackgroundTaskWithExpirationHandler({[weak self] () -> Void in
+                self?.backgroundTaskIdentifier = nil
+                })
+        }
+    }
+    
+    private func endBackgroundTask() {
+        if let backgroundTaskIdentifier = backgroundTaskIdentifier {
+            if backgroundTaskIdentifier != UIBackgroundTaskInvalid {
+                UIApplication.sharedApplication().endBackgroundTask(backgroundTaskIdentifier)
+            }
+            self.backgroundTaskIdentifier = nil
+        }
+    }
 }

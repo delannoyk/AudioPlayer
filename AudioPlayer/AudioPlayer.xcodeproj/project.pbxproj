@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		462679491AED567D003771C9 /* AudioPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4626793D1AED567D003771C9 /* AudioPlayer.framework */; };
-		462679651AED57E7003771C9 /* AudioPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 462679641AED57E7003771C9 /* AudioPlayer.h */; };
 		462679681AED5DDC003771C9 /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462679671AED5DDC003771C9 /* AudioPlayer.swift */; };
 		4626796A1AED5DE8003771C9 /* AudioItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462679691AED5DE8003771C9 /* AudioItem.swift */; };
 /* End PBXBuildFile section */
@@ -28,7 +27,6 @@
 		462679411AED567D003771C9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		462679481AED567D003771C9 /* AudioPlayerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AudioPlayerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4626794E1AED567D003771C9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		462679641AED57E7003771C9 /* AudioPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioPlayer.h; sourceTree = "<group>"; };
 		462679671AED5DDC003771C9 /* AudioPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioPlayer.swift; sourceTree = "<group>"; };
 		462679691AED5DE8003771C9 /* AudioItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioItem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -83,7 +81,6 @@
 		462679401AED567D003771C9 /* supporting_files */ = {
 			isa = PBXGroup;
 			children = (
-				462679641AED57E7003771C9 /* AudioPlayer.h */,
 				462679411AED567D003771C9 /* Info.plist */,
 			);
 			path = supporting_files;
@@ -112,7 +109,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				462679651AED57E7003771C9 /* AudioPlayer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -332,6 +328,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/AudioPlayer/supporting_files/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -349,6 +349,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/AudioPlayer/supporting_files/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
