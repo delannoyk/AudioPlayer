@@ -8,20 +8,6 @@
 
 import UIKit
 
-// MARK: - AudioItemType
-
-/**
-`AudioItemType` differentiate podcast (or replay) items from livestream items.
-
-- `Livestream`: Represents a livestream such as a live radio.
-- `Podcast`:    Represents a podcast (or replay) item.
-*/
-public enum AudioItemType {
-    case Livestream
-    case Podcast
-}
-
-
 // MARK: - AudioQuality
 
 /**
@@ -64,9 +50,6 @@ An `AudioItem` instance contains every piece of information needed for an `Audio
 URLs can be remote or local.
 */
 public class AudioItem: NSObject {
-    /// Returns the type of the item
-    public let type: AudioItemType
-
     /// Returns the available qualities
     public let soundURLs: [AudioQuality: NSURL]
 
@@ -76,39 +59,35 @@ public class AudioItem: NSObject {
     /**
     Initializes an AudioItem.
 
-    :param: type                  The type of the item.
     :param: highQualitySoundURL   The URL for the high quality sound.
     :param: mediumQualitySoundURL The URL for the medium quality sound.
     :param: lowQualitySoundURL    The URL for the low quality sound.
 
     :returns: An initialized `AudioItem` if there is at least a non-null URL.
     */
-    public convenience init?(type: AudioItemType, highQualitySoundURL: NSURL? = nil,
-        mediumQualitySoundURL: NSURL? = nil, lowQualitySoundURL: NSURL? = nil) {
-            var URLs = [AudioQuality: NSURL]()
-            if let highURL = highQualitySoundURL {
-                URLs[.High] = highURL
-            }
-            if let mediumURL = mediumQualitySoundURL {
-                URLs[.Medium] = mediumURL
-            }
-            if let lowURL = lowQualitySoundURL {
-                URLs[.Low] = lowURL
-            }
+    public convenience init?(highQualitySoundURL: NSURL? = nil, mediumQualitySoundURL: NSURL? = nil, lowQualitySoundURL: NSURL? = nil) {
+        var URLs = [AudioQuality: NSURL]()
+        if let highURL = highQualitySoundURL {
+            URLs[.High] = highURL
+        }
+        if let mediumURL = mediumQualitySoundURL {
+            URLs[.Medium] = mediumURL
+        }
+        if let lowURL = lowQualitySoundURL {
+            URLs[.Low] = lowURL
+        }
 
-            self.init(type: type, soundURLs: URLs)
+        self.init(soundURLs: URLs)
     }
 
     /**
     Initializes an `AudioItem`.
 
-    :param: type      The type of the item.
     :param: soundURLs The URLs of the sound associated with its quality wrapped in a `Dictionary`.
 
     :returns: An initialized `AudioItem` if there is at least an URL in the `soundURLs` dictionary.
     */
-    public init?(type: AudioItemType, soundURLs: [AudioQuality: NSURL]) {
-        self.type = type
+    public init?(soundURLs: [AudioQuality: NSURL]) {
         self.soundURLs = soundURLs
         super.init()
 
