@@ -76,7 +76,6 @@ public class AudioItem: NSObject {
         if let lowURL = lowQualitySoundURL {
             URLs[.Low] = lowURL
         }
-
         self.init(soundURLs: URLs)
     }
 
@@ -100,24 +99,24 @@ public class AudioItem: NSObject {
     // MARK: Quality selection
 
     /// Returns the highest quality URL found or nil if no URLs are available
-    internal var highestQualityURL: AudioItemURL? {
-        return AudioItemURL(quality: .High, URL: soundURLs[.High]) ??
+    internal var highestQualityURL: AudioItemURL {
+        return (AudioItemURL(quality: .High, URL: soundURLs[.High]) ??
             AudioItemURL(quality: .Medium, URL: soundURLs[.Medium]) ??
-            AudioItemURL(quality: .Low, URL: soundURLs[.Low])
+            AudioItemURL(quality: .Low, URL: soundURLs[.Low]))!
     }
 
     /// Returns the medium quality URL found or nil if no URLs are available
-    internal var mediumQualityURL: AudioItemURL? {
-        return AudioItemURL(quality: .Medium, URL: soundURLs[.Medium]) ??
+    internal var mediumQualityURL: AudioItemURL {
+        return (AudioItemURL(quality: .Medium, URL: soundURLs[.Medium]) ??
             AudioItemURL(quality: .Low, URL: soundURLs[.Low]) ??
-            AudioItemURL(quality: .High, URL: soundURLs[.High])
+            AudioItemURL(quality: .High, URL: soundURLs[.High]))!
     }
 
     /// Returns the lowest quality URL found or nil if no URLs are available
-    internal var lowestQualityURL: AudioItemURL? {
-        return AudioItemURL(quality: .Low, URL: soundURLs[.Low]) ??
+    internal var lowestQualityURL: AudioItemURL {
+        return (AudioItemURL(quality: .Low, URL: soundURLs[.Low]) ??
             AudioItemURL(quality: .Medium, URL: soundURLs[.Medium]) ??
-            AudioItemURL(quality: .High, URL: soundURLs[.High])
+            AudioItemURL(quality: .High, URL: soundURLs[.High]))!
     }
 
 
@@ -160,10 +159,17 @@ public class AudioItem: NSObject {
 
     /**
     The artwork image of the item.
-    
+
     This can change over time which is why the property is dynamic. It enables KVO on the property.
     */
     public dynamic var artworkImage: UIImage?
+
+
+    // MARK: KVO
+
+    internal static var ap_KVOItems: [String] {
+        return ["artist", "title", "album", "trackCount", "trackNumber", "artworkImage"]
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////
