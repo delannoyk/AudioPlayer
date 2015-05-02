@@ -17,7 +17,7 @@ private class ClosureContainer: NSObject {
         self.closure = closure
     }
 
-    func callSelectorOnTarget(sender: AnyObject) {
+    @objc func callSelectorOnTarget(sender: AnyObject) {
         closure(sender: sender)
     }
 }
@@ -109,12 +109,26 @@ private extension AVPlayer {
 // MARK: - NSObject+Observation
 
 private extension NSObject {
-    func observe(name: String, selector: Selector, object: AnyObject?) {
+    func observe(name: String, selector: Selector, object: AnyObject? = nil) {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: selector, name: name, object: object)
     }
 
-    func unobserve(name: String, object: AnyObject?) {
+    func unobserve(name: String, object: AnyObject? = nil) {
         NSNotificationCenter.defaultCenter().removeObserver(self, name: name, object: object)
+    }
+}
+
+
+// MARK: - Array+Shuffe
+
+private extension Array {
+    func shuffled() -> [T] {
+        var list = self
+        for i in 0..<(list.count - 1) {
+            let j = Int(arc4random_uniform(UInt32(list.count - i))) + i
+            swap(&list[i], &list[j])
+        }
+        return list
     }
 }
 
@@ -179,11 +193,11 @@ public class AudioPlayer: NSObject {
                 oldValue.removeTimeObserver(timeObserver)
                 timeObserver = nil
 
-                self.unobserve(AVAudioSessionInterruptionNotification, object: oldValue)
-                self.unobserve(AVAudioSessionRouteChangeNotification, object: oldValue)
-                self.unobserve(AVAudioSessionMediaServicesWereLostNotification, object: oldValue)
-                self.unobserve(AVAudioSessionMediaServicesWereResetNotification, object: oldValue)
-                self.unobserve(AVPlayerItemDidPlayToEndTimeNotification, object: oldValue)
+                self.unobserve(AVAudioSessionInterruptionNotification)
+                self.unobserve(AVAudioSessionRouteChangeNotification)
+                self.unobserve(AVAudioSessionMediaServicesWereLostNotification)
+                self.unobserve(AVAudioSessionMediaServicesWereResetNotification)
+                self.unobserve(AVPlayerItemDidPlayToEndTimeNotification)
             }
 
             if let player = player {
@@ -191,7 +205,7 @@ public class AudioPlayer: NSObject {
                 let target = ClosureContainer(closure: { [weak self] sender in
                     self?.adjustQualityIfNecessary()
                     })
-                let timer = NSTimer(timeInterval: retryTimeout, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
+                let timer = NSTimer(timeInterval: adjustQualityTimeInternal, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
                 NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
                 qualityAdjustmentTimer = timer
 
@@ -199,17 +213,18 @@ public class AudioPlayer: NSObject {
                     self?.currentProgressionUpdated(time)
                     })
 
-                self.observe(AVAudioSessionInterruptionNotification, selector: "audioSessionGotInterrupted:", object: player)
-                self.observe(AVAudioSessionRouteChangeNotification, selector: "audioSessionRouteChanged:", object: player)
-                self.observe(AVAudioSessionMediaServicesWereLostNotification, selector: "audioSessionMessedUp:", object: player)
-                self.observe(AVAudioSessionMediaServicesWereResetNotification, selector: "audioSessionMessedUp:", object: player)
-                self.observe(AVPlayerItemDidPlayToEndTimeNotification, selector: "playerItemDidEnd:", object: player)
+                self.observe(AVAudioSessionInterruptionNotification, selector: "audioSessionGotInterrupted:")
+                self.observe(AVAudioSessionRouteChangeNotification, selector: "audioSessionRouteChanged:")
+                self.observe(AVAudioSessionMediaServicesWereLostNotification, selector: "audioSessionMessedUp:")
+                self.observe(AVAudioSessionMediaServicesWereResetNotification, selector: "audioSessionMessedUp:")
+                self.observe(AVPlayerItemDidPlayToEndTimeNotification, selector: "playerItemDidEnd:")
             }
         }
     }
 
-    /// The queue containing items to play.
     private typealias AudioQueueItem = (position: Int, item: AudioItem)
+
+    /// The queue containing items to play.
     private var enqueuedItems: [AudioQueueItem]?
 
     /// A boolean value indicating whether the player has been paused because of a system interruption.
@@ -217,6 +232,36 @@ public class AudioPlayer: NSObject {
 
     /// The time observer
     private var timeObserver: AnyObject?
+
+    /// The number of interruption since last quality adjustment/begin playing
+    private var interruptionCount = 0 {
+        didSet {
+            if adjustQualityAutomatically && interruptionCount > adjustQualityAfterInterruptionCount {
+                adjustQualityIfNecessary()
+            }
+        }
+    }
+
+    /// A boolean value indicating if quality is being changed. It's necessary for the interruption count to not be incremented while new quality is buffering.
+    private var qualityIsBeingChanged = false
+
+    /// The current number of retry we already tried
+    private var retryCount = 0
+
+    /// The timer used to cancel a retry and make a new one
+    private var retryTimer: NSTimer?
+
+    /// The timer used to adjust quality
+    private var qualityAdjustmentTimer: NSTimer?
+
+    /// The state of the player when the connection was lost
+    private var stateWhenConnectionLost: AudioPlayerState?
+
+    /// The date of the connection loss
+    private var connectionLossDate: NSDate?
+
+    /// The index of the current item in the queue
+    private var currentItemIndexInQueue: Int?
 
 
     // MARK: Readonly properties
@@ -229,15 +274,6 @@ public class AudioPlayer: NSObject {
             }
         }
     }
-
-    /// The state of the player when the connection was lost
-    private var stateWhenConnectionLost: AudioPlayerState?
-
-    /// The date of the connection loss
-    private var connectionLossDate: NSDate?
-
-    /// The index of the current item in the queue
-    private var currentItemIndexInQueue: Int?
 
     /// The current item being played.
     public private(set) var currentItem: AudioItem? {
@@ -266,6 +302,7 @@ public class AudioPlayer: NSObject {
                     }
                     }()
 
+                //TODO:
                 if true || /*reachability.isReachable || */ URLInfo.URL.isFileReferenceURL() {
                     state = .Buffering
                 }
@@ -351,7 +388,11 @@ public class AudioPlayer: NSObject {
     public var adjustQualityAfterInterruptionCount = 3
 
     /// Defines the mode of the player. Default is `.Normal`.
-    public var mode = AudioPlayerModeMask.Normal
+    public var mode = AudioPlayerModeMask.Normal {
+        didSet {
+            adaptQueueToPlayerMode()
+        }
+    }
 
     /// Defines the rate of the player. Default value is 1.
     public var rate = Float(1) {
@@ -366,27 +407,6 @@ public class AudioPlayer: NSObject {
 
     /// The delegate that will be called upon special events
     public weak var delegate: AudioPlayerDelegate?
-
-    /// The number of interruption since last quality adjustment/begin playing
-    private var interruptionCount = 0 {
-        didSet {
-            if adjustQualityAutomatically && interruptionCount > adjustQualityAfterInterruptionCount {
-                adjustQualityIfNecessary()
-            }
-        }
-    }
-
-    /// A boolean value indicating if quality is being changed. It's necessary for the interruption count to not be incremented while new quality is buffering.
-    private var qualityIsBeingChanged = false
-
-    /// The current number of retry we already tried
-    private var retryCount = 0
-
-    /// The timer used to cancel a retry and make a new one
-    private var retryTimer: NSTimer?
-
-    /// The timer used to adjust quality
-    private var qualityAdjustmentTimer: NSTimer?
 
 
     /// MARK: Public handy functions
@@ -407,11 +427,12 @@ public class AudioPlayer: NSObject {
     */
     public func playItems(items: [AudioItem]) {
         if items.count > 0 {
-            currentItem = items.first
-            currentItemIndexInQueue = 0
-
             var idx = 0
             enqueuedItems = items.map { (position: idx++, item: $0) }
+            adaptQueueToPlayerMode()
+
+            currentItem = enqueuedItems?.first?.item
+            currentItemIndexInQueue = 0
         }
         else {
             stop()
@@ -440,6 +461,7 @@ public class AudioPlayer: NSObject {
         if currentItem != nil {
             var idx = 0
             enqueuedItems = (enqueuedItems ?? []) + items.map { (position: idx++, item: $0) }
+            adaptQueueToPlayerMode()
         }
         else {
             playItems(items)
@@ -497,8 +519,15 @@ public class AudioPlayer: NSObject {
             beginBackgroundTask()
             pause()
 
-            self.currentItemIndexInQueue = currentItemIndexInQueue + 1
-            currentItem = enqueuedItems?[currentItemIndexInQueue + 1].item
+            let newIndex = currentItemIndexInQueue + 1
+            if newIndex < enqueuedItems?.count {
+                self.currentItemIndexInQueue = newIndex
+                currentItem = enqueuedItems?[newIndex].item
+            }
+            else if mode & .RepeatAll != .Normal {
+                self.currentItemIndexInQueue = 0
+                currentItem = enqueuedItems?.first?.item
+            }
         }
     }
 
@@ -509,7 +538,7 @@ public class AudioPlayer: NSObject {
     */
     public func hasNext() -> Bool {
         if let enqueuedItems = enqueuedItems, currentItemIndexInQueue = currentItemIndexInQueue {
-            if currentItemIndexInQueue + 1 < enqueuedItems.count {
+            if currentItemIndexInQueue + 1 < enqueuedItems.count || mode & .RepeatAll != .Normal {
                 return true
             }
         }
@@ -520,7 +549,7 @@ public class AudioPlayer: NSObject {
     Plays previous item in the queue.
     */
     public func previous() {
-
+        //TODO:
     }
 
     /**
@@ -544,40 +573,22 @@ public class AudioPlayer: NSObject {
             switch event.subtype {
             case .RemoteControlBeginSeekingBackward:
                 rate = -(rate * rateMultiplerOnSeeking)
-                break
-
             case .RemoteControlBeginSeekingForward:
                 rate = rate * rateMultiplerOnSeeking
-                break
-
             case .RemoteControlEndSeekingBackward:
                 rate = -(rate / rateMultiplerOnSeeking)
-                break
-
             case .RemoteControlEndSeekingForward:
                 rate = rate / rateMultiplerOnSeeking
-                break
-
             case .RemoteControlNextTrack:
                 next()
-                break
-
             case .RemoteControlPause:
                 pause()
-                break
-
             case .RemoteControlPlay:
                 resume()
-                break
-
             case .RemoteControlPreviousTrack:
                 previous()
-                break
-
             case .RemoteControlStop:
                 stop()
-                break
-
             case .RemoteControlTogglePlayPause:
                 if state == .Playing {
                     pause()
@@ -585,8 +596,6 @@ public class AudioPlayer: NSObject {
                 else {
                     resume()
                 }
-                break
-
             default:
                 break
             }
@@ -650,7 +659,6 @@ public class AudioPlayer: NSObject {
                 if let currentItem = currentItem, currentItemDuration = currentItemDuration where currentItemDuration > 0 {
                     delegate?.audioPlayer(self, didFindDuration: currentItemDuration, forItem: currentItem)
                 }
-                break
 
             case "currentItem.playbackBufferEmpty":
                 //The buffer is empty and player is loading
@@ -659,7 +667,6 @@ public class AudioPlayer: NSObject {
                 }
                 state = .Buffering
                 beginBackgroundTask()
-                break
 
             case "currentItem.playbackLikelyToKeepUp":
                 //There is enough data in the buffer
@@ -678,7 +685,6 @@ public class AudioPlayer: NSObject {
                 retryTimer = nil
 
                 endBackgroundTask()
-                break
 
             default:
                 break
@@ -696,7 +702,7 @@ public class AudioPlayer: NSObject {
 
     :param: note The notification information.
     */
-    private func audioSessionGotInterrupted(note: NSNotification) {
+    @objc private func audioSessionGotInterrupted(note: NSNotification) {
         if let typeInt = note.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt, type = AVAudioSessionInterruptionType(rawValue: typeInt) {
             if type == .Began && (self.state == .Playing || self.state == .Buffering) {
                 //We pause the player when an interruption is detected
@@ -724,7 +730,7 @@ public class AudioPlayer: NSObject {
 
     :param: note The notification information.
     */
-    private func audioSessionRouteChanged(note: NSNotification) {
+    @objc private func audioSessionRouteChanged(note: NSNotification) {
         if let player = player where player.rate == 0 {
             state = .Paused
         }
@@ -736,7 +742,7 @@ public class AudioPlayer: NSObject {
 
     :param: note The notification information.
     */
-    private func audioSessionMessedUp(note: NSNotification) {
+    @objc private func audioSessionMessedUp(note: NSNotification) {
         //We reenable the audio session directly in case we're in background
         AVAudioSession.sharedInstance().setActive(true, error: nil)
         AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, error: nil)
@@ -752,12 +758,9 @@ public class AudioPlayer: NSObject {
 
     :param: note The notification information.
     */
-    private func playerItemDidEnd(note: NSNotification) {
-        if hasNext() {
-            next()
-        }
-        else {
-            stop()
+    @objc private func playerItemDidEnd(note: NSNotification) {
+        if let sender = note.object as? AVPlayerItem, currentItem = player?.currentItem where sender == currentItem {
+            nextOrStop()
         }
     }
 
@@ -812,7 +815,15 @@ public class AudioPlayer: NSObject {
             }
         }
 
-        if hasNext() {
+        nextOrStop()
+    }
+
+    private func nextOrStop() {
+        if mode & .Repeat != .Normal {
+            seekToTime(0)
+            resume()
+        }
+        else if hasNext() {
             next()
         }
         else {
@@ -886,18 +897,18 @@ public class AudioPlayer: NSObject {
             let target = ClosureContainer(closure: { [weak self] sender in
                 self?.adjustQualityIfNecessary()
                 })
-            let timer = NSTimer(timeInterval: retryTimeout, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
+            let timer = NSTimer(timeInterval: adjustQualityTimeInternal, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
             NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
             qualityAdjustmentTimer = timer
         }
     }
-    
-    
+
+
     // MARK: Background
-    
+
     /// The backround task identifier if a background task started. Nil if not.
     private var backgroundTaskIdentifier: Int?
-    
+
     /**
     Starts a background task if there isn't already one running.
     */
@@ -918,6 +929,21 @@ public class AudioPlayer: NSObject {
                 UIApplication.sharedApplication().endBackgroundTask(backgroundTaskIdentifier)
             }
             self.backgroundTaskIdentifier = nil
+        }
+    }
+    
+    
+    // MARK: Mode
+
+    /**
+    Sorts the queue depending on the current mode.
+    */
+    private func adaptQueueToPlayerMode() {
+        if mode & .Shuffle != .Normal {
+            enqueuedItems = enqueuedItems?.shuffled()
+        }
+        else {
+            enqueuedItems = enqueuedItems?.sorted({ $0.position < $1.position })
         }
     }
 }
