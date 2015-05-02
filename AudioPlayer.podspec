@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'AudioPlayer'
-  s.version      = '0.0.1'
+  s.version      = '0.1.0'
   s.license      =  { :type => 'MIT' }
   s.homepage     = 'https://github.com/delannoyk/AudioPlayer'
   s.authors      = {
@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
     :tag => s.version.to_s
   }
   s.source_files = 'AudioPlayer/**/*.swift'
-  s.framework    =  'UIKit', 'AVFoundation', 'MediaPlayer'
+  s.framework    =  'UIKit', 'AVFoundation', 'MediaPlayer', 'SystemConfiguration'
 
   s.requires_arc = true
 end

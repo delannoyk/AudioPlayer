@@ -52,7 +52,7 @@ public struct AudioPlayerModeMask: RawOptionSetType {
     }
 
     public init(nilLiteral: ()) {
-        self.rawValue = 0
+        rawValue = 0
     }
 
     public static var Normal: AudioPlayerModeMask {
@@ -72,7 +72,7 @@ public struct AudioPlayerModeMask: RawOptionSetType {
     }
 
     public static var allZeros: AudioPlayerModeMask {
-        return self.Normal
+        return .Normal
     }
 }
 
@@ -158,9 +158,15 @@ public class AudioPlayer: NSObject {
     public override init() {
         state = .Buffering
         super.init()
+
+        observe(ReachabilityChangedNotification, selector: "reachabilityStatusChanged:", object: reachability)
+        reachability.startNotifier()
     }
 
     deinit {
+        reachability.stopNotifier()
+        unobserve(ReachabilityChangedNotification, object: reachability)
+
         qualityAdjustmentTimer?.invalidate()
         qualityAdjustmentTimer = nil
 
@@ -193,11 +199,11 @@ public class AudioPlayer: NSObject {
                 oldValue.removeTimeObserver(timeObserver)
                 timeObserver = nil
 
-                self.unobserve(AVAudioSessionInterruptionNotification)
-                self.unobserve(AVAudioSessionRouteChangeNotification)
-                self.unobserve(AVAudioSessionMediaServicesWereLostNotification)
-                self.unobserve(AVAudioSessionMediaServicesWereResetNotification)
-                self.unobserve(AVPlayerItemDidPlayToEndTimeNotification)
+                unobserve(AVAudioSessionInterruptionNotification)
+                unobserve(AVAudioSessionRouteChangeNotification)
+                unobserve(AVAudioSessionMediaServicesWereLostNotification)
+                unobserve(AVAudioSessionMediaServicesWereResetNotification)
+                unobserve(AVPlayerItemDidPlayToEndTimeNotification)
             }
 
             if let player = player {
@@ -213,11 +219,11 @@ public class AudioPlayer: NSObject {
                     self?.currentProgressionUpdated(time)
                     })
 
-                self.observe(AVAudioSessionInterruptionNotification, selector: "audioSessionGotInterrupted:")
-                self.observe(AVAudioSessionRouteChangeNotification, selector: "audioSessionRouteChanged:")
-                self.observe(AVAudioSessionMediaServicesWereLostNotification, selector: "audioSessionMessedUp:")
-                self.observe(AVAudioSessionMediaServicesWereResetNotification, selector: "audioSessionMessedUp:")
-                self.observe(AVPlayerItemDidPlayToEndTimeNotification, selector: "playerItemDidEnd:")
+                observe(AVAudioSessionInterruptionNotification, selector: "audioSessionGotInterrupted:")
+                observe(AVAudioSessionRouteChangeNotification, selector: "audioSessionRouteChanged:")
+                observe(AVAudioSessionMediaServicesWereLostNotification, selector: "audioSessionMessedUp:")
+                observe(AVAudioSessionMediaServicesWereResetNotification, selector: "audioSessionMessedUp:")
+                observe(AVPlayerItemDidPlayToEndTimeNotification, selector: "playerItemDidEnd:")
             }
         }
     }
@@ -263,6 +269,9 @@ public class AudioPlayer: NSObject {
     /// The index of the current item in the queue
     private var currentItemIndexInQueue: Int?
 
+    /// Reachability for network connection
+    private let reachability = Reachability.reachabilityForInternetConnection()
+
 
     // MARK: Readonly properties
 
@@ -302,14 +311,13 @@ public class AudioPlayer: NSObject {
                     }
                     }()
 
-                //TODO:
-                if true || /*reachability.isReachable || */ URLInfo.URL.isFileReferenceURL() {
+                if reachability.isReachable() || URLInfo.URL.isFileReferenceURL() {
                     state = .Buffering
                 }
                 else {
                     connectionLossDate = nil
                     stateWhenConnectionLost = .Buffering
-                    state = .Stopped
+                    state = .WaitingForConnection
                     return
                 }
 
@@ -549,7 +557,17 @@ public class AudioPlayer: NSObject {
     Plays previous item in the queue.
     */
     public func previous() {
-        //TODO:
+        if let currentItemIndexInQueue = currentItemIndexInQueue, enqueuedItems = enqueuedItems {
+            let newIndex = currentItemIndexInQueue - 1
+            if newIndex >= 0 {
+                self.currentItemIndexInQueue = newIndex
+                currentItem = enqueuedItems[newIndex].item
+            }
+            else if mode & .RepeatAll != .Normal {
+                self.currentItemIndexInQueue = enqueuedItems.count - 1
+                currentItem = enqueuedItems.last?.item
+            }
+        }
     }
 
     /**
@@ -670,7 +688,7 @@ public class AudioPlayer: NSObject {
 
             case "currentItem.playbackLikelyToKeepUp":
                 //There is enough data in the buffer
-                if !pausedForInterruption {
+                if !pausedForInterruption && (stateWhenConnectionLost == nil || stateWhenConnectionLost != .Paused) {
                     state = .Playing
                     player.play()
                 }
@@ -704,7 +722,7 @@ public class AudioPlayer: NSObject {
     */
     @objc private func audioSessionGotInterrupted(note: NSNotification) {
         if let typeInt = note.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt, type = AVAudioSessionInterruptionType(rawValue: typeInt) {
-            if type == .Began && (self.state == .Playing || self.state == .Buffering) {
+            if type == .Began && (state == .Playing || state == .Buffering) {
                 //We pause the player when an interruption is detected
                 pausedForInterruption = true
                 pause()
@@ -761,6 +779,31 @@ public class AudioPlayer: NSObject {
     @objc private func playerItemDidEnd(note: NSNotification) {
         if let sender = note.object as? AVPlayerItem, currentItem = player?.currentItem where sender == currentItem {
             nextOrStop()
+        }
+    }
+
+    @objc private func reachabilityStatusChanged(note: NSNotification) {
+        if state == .WaitingForConnection {
+            if let connectionLossDate = connectionLossDate where reachability.isReachable() {
+                if let stateWhenConnectionLost = stateWhenConnectionLost where stateWhenConnectionLost != .Stopped {
+                    if fabs(connectionLossDate.timeIntervalSinceNow) < maximumConnectionLossTime {
+                        retryOrPlayNext()
+                    }
+                }
+                self.connectionLossDate = nil
+            }
+        }
+        else if state != .Stopped {
+            if reachability.isReachable() {
+                retryOrPlayNext()
+                connectionLossDate = nil
+                stateWhenConnectionLost = nil
+            }
+            else {
+                connectionLossDate = NSDate()
+                stateWhenConnectionLost = state
+                state = .WaitingForConnection
+            }
         }
     }
 
@@ -934,7 +977,7 @@ public class AudioPlayer: NSObject {
     
     
     // MARK: Mode
-
+    
     /**
     Sorts the queue depending on the current mode.
     */
