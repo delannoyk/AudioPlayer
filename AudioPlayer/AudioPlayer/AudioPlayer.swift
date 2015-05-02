@@ -10,6 +10,18 @@ import UIKit
 import MediaPlayer
 import AVFoundation
 
+private class ClosureContainer: NSObject {
+    let closure: (sender: AnyObject) -> ()
+
+    init(closure: (sender: AnyObject) -> ()) {
+        self.closure = closure
+    }
+
+    func callSelectorOnTarget(sender: AnyObject) {
+        closure(sender: sender)
+    }
+}
+
 // MARK: - AudioPlayerState
 
 /**
@@ -135,6 +147,12 @@ public class AudioPlayer: NSObject {
     }
 
     deinit {
+        qualityAdjustmentTimer?.invalidate()
+        qualityAdjustmentTimer = nil
+
+        retryTimer?.invalidate()
+        retryTimer = nil
+
         currentItem = nil
         enqueuedItems = nil
         player = nil
@@ -155,7 +173,8 @@ public class AudioPlayer: NSObject {
             }
 
             if let oldValue = oldValue {
-                //TODO: remove quality adjustment timer
+                qualityAdjustmentTimer?.invalidate()
+                qualityAdjustmentTimer = nil
 
                 oldValue.removeTimeObserver(timeObserver)
                 timeObserver = nil
@@ -168,7 +187,13 @@ public class AudioPlayer: NSObject {
             }
 
             if let player = player {
-                //TODO: create quality adjustment timer
+                //Creating the qualityAdjustment timer
+                let target = ClosureContainer(closure: { [weak self] sender in
+                    self?.adjustQualityIfNecessary()
+                    })
+                let timer = NSTimer(timeInterval: retryTimeout, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
+                NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
+                qualityAdjustmentTimer = timer
 
                 timeObserver = player.addPeriodicTimeObserverForInterval(CMTimeMake(1, 2), queue: dispatch_get_main_queue(), usingBlock: {[weak self] time in
                     self?.currentProgressionUpdated(time)
@@ -205,6 +230,12 @@ public class AudioPlayer: NSObject {
         }
     }
 
+    /// The state of the player when the connection was lost
+    private var stateWhenConnectionLost: AudioPlayerState?
+
+    /// The date of the connection loss
+    private var connectionLossDate: NSDate?
+
     /// The index of the current item in the queue
     private var currentItemIndexInQueue: Int?
 
@@ -239,6 +270,8 @@ public class AudioPlayer: NSObject {
                     state = .Buffering
                 }
                 else {
+                    connectionLossDate = nil
+                    stateWhenConnectionLost = .Buffering
                     state = .Stopped
                     return
                 }
@@ -333,6 +366,27 @@ public class AudioPlayer: NSObject {
 
     /// The delegate that will be called upon special events
     public weak var delegate: AudioPlayerDelegate?
+
+    /// The number of interruption since last quality adjustment/begin playing
+    private var interruptionCount = 0 {
+        didSet {
+            if adjustQualityAutomatically && interruptionCount > adjustQualityAfterInterruptionCount {
+                adjustQualityIfNecessary()
+            }
+        }
+    }
+
+    /// A boolean value indicating if quality is being changed. It's necessary for the interruption count to not be incremented while new quality is buffering.
+    private var qualityIsBeingChanged = false
+
+    /// The current number of retry we already tried
+    private var retryCount = 0
+
+    /// The timer used to cancel a retry and make a new one
+    private var retryTimer: NSTimer?
+
+    /// The timer used to adjust quality
+    private var qualityAdjustmentTimer: NSTimer?
 
 
     /// MARK: Public handy functions
@@ -600,7 +654,9 @@ public class AudioPlayer: NSObject {
 
             case "currentItem.playbackBufferEmpty":
                 //The buffer is empty and player is loading
-                //TODO: increment interruption count and maybe change the current sound quality
+                if state == .Playing && !qualityIsBeingChanged {
+                    interruptionCount++
+                }
                 state = .Buffering
                 beginBackgroundTask()
                 break
@@ -615,8 +671,11 @@ public class AudioPlayer: NSObject {
                     state = .Paused
                 }
 
-                //TODO: the retry count can be reinitialized here
-                //TODO: we want to cancel any retry we started to delay here
+                retryCount = 0
+
+                //We cancel the retry we might have asked for
+                retryTimer?.invalidate()
+                retryTimer = nil
 
                 endBackgroundTask()
                 break
@@ -678,9 +737,14 @@ public class AudioPlayer: NSObject {
     :param: note The notification information.
     */
     private func audioSessionMessedUp(note: NSNotification) {
-        //TODO:
-        //Reenable audio session
-        //Restart to play
+        //We reenable the audio session directly in case we're in background
+        AVAudioSession.sharedInstance().setActive(true, error: nil)
+        AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, error: nil)
+
+        //Aaaaand we: restart playing/go to next
+        state = .Stopped
+        interruptionCount++
+        retryOrPlayNext()
     }
 
     /**
@@ -711,8 +775,126 @@ public class AudioPlayer: NSObject {
     }
 
 
-    // MARK: Background
+    // MARK: Retrying
 
+    /**
+    This will retry to play current item and seek back at the correct position if possible (or enabled). If not,
+    it'll just play the next item in queue.
+    */
+    private func retryOrPlayNext() {
+        if state == .Playing {
+            return
+        }
+
+        if maximumRetryCount > 0 {
+            if retryCount < maximumRetryCount {
+                //We can retry
+                let cip = currentItemProgression
+                let ci = currentItem
+
+                currentItem = ci
+                if let cip = cip {
+                    seekToTime(cip)
+                }
+
+                retryCount++
+
+                //We gonna cancel this current retry and create a new one if the player isn't playing after a certain delay
+                let target = ClosureContainer(closure: { [weak self] sender in
+                    self?.retryOrPlayNext()
+                    })
+                let timer = NSTimer(timeInterval: retryTimeout, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
+                NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
+                retryTimer = timer
+            }
+            else {
+                retryCount = 0
+            }
+        }
+
+        if hasNext() {
+            next()
+        }
+        else {
+            stop()
+        }
+    }
+
+
+    // MARK: Quality adjustment
+
+    /**
+    Adjusts quality if necessary based on interruption count.
+    */
+    private func adjustQualityIfNecessary() {
+        if let currentQuality = currentQuality where adjustQualityAutomatically {
+            if interruptionCount >= adjustQualityAfterInterruptionCount {
+                //Decreasing audio quality
+                let URLInfo: AudioItemURL? = {
+                    if currentQuality == .High {
+                        return self.currentItem?.mediumQualityURL
+                    }
+                    if currentQuality == .Medium {
+                        return self.currentItem?.lowestQualityURL
+                    }
+                    return nil
+                    }()
+
+                if let URLInfo = URLInfo where URLInfo.quality != currentQuality {
+                    let cip = currentItemProgression
+                    let item = AVPlayerItem(URL: URLInfo.URL)
+
+                    qualityIsBeingChanged = true
+                    player?.replaceCurrentItemWithPlayerItem(item)
+                    if let cip = cip {
+                        seekToTime(cip)
+                    }
+                    qualityIsBeingChanged = false
+
+                    self.currentQuality = URLInfo.quality
+                }
+            }
+            else if interruptionCount == 0 {
+                //Increasing audio quality
+                let URLInfo: AudioItemURL? = {
+                    if currentQuality == .Low {
+                        return self.currentItem?.mediumQualityURL
+                    }
+                    if currentQuality == .Medium {
+                        return self.currentItem?.highestQualityURL
+                    }
+                    return nil
+                    }()
+
+                if let URLInfo = URLInfo where URLInfo.quality != currentQuality {
+                    let cip = currentItemProgression
+                    let item = AVPlayerItem(URL: URLInfo.URL)
+
+                    qualityIsBeingChanged = true
+                    player?.replaceCurrentItemWithPlayerItem(item)
+                    if let cip = cip {
+                        seekToTime(cip)
+                    }
+                    qualityIsBeingChanged = false
+
+                    self.currentQuality = URLInfo.quality
+                }
+            }
+
+            interruptionCount = 0
+
+            let target = ClosureContainer(closure: { [weak self] sender in
+                self?.adjustQualityIfNecessary()
+                })
+            let timer = NSTimer(timeInterval: retryTimeout, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
+            NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
+            qualityAdjustmentTimer = timer
+        }
+    }
+    
+    
+    // MARK: Background
+    
     /// The backround task identifier if a background task started. Nil if not.
     private var backgroundTaskIdentifier: Int?
     
