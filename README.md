@@ -11,7 +11,7 @@ AudioPlayer is a wrapper around AVPlayer. It also offers cool features such as:
 
 ## Installation
 
-* Adding it in your Podfile `pod 'AudioPlayer'`
+* Adding it in your Podfile `pod 'KDEAudioPlayer'`
 
 ## Usage
 ```swift
