@@ -1,12 +1,12 @@
 Pod::Spec.new do |s|
-  s.name         = 'AudioPlayer'
+  s.name         = 'KDEAudioPlayer'
   s.version      = '0.1.0'
   s.license      =  { :type => 'MIT' }
   s.homepage     = 'https://github.com/delannoyk/AudioPlayer'
   s.authors      = {
     'Kevin Delannoy' => 'delannoyk@gmail.com'
   }
-  s.summary      = ''
+  s.summary      = 'AudioPlayer is a wrapper around AVPlayer and also offers cool features.'
 
 # Source Info
   s.platform     =  :ios, '8.0'
