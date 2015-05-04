@@ -323,6 +323,8 @@ public class AudioPlayer: NSObject {
 
                 state = .Buffering
                 player = AVPlayer(URL: URLInfo.URL)
+                player?.rate = rate
+                player?.volume = volume
                 currentQuality = URLInfo.quality
 
                 player?.play()
@@ -407,6 +409,13 @@ public class AudioPlayer: NSObject {
         didSet {
             player?.rate = rate
             updateNowPlayingInfoCenter()
+        }
+    }
+
+    /// Defines the volume of the player. `1.0` means 100% and `0.0` is 0%.
+    public var volume = Float(1) {
+        didSet {
+            player?.volume = volume
         }
     }
 
