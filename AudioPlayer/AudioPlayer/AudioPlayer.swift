@@ -137,7 +137,7 @@ private extension Array {
 
 public protocol AudioPlayerDelegate: NSObjectProtocol {
     func audioPlayer(audioPlayer: AudioPlayer, didChangeStateFrom from: AudioPlayerState, toState to: AudioPlayerState)
-    func audioPlayer(audioPlayer: AudioPlayer, willStartPlayingItem: AudioItem)
+    func audioPlayer(audioPlayer: AudioPlayer, willStartPlayingItem item: AudioItem)
     func audioPlayer(audioPlayer: AudioPlayer, didUpdateProgressionToTime time: NSTimeInterval, percentageRead: Float)
     func audioPlayer(audioPlayer: AudioPlayer, didFindDuration duration: NSTimeInterval, forItem item: AudioItem)
 
