@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'KDEAudioPlayer'
-  s.version      = '0.1.0'
+  s.version      = '0.2.0'
   s.license      =  { :type => 'MIT' }
   s.homepage     = 'https://github.com/delannoyk/AudioPlayer'
   s.authors      = {
