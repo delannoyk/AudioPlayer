@@ -330,7 +330,7 @@ public class AudioPlayer: NSObject {
                 player?.play()
                 updateNowPlayingInfoCenter()
 
-                if oldValue == currentItem {
+                if oldValue != currentItem {
                     delegate?.audioPlayer(self, willStartPlayingItem: currentItem)
                 }
             }
