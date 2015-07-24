@@ -802,7 +802,7 @@ public class AudioPlayer: NSObject {
                 self.connectionLossDate = nil
             }
         }
-        else if state != .Stopped {
+        else if state != .Stopped && state != .Paused {
             if reachability.isReachable() {
                 retryOrPlayNext()
                 connectionLossDate = nil
@@ -861,6 +861,8 @@ public class AudioPlayer: NSObject {
                 let timer = NSTimer(timeInterval: retryTimeout, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
                 NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
                 retryTimer = timer
+
+                return
             }
             else {
                 retryCount = 0
