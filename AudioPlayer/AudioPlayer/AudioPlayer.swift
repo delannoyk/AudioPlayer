@@ -697,7 +697,7 @@ public class AudioPlayer: NSObject {
 
             case "currentItem.playbackLikelyToKeepUp":
                 //There is enough data in the buffer
-                if !pausedForInterruption && (stateWhenConnectionLost == nil || stateWhenConnectionLost != .Paused) {
+                if !pausedForInterruption && state != .Paused && (stateWhenConnectionLost == nil || stateWhenConnectionLost != .Paused) {
                     state = .Playing
                     player.play()
                 }
