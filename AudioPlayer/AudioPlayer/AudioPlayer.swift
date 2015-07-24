@@ -696,22 +696,24 @@ public class AudioPlayer: NSObject {
                 beginBackgroundTask()
 
             case "currentItem.playbackLikelyToKeepUp":
-                //There is enough data in the buffer
-                if !pausedForInterruption && state != .Paused && (stateWhenConnectionLost == nil || stateWhenConnectionLost != .Paused) {
-                    state = .Playing
-                    player.play()
+                if let playbackLikelyToKeepUp = player.currentItem?.playbackLikelyToKeepUp where playbackLikelyToKeepUp {
+                    //There is enough data in the buffer
+                    if !pausedForInterruption && state != .Paused && (stateWhenConnectionLost == nil || stateWhenConnectionLost != .Paused) {
+                        state = .Playing
+                        player.play()
+                    }
+                    else {
+                        state = .Paused
+                    }
+
+                    retryCount = 0
+
+                    //We cancel the retry we might have asked for
+                    retryTimer?.invalidate()
+                    retryTimer = nil
+
+                    endBackgroundTask()
                 }
-                else {
-                    state = .Paused
-                }
-
-                retryCount = 0
-
-                //We cancel the retry we might have asked for
-                retryTimer?.invalidate()
-                retryTimer = nil
-
-                endBackgroundTask()
 
             default:
                 break
@@ -824,6 +826,20 @@ public class AudioPlayer: NSObject {
     */
     private func currentProgressionUpdated(time: CMTime) {
         if let currentItemProgression = currentItemProgression, currentItemDuration = currentItemDuration where currentItemDuration > 0 {
+            //If the current progression is updated, it means we are playing. This fixes the behavior where sometimes
+            //the `playbackLikelyToKeepUp` isn't changed even though it's playing (the first play).
+            if state != .Playing {
+                if !pausedForInterruption && state != .Paused && (stateWhenConnectionLost == nil || stateWhenConnectionLost != .Paused) {
+                    state = .Playing
+                    player?.play()
+                }
+                else {
+                    state = .Paused
+                }
+                endBackgroundTask()
+            }
+
+            //Then we can call the didUpdateProgressionToTime: delegate method
             let percentage = Float(currentItemProgression / currentItemDuration) * 100
             delegate?.audioPlayer(self, didUpdateProgressionToTime: currentItemProgression, percentageRead: percentage)
         }
