@@ -443,14 +443,15 @@ public class AudioPlayer: NSObject {
 
     :param: items The items to play.
     */
-    public func playItems(items: [AudioItem]) {
+    public func playItems(items: [AudioItem], startAtIndex index: Int = 0) {
         if items.count > 0 {
             var idx = 0
             enqueuedItems = items.map { (position: idx++, item: $0) }
             adaptQueueToPlayerMode()
 
-            currentItem = enqueuedItems?.first?.item
-            currentItemIndexInQueue = 0
+            let startIndex: Int = { (index >= items.count || index < 0) ? 0 : index }
+            currentItem = enqueuedItems?[startIndex].item
+            currentItemIndexInQueue = startIndex
         }
         else {
             stop()
