@@ -174,9 +174,7 @@ public class AudioPlayer: NSObject {
         retryTimer?.invalidate()
         retryTimer = nil
 
-        currentItem = nil
-        enqueuedItems = nil
-        player = nil
+        stop()
 
         endBackgroundTask()
     }
