@@ -310,7 +310,7 @@ public class AudioPlayer: NSObject {
                     }
                     }()
 
-                if reachability.isReachable() || URLInfo.URL.isFileReferenceURL() {
+                if reachability.isReachable() || URLInfo.URL.fileURL {
                     state = .Buffering
                 }
                 else {
