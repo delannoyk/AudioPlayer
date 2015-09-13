@@ -99,21 +99,21 @@ public class AudioItem: NSObject {
     // MARK: Quality selection
 
     /// Returns the highest quality URL found or nil if no URLs are available
-    internal var highestQualityURL: AudioItemURL {
+    public var highestQualityURL: AudioItemURL {
         return (AudioItemURL(quality: .High, URL: soundURLs[.High]) ??
             AudioItemURL(quality: .Medium, URL: soundURLs[.Medium]) ??
             AudioItemURL(quality: .Low, URL: soundURLs[.Low]))!
     }
 
     /// Returns the medium quality URL found or nil if no URLs are available
-    internal var mediumQualityURL: AudioItemURL {
+    public var mediumQualityURL: AudioItemURL {
         return (AudioItemURL(quality: .Medium, URL: soundURLs[.Medium]) ??
             AudioItemURL(quality: .Low, URL: soundURLs[.Low]) ??
             AudioItemURL(quality: .High, URL: soundURLs[.High]))!
     }
 
     /// Returns the lowest quality URL found or nil if no URLs are available
-    internal var lowestQualityURL: AudioItemURL {
+    public var lowestQualityURL: AudioItemURL {
         return (AudioItemURL(quality: .Low, URL: soundURLs[.Low]) ??
             AudioItemURL(quality: .Medium, URL: soundURLs[.Medium]) ??
             AudioItemURL(quality: .High, URL: soundURLs[.High]))!
