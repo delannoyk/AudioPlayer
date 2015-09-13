@@ -26,11 +26,11 @@ public enum AudioQuality {
 
 // MARK: - AudioItemURL
 
-internal struct AudioItemURL {
-    let quality: AudioQuality
-    let URL: NSURL
+public struct AudioItemURL {
+    public let quality: AudioQuality
+    public let URL: NSURL
 
-    private init?(quality: AudioQuality, URL: NSURL?) {
+    public init?(quality: AudioQuality, URL: NSURL?) {
         if let URL = URL {
             self.quality = quality
             self.URL = URL
