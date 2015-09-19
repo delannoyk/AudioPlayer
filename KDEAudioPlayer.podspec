@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name          = 'KDEAudioPlayer'
-  s.version       = '0.2.7'
+  s.version       = '0.3.1'
   s.license       =  { :type => 'MIT' }
   s.homepage      = 'https://github.com/delannoyk/AudioPlayer'
   s.authors       = {
@@ -16,7 +16,6 @@ Pod::Spec.new do |s|
   }
   s.source_files  = 'AudioPlayer/**/*.swift'
   s.framework     = 'UIKit', 'AVFoundation', 'MediaPlayer', 'SystemConfiguration'
-  s.dependency 'ReachabilitySwift', '~> 1.1'
 
   s.requires_arc = true
 end
