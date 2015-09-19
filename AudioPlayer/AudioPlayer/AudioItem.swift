@@ -59,11 +59,11 @@ public class AudioItem: NSObject {
     /**
     Initializes an AudioItem.
 
-    :param: highQualitySoundURL   The URL for the high quality sound.
-    :param: mediumQualitySoundURL The URL for the medium quality sound.
-    :param: lowQualitySoundURL    The URL for the low quality sound.
+    - parameter highQualitySoundURL:   The URL for the high quality sound.
+    - parameter mediumQualitySoundURL: The URL for the medium quality sound.
+    - parameter lowQualitySoundURL:    The URL for the low quality sound.
 
-    :returns: An initialized `AudioItem` if there is at least a non-null URL.
+    - returns: An initialized `AudioItem` if there is at least a non-null URL.
     */
     public convenience init?(highQualitySoundURL: NSURL? = nil, mediumQualitySoundURL: NSURL? = nil, lowQualitySoundURL: NSURL? = nil) {
         var URLs = [AudioQuality: NSURL]()
@@ -82,9 +82,9 @@ public class AudioItem: NSObject {
     /**
     Initializes an `AudioItem`.
 
-    :param: soundURLs The URLs of the sound associated with its quality wrapped in a `Dictionary`.
+    - parameter soundURLs: The URLs of the sound associated with its quality wrapped in a `Dictionary`.
 
-    :returns: An initialized `AudioItem` if there is at least an URL in the `soundURLs` dictionary.
+    - returns: An initialized `AudioItem` if there is at least an URL in the `soundURLs` dictionary.
     */
     public init?(soundURLs: [AudioQuality: NSURL]) {
         self.soundURLs = soundURLs
