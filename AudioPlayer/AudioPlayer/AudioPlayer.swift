@@ -548,6 +548,9 @@ public class AudioPlayer: NSObject {
                 self.currentItemIndexInQueue = enqueuedItems.count - 1
                 currentItem = enqueuedItems.last?.item
             }
+            else {
+                seekToTime(0)
+            }
         }
     }
 
