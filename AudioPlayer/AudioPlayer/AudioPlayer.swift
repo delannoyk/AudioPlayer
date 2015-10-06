@@ -419,7 +419,12 @@ public class AudioPlayer: NSObject {
             enqueuedItems = items.map { (position: idx++, item: $0) }
             adaptQueueToPlayerMode()
 
-            let startIndex: Int = { (index >= items.count || index < 0) ? 0 : index }()
+            let startIndex: Int = {
+                if index >= items.count || index < 0 {
+                    return 0
+                }
+                return enqueuedItems?.indexOf { $0.position == index } ?? 0
+                }()
             currentItem = enqueuedItems?[startIndex].item
             currentItemIndexInQueue = startIndex
         }
