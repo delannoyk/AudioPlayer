@@ -717,6 +717,7 @@ public class AudioPlayer: NSObject {
         if let typeInt = note.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt, type = AVAudioSessionInterruptionType(rawValue: typeInt) {
             if type == .Began && (state == .Playing || state == .Buffering) {
                 //We pause the player when an interruption is detected
+                beginBackgroundTask()
                 pausedForInterruption = true
                 pause()
             }
@@ -729,6 +730,7 @@ public class AudioPlayer: NSObject {
                             resume()
                         }
                         pausedForInterruption = false
+                        endBackgroundTask()
                     }
                 }
             }
