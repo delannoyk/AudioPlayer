@@ -188,6 +188,8 @@ public class AudioPlayer: NSObject {
                     self?.currentProgressionUpdated(time)
                     })
 
+                player.allowsExternalPlayback = false
+
                 observe(AVAudioSessionInterruptionNotification, selector: "audioSessionGotInterrupted:")
                 observe(AVAudioSessionRouteChangeNotification, selector: "audioSessionRouteChanged:")
                 observe(AVAudioSessionMediaServicesWereLostNotification, selector: "audioSessionMessedUp:")
