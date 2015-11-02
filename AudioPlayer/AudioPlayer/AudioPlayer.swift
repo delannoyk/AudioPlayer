@@ -249,7 +249,7 @@ public class AudioPlayer: NSObject {
     /// The current state of the player.
     public private(set) var state: AudioPlayerState {
         didSet {
-            if state != oldValue {
+            if state != oldValue || state == .WaitingForConnection {
                 delegate?.audioPlayer(self, didChangeStateFrom: oldValue, toState: state)
             }
         }
