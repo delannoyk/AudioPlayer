@@ -271,7 +271,6 @@ public class AudioPlayer: NSObject {
 
                 player?.pause()
                 player = nil
-                state = .Stopped
 
                 let URLInfo: AudioItemURL = {
                     switch (self.currentQuality ?? self.defaultQuality) {
@@ -294,7 +293,6 @@ public class AudioPlayer: NSObject {
                     return
                 }
 
-                state = .Buffering
                 player = AVPlayer(URL: URLInfo.URL)
                 player?.rate = rate
                 player?.volume = volume
