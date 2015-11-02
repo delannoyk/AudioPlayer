@@ -673,7 +673,13 @@ public class AudioPlayer: NSObject {
                     if state == .Playing && !qualityIsBeingChanged {
                         interruptionCount++
                     }
-                    state = .Buffering
+
+                    if reachability.isReachable() || (currentItem?.soundURLs[currentQuality ?? defaultQuality]?.fileURL ?? false) {
+                        state = .Buffering
+                    }
+                    else {
+                        state = .WaitingForConnection
+                    }
                     beginBackgroundTask()
 
                 case "currentItem.playbackLikelyToKeepUp":
