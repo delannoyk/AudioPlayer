@@ -424,9 +424,9 @@ public class AudioPlayer: NSObject {
                     return 0
                 }
                 return enqueuedItems?.indexOf { $0.position == index } ?? 0
-                }()
-            currentItem = enqueuedItems?[startIndex].item
+            }()
             currentItemIndexInQueue = startIndex
+            currentItem = enqueuedItems?[startIndex].item
         }
         else {
             stop()
@@ -511,7 +511,7 @@ public class AudioPlayer: NSObject {
         if let currentItemIndexInQueue = currentItemIndexInQueue where hasNext() {
             //The background task will end when the player will have enough data to play
             beginBackgroundTask()
-            pause()
+            //pause()
 
             let newIndex = currentItemIndexInQueue + 1
             if newIndex < enqueuedItems?.count {
@@ -797,7 +797,7 @@ public class AudioPlayer: NSObject {
             }
         }
         else if state != .Stopped && state != .Paused {
-            if reachability.isReachable() {
+            if reachability.isReachable() || (currentItem?.soundURLs[currentQuality ?? defaultQuality]?.fileURL ?? false) {
                 retryOrPlayNext()
                 connectionLossDate = nil
                 stateWhenConnectionLost = nil
@@ -805,7 +805,6 @@ public class AudioPlayer: NSObject {
             else {
                 connectionLossDate = NSDate()
                 stateWhenConnectionLost = state
-                state = .WaitingForConnection
             }
         }
     }
