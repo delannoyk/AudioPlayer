@@ -102,6 +102,15 @@ private extension Array {
 }
 
 
+// MARK: - NSURL+iPodLibrary
+
+private extension NSURL {
+    var isOfflineURL: Bool {
+        return fileURL || scheme == "ipod-library"
+    }
+}
+
+
 // MARK: - AudioPlayerDelegate
 
 public protocol AudioPlayerDelegate: NSObjectProtocol {
@@ -283,7 +292,7 @@ public class AudioPlayer: NSObject {
                     }
                     }()
 
-                if reachability.isReachable() || URLInfo.URL.fileURL {
+                if reachability.isReachable() || URLInfo.URL.isOfflineURL {
                     state = .Buffering
                 }
                 else {
@@ -674,7 +683,7 @@ public class AudioPlayer: NSObject {
                         interruptionCount++
                     }
 
-                    if reachability.isReachable() || (currentItem?.soundURLs[currentQuality ?? defaultQuality]?.fileURL ?? false) {
+                    if reachability.isReachable() || (currentItem?.soundURLs[currentQuality ?? defaultQuality]?.isOfflineURL ?? false) {
                         state = .Buffering
                     }
                     else {
@@ -797,7 +806,7 @@ public class AudioPlayer: NSObject {
             }
         }
         else if state != .Stopped && state != .Paused {
-            if reachability.isReachable() || (currentItem?.soundURLs[currentQuality ?? defaultQuality]?.fileURL ?? false) {
+            if reachability.isReachable() || (currentItem?.soundURLs[currentQuality ?? defaultQuality]?.isOfflineURL ?? false) {
                 retryOrPlayNext()
                 connectionLossDate = nil
                 stateWhenConnectionLost = nil
