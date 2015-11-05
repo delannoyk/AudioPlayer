@@ -213,6 +213,10 @@ public class AudioPlayer: NSObject {
     /// The queue containing items to play.
     private var enqueuedItems: [AudioQueueItem]?
 
+    public var items: [AudioItem]? {
+        return enqueuedItems?.map { $0.item }
+    }
+
     /// A boolean value indicating whether the player has been paused because of a system interruption.
     private var pausedForInterruption = false
 
@@ -247,7 +251,7 @@ public class AudioPlayer: NSObject {
     private var connectionLossDate: NSDate?
 
     /// The index of the current item in the queue
-    private var currentItemIndexInQueue: Int?
+    public private(set) var currentItemIndexInQueue: Int?
 
     /// Reachability for network connection
     private let reachability = Reachability.reachabilityForInternetConnection()
