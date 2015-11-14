@@ -1102,7 +1102,7 @@ public class AudioPlayer: NSObject {
         nextOrStop()
     }
 
-    private func nextOrStop() {
+    public func nextOrStop() {
         if mode.intersect(.Repeat) != [] {
             seekToTime(0)
             resume()
