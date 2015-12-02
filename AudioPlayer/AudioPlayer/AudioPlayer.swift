@@ -283,7 +283,7 @@ public class AudioPlayer: NSObject {
     // MARK: Readonly properties
 
     /// The current state of the player.
-    public private(set) var state: AudioPlayerState {
+    public private(set) var state = AudioPlayerState.Stopped {
         didSet {
             if state != oldValue || state == .WaitingForConnection {
                 delegate?.audioPlayer(self, didChangeStateFrom: oldValue, toState: state)
