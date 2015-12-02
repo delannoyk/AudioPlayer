@@ -39,6 +39,28 @@ public enum AudioPlayerState {
     case Paused
     case Stopped
     case WaitingForConnection
+    case Error(NSError?)
+}
+
+extension AudioPlayerState: Equatable { }
+
+public func ==(lhs: AudioPlayerState, rhs: AudioPlayerState) -> Bool {
+    switch (lhs, rhs) {
+    case (.Buffering, .Buffering):
+        return true
+    case (.Playing, .Playing):
+        return true
+    case (.Paused, .Paused):
+        return true
+    case (.Stopped, .Stopped):
+        return true
+    case (.WaitingForConnection, .WaitingForConnection):
+        return true
+    case (.Error(let e1), .Error(let e2)):
+        return e1 == e2
+    default:
+        return false
+    }
 }
 
 
@@ -72,7 +94,8 @@ private extension AVPlayer {
         return [
             "currentItem.playbackBufferEmpty",
             "currentItem.playbackLikelyToKeepUp",
-            "currentItem.duration"
+            "currentItem.duration",
+            "currentItem.status"
         ]
     }
 }
@@ -714,7 +737,13 @@ public class AudioPlayer: NSObject {
                         
                         endBackgroundTask()
                     }
-                    
+
+                case "currentItem.status":
+                    if let item = player.currentItem where item.status == .Failed {
+                        state = .Error(item.error)
+                        nextOrStop()
+                    }
+
                 default:
                     break
                 }
