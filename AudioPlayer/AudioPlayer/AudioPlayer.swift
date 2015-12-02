@@ -39,7 +39,7 @@ public enum AudioPlayerState {
     case Paused
     case Stopped
     case WaitingForConnection
-    case Error(NSError?)
+    case Failed(NSError?)
 }
 
 extension AudioPlayerState: Equatable { }
@@ -56,7 +56,7 @@ public func ==(lhs: AudioPlayerState, rhs: AudioPlayerState) -> Bool {
         return true
     case (.WaitingForConnection, .WaitingForConnection):
         return true
-    case (.Error(let e1), .Error(let e2)):
+    case (.Failed(let e1), .Failed(let e2)):
         return e1 == e2
     default:
         return false
@@ -740,7 +740,7 @@ public class AudioPlayer: NSObject {
 
                 case "currentItem.status":
                     if let item = player.currentItem where item.status == .Failed {
-                        state = .Error(item.error)
+                        state = .Failed(item.error)
                         nextOrStop()
                     }
 
