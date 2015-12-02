@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9060" systemVersion="15B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9051"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="AudioPlayerExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
+                        <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="http://www.stephaniequinn.com/Music/Rondeau.mp3" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="amP-1G-7jR">
+                                <rect key="frame" x="40" y="40" width="520" height="30"/>
+                                <animations/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tgS-QQ-uRm">
+                                <rect key="frame" x="40" y="78" width="520" height="30"/>
+                                <animations/>
+                                <state key="normal" title="Play item"/>
+                                <connections>
+                                    <action selector="buttonPlayPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="EkG-ek-7ZP"/>
+                                </connections>
+                            </button>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="dAA-vm-lbe">
+                                <rect key="frame" x="40" y="128" width="520" height="452"/>
+                                <animations/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
+                        <animations/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailingMargin" secondItem="tgS-QQ-uRm" secondAttribute="trailing" constant="20" id="4rc-gD-9JJ"/>
+                            <constraint firstItem="dAA-vm-lbe" firstAttribute="top" secondItem="tgS-QQ-uRm" secondAttribute="bottom" constant="20" id="Fp1-zn-SPd"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="amP-1G-7jR" secondAttribute="trailing" constant="20" id="Sbe-rr-lYM"/>
+                            <constraint firstItem="tgS-QQ-uRm" firstAttribute="top" secondItem="amP-1G-7jR" secondAttribute="bottom" constant="8" id="UJg-hD-Tqq"/>
+                            <constraint firstItem="amP-1G-7jR" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="20" id="a4G-yq-0Uz"/>
+                            <constraint firstItem="tgS-QQ-uRm" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="20" id="cNW-sV-cJh"/>
+                            <constraint firstItem="dAA-vm-lbe" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="20" id="fEL-5W-pp6"/>
+                            <constraint firstItem="amP-1G-7jR" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="20" id="oZX-ur-L5O"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="dAA-vm-lbe" secondAttribute="bottom" constant="20" id="t1i-5Z-dCi"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="dAA-vm-lbe" secondAttribute="trailing" constant="20" id="uMP-BX-fpc"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="textFieldURL" destination="amP-1G-7jR" id="tkg-KP-gEg"/>
+                        <outlet property="textViewLogs" destination="dAA-vm-lbe" id="LgI-EE-zkn"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="245" y="314"/>
+        </scene>
+    </scenes>
+</document>

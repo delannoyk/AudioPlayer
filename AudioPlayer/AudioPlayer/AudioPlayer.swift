@@ -105,8 +105,21 @@ private extension Array {
 // MARK: - NSURL+iPodLibrary
 
 private extension NSURL {
+    static var audioPlayerScheme: String {
+        return "kdeaudioplayer"
+    }
+
     var isOfflineURL: Bool {
         return fileURL || scheme == "ipod-library"
+    }
+
+    var audioPlayerURL: NSURL {
+        if ["http", "https"].contains(scheme) {
+            let components = NSURLComponents(URL: self, resolvingAgainstBaseURL: false)
+            components?.scheme = NSURL.audioPlayerScheme
+            return components?.URL ?? self
+        }
+        return self
     }
 }
 
@@ -256,6 +269,9 @@ public class AudioPlayer: NSObject {
     /// Reachability for network connection
     private let reachability = Reachability.reachabilityForInternetConnection()
 
+    /// Resource loader used to buffer/download current item
+    private var currentResourceLoader: AudioResourceLoader?
+
 
     // MARK: Readonly properties
 
@@ -284,6 +300,7 @@ public class AudioPlayer: NSObject {
 
                 player?.pause()
                 player = nil
+                currentResourceLoader = nil
 
                 let URLInfo: AudioItemURL = {
                     switch (self.currentQuality ?? self.defaultQuality) {
@@ -306,7 +323,14 @@ public class AudioPlayer: NSObject {
                     return
                 }
 
-                player = AVPlayer(URL: URLInfo.URL)
+                let asset = AVURLAsset(URL: URLInfo.URL.audioPlayerURL)
+                currentResourceLoader = AudioResourceLoader(URL: URLInfo.URL, delegate: self)
+                asset.resourceLoader.setDelegate(currentResourceLoader, queue: dispatch_get_main_queue())
+
+                let item = AVPlayerItem(asset: asset)
+                item.addObserver(self, forKeyPath: "status", options: [.New, .Old], context: nil)
+
+                player = AVPlayer(playerItem: item)
                 player?.rate = rate
                 player?.volume = volume
                 currentQuality = URLInfo.quality
@@ -514,6 +538,7 @@ public class AudioPlayer: NSObject {
 
         enqueuedItems = nil
         currentItem = nil
+        currentResourceLoader = nil
         player = nil
     }
 
@@ -1021,3 +1046,29 @@ public class AudioPlayer: NSObject {
         }
     }
 }
+
+// MARK: - AudioResourceLoaderDelegate
+////////////////////////////////////////////////////////////////////////////
+
+extension AudioPlayer: AudioResourceLoaderDelegate {
+    func audioResourceLoader(resourceLoader: AudioResourceLoader, didFailWithError error: NSError?) {
+
+    }
+
+    func audioResourceLoader(resourceLoader: AudioResourceLoader, didFinishLoadingItem temporaryFileURL: NSURL) {
+
+    }
+
+    func audioResourceLoader(resourceLoader: AudioResourceLoader, didReceiveData data: NSData) {
+
+    }
+
+    func audioResourceLoader(resourceLoader: AudioResourceLoader, didReceiveResponse response: NSURLResponse) {
+
+
+
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////
+
