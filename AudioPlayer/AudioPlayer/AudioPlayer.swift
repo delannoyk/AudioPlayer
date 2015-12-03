@@ -634,7 +634,7 @@ public class AudioPlayer: NSObject {
         updateNowPlayingInfoCenter()
     }
     
-    func getSeekableBordersWithBufferTime(bufferTime: CMTime) -> (earliesPoint: CMTime, latestPoint: CMTime) {
+    private func getSeekableBordersWithBufferTime(bufferTime: CMTime) -> (earliesPoint: CMTime, latestPoint: CMTime) {
         let seekableRange = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
 
         // set new end to current end minus buffer time. but do not move before start time
