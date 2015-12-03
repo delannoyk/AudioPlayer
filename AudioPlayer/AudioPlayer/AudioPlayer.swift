@@ -628,7 +628,11 @@ public class AudioPlayer: NSObject {
         let seekableRange = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
         let seekableEnd = seekableRange!.end.seconds
         
-        let livePosition = seekableEnd - 5
+        // ensure 5 seconds of buffer time is actually in range
+        let seekableDuration = seekableRange!.duration.seconds
+        let bufferTime = min(seekableDuration, 5)
+        
+        let livePosition = seekableEnd - bufferTime
         
         player?.seekToTime(CMTimeMake(Int64(livePosition), 1))
         updateNowPlayingInfoCenter()
