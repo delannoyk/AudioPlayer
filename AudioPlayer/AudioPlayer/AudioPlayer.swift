@@ -633,13 +633,6 @@ public class AudioPlayer: NSObject {
         player?.seekToTime(newPos)
         updateNowPlayingInfoCenter()
     }
-    
-    private func getSeekableBordersWithBufferTime(bufferTime: CMTime) -> (earliesPoint: CMTime, latestPoint: CMTime) {
-        let seekableRange = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
-        let latestPoint = max(seekableRange!.start, seekableRange!.end - bufferTime)
-        let earliesPoint = min(seekableRange!.end, seekableRange!.start + bufferTime)
-        return (earliesPoint, latestPoint)
-    }
 
     /**
      Seeks backwards as far as possible.
@@ -652,6 +645,15 @@ public class AudioPlayer: NSObject {
         
         player?.seekToTime(newPos)
         updateNowPlayingInfoCenter()
+    }
+    
+    private func getSeekableBordersWithBufferTime(var bufferTime: CMTime) -> (earliesPoint: CMTime, latestPoint: CMTime) {
+        let marginBuffer = CMTime(seconds: 1, preferredTimescale: 1000000000)
+        bufferTime = max(bufferTime, marginBuffer)
+        let seekableRange = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
+        let latestPoint = max(seekableRange!.start, seekableRange!.end - bufferTime)
+        let earliesPoint = min(seekableRange!.end, seekableRange!.start + marginBuffer)
+        return (earliesPoint, latestPoint)
     }
 
     /**
