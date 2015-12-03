@@ -638,7 +638,7 @@ public class AudioPlayer: NSObject {
         let seekableRange = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
 
         // set new end to current end minus buffer time. but do not move before start time
-        let latestPoint = min(seekableRange!.start, seekableRange!.end - bufferTime)
+        let latestPoint = max(seekableRange!.start, seekableRange!.end - bufferTime)
         // set new preferred start one second after start, but make sure it does not go over the end
         let earliesPoint = max(seekableRange!.end, seekableRange!.start + bufferTime)
         
