@@ -39,6 +39,28 @@ public enum AudioPlayerState {
     case Paused
     case Stopped
     case WaitingForConnection
+    case Failed(NSError?)
+}
+
+extension AudioPlayerState: Equatable { }
+
+public func ==(lhs: AudioPlayerState, rhs: AudioPlayerState) -> Bool {
+    switch (lhs, rhs) {
+    case (.Buffering, .Buffering):
+        return true
+    case (.Playing, .Playing):
+        return true
+    case (.Paused, .Paused):
+        return true
+    case (.Stopped, .Stopped):
+        return true
+    case (.WaitingForConnection, .WaitingForConnection):
+        return true
+    case (.Failed(let e1), .Failed(let e2)):
+        return e1 == e2
+    default:
+        return false
+    }
 }
 
 
@@ -72,7 +94,8 @@ private extension AVPlayer {
         return [
             "currentItem.playbackBufferEmpty",
             "currentItem.playbackLikelyToKeepUp",
-            "currentItem.duration"
+            "currentItem.duration",
+            "currentItem.status"
         ]
     }
 }
@@ -134,7 +157,7 @@ public class AudioPlayer: NSObject {
     // MARK: Initialization
 
     public override init() {
-        state = .Buffering
+        state = .Stopped
         super.init()
 
         observe(ReachabilityChangedNotification, selector: "reachabilityStatusChanged:", object: reachability)
@@ -260,7 +283,7 @@ public class AudioPlayer: NSObject {
     // MARK: Readonly properties
 
     /// The current state of the player.
-    public private(set) var state: AudioPlayerState {
+    public private(set) var state = AudioPlayerState.Stopped {
         didSet {
             if state != oldValue || state == .WaitingForConnection {
                 delegate?.audioPlayer(self, didChangeStateFrom: oldValue, toState: state)
@@ -714,7 +737,13 @@ public class AudioPlayer: NSObject {
                         
                         endBackgroundTask()
                     }
-                    
+
+                case "currentItem.status":
+                    if let item = player.currentItem where item.status == .Failed {
+                        state = .Failed(item.error)
+                        nextOrStop()
+                    }
+
                 default:
                     break
                 }
