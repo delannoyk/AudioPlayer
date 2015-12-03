@@ -645,9 +645,9 @@ public class AudioPlayer: NSObject {
      */
     func seekToStart() {
         let seekableRange = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
-        let seekableStart = seekableRange!.start.seconds
+        let seekableStart = seekableRange!.start
         
-        player?.seekToTime(CMTimeMake(Int64(seekableStart), 1))
+        player?.seekToTime(seekableStart)
         updateNowPlayingInfoCenter()
     }
 
