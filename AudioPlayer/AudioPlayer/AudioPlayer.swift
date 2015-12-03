@@ -601,7 +601,7 @@ public class AudioPlayer: NSObject {
     - parameter time: The time to seek to.
     */
     public func seekToTime(time: NSTimeInterval) {
-        let time = CMTime(seconds: time, preferredTimescale: 600)
+        let time = CMTime(seconds: time, preferredTimescale: 1000000000)
         let seekableRange = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
         let seekableStart = seekableRange!.start
         let seekableEnd = seekableRange!.end
@@ -627,22 +627,37 @@ public class AudioPlayer: NSObject {
      */
     public func seekToLive() {
         let seekableRange = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
-        let seekableEnd = seekableRange!.end
+        let bufferTime = CMTime(seconds: 5, preferredTimescale: 1000000000)
         
-        player?.seekToTime(seekableEnd)
+        // set new end to current end minus buffer time. but do not move before start time
+        let seekableEnd = min(seekableRange!.start, seekableRange!.end - bufferTime)
+        // set new preferred start one second after start, but make sure it does not go over the end
+        let seekableStart = max(seekableRange!.end, seekableRange!.start + CMTime(seconds: 1, preferredTimescale: 1000000000))
+
+        // ensure we do not seek before start time
+        let newPos = max(seekableStart, seekableEnd)
+        
+        player?.seekToTime(newPos)
         updateNowPlayingInfoCenter()
     }
 
     /**
-     Seeks backwards as far as possible. If the whole audio file
-     is seekable this will seek to the start of the file
+     Seeks backwards as far as possible.
      
      */
     func seekToStart() {
         let seekableRange = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
-        let seekableStart = seekableRange!.start
+        let bufferTime = CMTime(seconds: 5, preferredTimescale: 1000000000)
         
-        player?.seekToTime(seekableStart, toleranceBefore: CMTime(seconds: 1, preferredTimescale: 1), toleranceAfter: CMTime(seconds: 1, preferredTimescale: 1))
+        // set new end to current end minus buffer time. but do not move before start time
+        let seekableEnd = min(seekableRange!.start, seekableRange!.end - bufferTime)
+        // set new preferred start one second after start, but make sure it does not go over the end
+        let seekableStart = max(seekableRange!.end, seekableRange!.start + CMTime(seconds: 1, preferredTimescale: 1000000000))
+        
+        // ensure we do not seek before start time
+        let newPos = min(seekableStart, seekableEnd)
+        
+        player?.seekToTime(newPos)
         updateNowPlayingInfoCenter()
     }
 
