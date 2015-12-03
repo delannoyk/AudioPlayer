@@ -601,7 +601,49 @@ public class AudioPlayer: NSObject {
     - parameter time: The time to seek to.
     */
     public func seekToTime(time: NSTimeInterval) {
-        player?.seekToTime(CMTimeMake(Int64(time), 1))
+        let seekableRange = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
+        let seekableStart = seekableRange!.start.seconds
+        let seekableEnd = seekableRange!.end.seconds
+        
+        // check if time is in seekable range
+        if time >= seekableStart && time <= seekableEnd {
+            // time is in seekable range
+            player?.seekToTime(CMTimeMake(Int64(time), 1))
+        } else if time < seekableStart {
+            // time is before seekable start, so just move to the most early position as possible
+            seekToStart()
+        } else if time > seekableEnd {
+            // time is larger than possibly, so just move forward as far as possible
+            seekToLive()
+        }
+
+        updateNowPlayingInfoCenter()
+    }
+    
+    /**
+     Seeks forward as far as possible minus 5 seconds of buffer time
+     
+     */
+    public func seekToLive() {
+        let seekableRange = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
+        let seekableEnd = seekableRange!.end.seconds
+        
+        let livePosition = seekableEnd - 5
+        
+        player?.seekToTime(CMTimeMake(Int64(livePosition), 1))
+        updateNowPlayingInfoCenter()
+    }
+
+    /**
+     Seeks backwards as far as possible. If the whole audio file
+     is seekable this will seek to the start of the file
+     
+     */
+    func seekToStart() {
+        let seekableRange = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
+        let seekableStart = seekableRange!.start.seconds
+        
+        player?.seekToTime(CMTimeMake(Int64(seekableStart), 1))
         updateNowPlayingInfoCenter()
     }
 
