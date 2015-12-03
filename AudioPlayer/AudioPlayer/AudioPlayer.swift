@@ -157,7 +157,6 @@ public class AudioPlayer: NSObject {
     // MARK: Initialization
 
     public override init() {
-        state = .Stopped
         super.init()
 
         observe(ReachabilityChangedNotification, selector: "reachabilityStatusChanged:", object: reachability)
