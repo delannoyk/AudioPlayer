@@ -647,6 +647,13 @@ public class AudioPlayer: NSObject {
         updateNowPlayingInfoCenter()
     }
     
+    /**
+     Returns the earliest and latest possible point of the current seekable range with a margin to
+     the actual borders of 1 second.
+
+    - parameter bufferTime: set the margin buffer time of the latest point to the end of the actual
+                            seekable range. A minimum of 1 second will be enforced.
+    */
     private func getSeekableBordersWithBufferTime(var bufferTime: CMTime) -> (earliesPoint: CMTime, latestPoint: CMTime) {
         let marginBuffer = CMTime(seconds: 1, preferredTimescale: 1000000000)
         bufferTime = max(bufferTime, marginBuffer)
