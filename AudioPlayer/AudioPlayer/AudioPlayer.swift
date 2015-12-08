@@ -658,10 +658,21 @@ public class AudioPlayer: NSObject {
     private func getSeekableBordersWithBufferTime(var bufferTime: CMTime) -> (earliesPoint: CMTime, latestPoint: CMTime) {
         let marginBuffer = CMTime(seconds: 1, preferredTimescale: 1000000000)
         bufferTime = max(bufferTime, marginBuffer)
+        
         let seekableRange = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
-        let latestPoint = max(seekableRange!.start, seekableRange!.end - bufferTime)
-        let earliesPoint = min(seekableRange!.end, seekableRange!.start + marginBuffer)
-        return (earliesPoint, latestPoint)
+        if let seekableStart = seekableRange?.start, let seekableEnd = seekableRange?.end {
+            let latestPoint = max(seekableStart, seekableEnd - bufferTime)
+            let earliesPoint = min(seekableEnd, seekableStart + marginBuffer)
+            return (earliesPoint, latestPoint)
+        }
+        else if let currentTime = player?.currentTime() {
+            // if there is no start and end point of seekable range
+            // return the current time, so no seeking possible
+            return (currentTime, currentTime)
+        }
+        else {
+            // TODO: what should I do here?
+        }
     }
 
     /**
