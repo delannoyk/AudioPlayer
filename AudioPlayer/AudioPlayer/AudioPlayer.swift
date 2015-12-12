@@ -629,10 +629,11 @@ public class AudioPlayer: NSObject {
     public func seekToSeekableRangeEnd() {
         let bufferTime = CMTime(seconds: 1, preferredTimescale: 1000000000)
         let (earliesPoint, latestPoint) = getSeekableBordersWithBufferTime(bufferTime)
-        let newPos = max(earliesPoint, latestPoint)
-        
-        player?.seekToTime(newPos)
-        updateNowPlayingInfoCenter()
+        if earliesPoint != nil && latestPoint != nil {
+            let newPos = max(earliesPoint!, latestPoint!)
+            player?.seekToTime(newPos)
+            updateNowPlayingInfoCenter()
+        }
     }
 
     /**
@@ -642,10 +643,11 @@ public class AudioPlayer: NSObject {
     public func seekToSeekableRangeStart() {
         let bufferTime = CMTime(seconds: 1, preferredTimescale: 1000000000)
         let (earliesPoint, latestPoint) = getSeekableBordersWithBufferTime(bufferTime)
-        let newPos = min(earliesPoint, latestPoint)
-        
-        player?.seekToTime(newPos)
-        updateNowPlayingInfoCenter()
+        if earliesPoint != nil && latestPoint != nil {
+            let newPos = min(earliesPoint!, latestPoint!)
+            player?.seekToTime(newPos)
+            updateNowPlayingInfoCenter()
+        }
     }
     
     /**
@@ -655,7 +657,7 @@ public class AudioPlayer: NSObject {
     - parameter bufferTime: set the margin buffer time of the latest point to the end of the actual
                             seekable range. A minimum of 1 second will be enforced.
     */
-    private func getSeekableBordersWithBufferTime(var bufferTime: CMTime) -> (earliesPoint: CMTime, latestPoint: CMTime) {
+    private func getSeekableBordersWithBufferTime(var bufferTime: CMTime) -> (earliesPoint: CMTime?, latestPoint: CMTime?) {
         let marginBuffer = CMTime(seconds: 1, preferredTimescale: 1000000000)
         bufferTime = max(bufferTime, marginBuffer)
         
@@ -671,7 +673,8 @@ public class AudioPlayer: NSObject {
             return (currentTime, currentTime)
         }
         else {
-            // TODO: what should I do here?
+            // can not seek at all, so return nil
+            return (nil, nil)
         }
     }
 
