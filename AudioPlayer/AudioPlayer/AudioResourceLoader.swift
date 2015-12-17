@@ -81,8 +81,6 @@ internal class AudioResourceLoader: NSObject, AVAssetResourceLoaderDelegate, NSU
 
     func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
         processPendingRequests()
-        //data = nil
-        dataTask = nil
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -125,12 +123,12 @@ internal class AudioResourceLoader: NSObject, AVAssetResourceLoaderDelegate, NSU
         }
 
         let startOffset = request.currentOffset != 0 ? request.currentOffset : request.requestedOffset
-        if Int64(data.length) < startOffset {
-            return false
-        }
-
         let unreadBytesLength = totalDataLengthReceived - startOffset
         let responseLength = min(Int64(request.requestedLength), unreadBytesLength)
+
+        if Int64(data.length) < responseLength {
+            return false
+        }
 
         let range = NSMakeRange(0, Int(responseLength))
         request.respondWithData(data.subdataWithRange(range))
