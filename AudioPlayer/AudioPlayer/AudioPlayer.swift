@@ -95,7 +95,8 @@ private extension AVPlayer {
             "currentItem.playbackBufferEmpty",
             "currentItem.playbackLikelyToKeepUp",
             "currentItem.duration",
-            "currentItem.status"
+            "currentItem.status",
+            "currentItem.loadedTimeRanges"
         ]
     }
 }
@@ -141,7 +142,7 @@ public protocol AudioPlayerDelegate: NSObjectProtocol {
     func audioPlayer(audioPlayer: AudioPlayer, willStartPlayingItem item: AudioItem)
     func audioPlayer(audioPlayer: AudioPlayer, didUpdateProgressionToTime time: NSTimeInterval, percentageRead: Float)
     func audioPlayer(audioPlayer: AudioPlayer, didFindDuration duration: NSTimeInterval, forItem item: AudioItem)
-
+    func audioPlayer(audioPlayer: AudioPlayer, didLoadRange: AudioPlayer.TimeRange, forItem item: AudioItem)
 }
 
 
@@ -817,6 +818,11 @@ public class AudioPlayer: NSObject {
                     if let item = player.currentItem where item.status == .Failed {
                         state = .Failed(item.error)
                         nextOrStop()
+                    }
+
+                case "currentItem.loadedTimeRanges":
+                    if let currentItem = currentItem, currentItemLoadedRange = currentItemLoadedRange {
+                        delegate?.audioPlayer(self, didLoadRange: currentItemLoadedRange, forItem: currentItem)
                     }
 
                 default:
