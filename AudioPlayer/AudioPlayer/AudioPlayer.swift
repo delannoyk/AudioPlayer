@@ -346,7 +346,7 @@ public class AudioPlayer: NSObject {
                     return
                 }
 
-                let asset = AVURLAsset(URL: URLInfo.URL.audioPlayerURL)
+                let asset = AVURLAsset(URL: allowsCaching ? URLInfo.URL.audioPlayerURL : URLInfo.URL)
                 currentResourceLoader = AudioResourceLoader(URL: URLInfo.URL)
                 asset.resourceLoader.setDelegate(currentResourceLoader, queue: dispatch_get_main_queue())
 
@@ -478,8 +478,15 @@ public class AudioPlayer: NSObject {
     /// Defines the rate multiplier of the player when the backward/forward buttons are pressed. Default value is 2.
     public var rateMultiplerOnSeeking = Float(2)
 
-    /// The delegate that will be called upon special events
+    /// The delegate that will be called upon special events.
     public weak var delegate: AudioPlayerDelegate?
+
+    /// Defines whether the audioPlayer should let you cache read data.
+    /// - Important: if this is true, the default Resource loader will be
+    ///              used. Else, AudioResourceLoader will be. Also, note
+    ///              that the delegate method used to send you data will be
+    ///              called based on this value.
+    public var allowsCaching = true
 
 
     /// MARK: Public handy functions
