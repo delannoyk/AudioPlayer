@@ -351,7 +351,6 @@ public class AudioPlayer: NSObject {
                 asset.resourceLoader.setDelegate(currentResourceLoader, queue: dispatch_get_main_queue())
 
                 let item = AVPlayerItem(asset: asset)
-                item.addObserver(self, forKeyPath: "status", options: [.New, .Old], context: nil)
 
                 player = AVPlayer(playerItem: item)
                 player?.rate = rate
