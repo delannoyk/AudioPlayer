@@ -14,10 +14,53 @@ AudioPlayer is a wrapper around AVPlayer. It also offers cool features such as:
 * Adding it in your Podfile `pod 'KDEAudioPlayer'`
 
 ## Usage
+### Basics
 ```swift
 let player = AudioPlayer()
 let item = AudioItem(mediumQualitySoundURL: track.streamURL)
 player.playItem(item)
+```
+
+### Delegate
+In order to alert about status change or other events, AudioPlayer uses delegation.
+
+#### State
+When AudioPlayer’s state changes, the method
+```swift
+func audioPlayer(audioPlayer: AudioPlayer, didChangeStateFrom from: AudioPlayerState, toState to: AudioPlayerState)
+```
+is called.
+
+#### Duration & progression
+When AudioPlayer’s current item found duration of its content
+```swift
+func audioPlayer(audioPlayer: AudioPlayer, didFindDuration duration: NSTimeInterval, forItem item: AudioItem)
+```
+is called.
+
+This method is called regularly to notify progression update.
+```swift
+func audioPlayer(audioPlayer: AudioPlayer, didUpdateProgressionToTime time: NSTimeInterval, percentageRead: Float)
+```
+`percentageRead` is a Float value between 0 & 100 so that you can easily update an UISlider for example.
+
+#### Queue
+```swift
+func audioPlayer(audioPlayer: AudioPlayer, willStartPlayingItem item: AudioItem)
+```
+
+### Control Center / Lockscreen
+```swift
+func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+    application.beginReceivingRemoteControlEvents()
+}
+
+//Then in your UIResponder (or your AppDelegate if you will)
+override func remoteControlReceivedWithEvent(event: UIEvent?) {
+    if let event = event {
+        yourPlayer.remoteControlReceivedWithEvent(event)
+    }
+}
 ```
 
 ## Contributing
@@ -28,30 +71,14 @@ player.playItem(item)
 4. Push to the branch: `git push origin my-new-feature`
 5. Submit a pull request :D
 
-## Todo
-
-* See issues
-
 ## License
 
 The MIT License (MIT)
 
 Copyright (c) 2015 Kevin Delannoy
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
