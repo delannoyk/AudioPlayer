@@ -64,7 +64,7 @@ extension ViewController: AudioPlayerDelegate {
 
     }
 
-    func audioPlayer(audioPlayer: AudioPlayer, didFinishLoadingDataForItem item: AudioItem, withError error: ErrorType) {
+    func audioPlayer(audioPlayer: AudioPlayer, didFinishLoadingDataForItem item: AudioItem, withError error: ErrorType?) {
         
     }
 }
