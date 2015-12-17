@@ -373,10 +373,10 @@ public class AudioPlayer: NSObject {
     /// The current quality being played.
     public private(set) var currentQuality: AudioQuality?
 
-    public typealias SeekableRange = (earliest: NSTimeInterval, latest: NSTimeInterval)
+    public typealias TimeRange = (earliest: NSTimeInterval, latest: NSTimeInterval)
 
     /// The current seekable range.
-    public var currentItemSeekableRange: SeekableRange? {
+    public var currentItemSeekableRange: TimeRange? {
         let range = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
         if let seekableStart = range?.start, seekableEnd = range?.end {
             return (CMTimeGetSeconds(seekableStart), CMTimeGetSeconds(seekableEnd))
