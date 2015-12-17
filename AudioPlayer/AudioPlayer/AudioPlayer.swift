@@ -347,7 +347,7 @@ public class AudioPlayer: NSObject {
                 }
 
                 let asset = AVURLAsset(URL: URLInfo.URL.audioPlayerURL)
-                currentResourceLoader = AudioResourceLoader(URL: URLInfo.URL, delegate: self)
+                currentResourceLoader = AudioResourceLoader(URL: URLInfo.URL)
                 asset.resourceLoader.setDelegate(currentResourceLoader, queue: dispatch_get_main_queue())
 
                 let item = AVPlayerItem(asset: asset)
@@ -1156,29 +1156,3 @@ public class AudioPlayer: NSObject {
         }
     }
 }
-
-// MARK: - AudioResourceLoaderDelegate
-////////////////////////////////////////////////////////////////////////////
-
-extension AudioPlayer: AudioResourceLoaderDelegate {
-    func audioResourceLoader(resourceLoader: AudioResourceLoader, didFailWithError error: NSError?) {
-
-    }
-
-    func audioResourceLoader(resourceLoader: AudioResourceLoader, didFinishLoadingItem temporaryFileURL: NSURL) {
-
-    }
-
-    func audioResourceLoader(resourceLoader: AudioResourceLoader, didReceiveData data: NSData) {
-
-    }
-
-    func audioResourceLoader(resourceLoader: AudioResourceLoader, didReceiveResponse response: NSURLResponse) {
-
-
-
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////
-

@@ -10,27 +10,26 @@ import UIKit
 import AVFoundation
 import MobileCoreServices
 
-internal protocol AudioResourceLoaderDelegate: class {
-    func audioResourceLoader(resourceLoader: AudioResourceLoader, didReceiveResponse response: NSURLResponse)
-    func audioResourceLoader(resourceLoader: AudioResourceLoader, didReceiveData data: NSData)
-    func audioResourceLoader(resourceLoader: AudioResourceLoader, didFinishLoadingItem temporaryFileURL: NSURL)
-    func audioResourceLoader(resourceLoader: AudioResourceLoader, didFailWithError error: NSError?)
-}
-
 internal class AudioResourceLoader: NSObject, AVAssetResourceLoaderDelegate, NSURLSessionDataDelegate {
-    private var currentTask: AVAssetResourceLoadingRequest?
-    private var currentDownloadTask: NSURLSessionDataTask?
-    private var totalBytesReceived = 0
+    private let URL: NSURL
 
-    private var URL: NSURL
-    private weak var delegate: AudioResourceLoaderDelegate?
+    private lazy var session: NSURLSession = {
+        return NSURLSession(configuration: .defaultSessionConfiguration(),
+            delegate: self,
+            delegateQueue: NSOperationQueue.mainQueue())
+    }()
+
+    private var data: NSMutableData?
+    private var response: NSHTTPURLResponse?
+    private var dataTask: NSURLSessionDataTask?
+    private var pendingRequests = [AVAssetResourceLoadingRequest]()
+    private var totalDataLengthReceived = Int64(0)
 
     // MARK: Initialization
     ////////////////////////////////////////////////////////////////////////////
 
-    init(URL: NSURL, delegate: AudioResourceLoaderDelegate) {
+    init(URL: NSURL) {
         self.URL = URL
-        self.delegate = delegate
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -40,26 +39,21 @@ internal class AudioResourceLoader: NSObject, AVAssetResourceLoaderDelegate, NSU
     ////////////////////////////////////////////////////////////////////////////
 
     func resourceLoader(resourceLoader: AVAssetResourceLoader, shouldWaitForLoadingOfRequestedResource loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
-        currentDownloadTask?.cancel()
-        currentDownloadTask = nil
+        if dataTask == nil {
+            let request = NSURLRequest(URL: URL)
+            let task = session.dataTaskWithRequest(request)
 
-        print("test 1")
-
-        let request = NSURLRequest(URL: URL)
-        let session = NSURLSession(configuration: .defaultSessionConfiguration(),
-            delegate: self,
-            delegateQueue: NSOperationQueue.mainQueue())
-
-        currentTask = loadingRequest
-
-        let task = session.dataTaskWithRequest(request)
-        task.resume()
-
-        currentDownloadTask = task
+            dataTask = task
+            task.resume()
+        }
+        pendingRequests.append(loadingRequest)
         return true
     }
 
     func resourceLoader(resourceLoader: AVAssetResourceLoader, didCancelLoadingRequest loadingRequest: AVAssetResourceLoadingRequest) {
+        if let index = pendingRequests.indexOf(loadingRequest) {
+            pendingRequests.removeAtIndex(index)
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -69,33 +63,85 @@ internal class AudioResourceLoader: NSObject, AVAssetResourceLoaderDelegate, NSU
     ////////////////////////////////////////////////////////////////////////////
 
     func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveResponse response: NSURLResponse, completionHandler: (NSURLSessionResponseDisposition) -> Void) {
-        guard let MIMEType = response.MIMEType else {
-            completionHandler(.Cancel)
-            return
-        }
+        data = NSMutableData()
+        totalDataLengthReceived = 0
+        self.response = response as? NSHTTPURLResponse
 
-        let contentType = UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, MIMEType, nil)
-        currentTask?.contentInformationRequest?.byteRangeAccessSupported = true
-        currentTask?.contentInformationRequest?.contentLength = response.expectedContentLength
-        currentTask?.contentInformationRequest?.contentType = "public.mp3"//contentType?.takeUnretainedValue() as? String
+        processPendingRequests()
+
         completionHandler(.Allow)
     }
 
     func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveData data: NSData) {
-        totalBytesReceived += data.length
+        self.data?.appendData(data)
+        totalDataLengthReceived += data.length
 
-        currentTask?.dataRequest?.respondWithData(data)
+        processPendingRequests()
     }
 
     func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
-        if let error = error {
-            currentTask?.finishLoadingWithError(error)
+        processPendingRequests()
+        //data = nil
+        dataTask = nil
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+
+
+    // MARK: Requests handling
+    ////////////////////////////////////////////////////////////////////////////
+
+    private func processPendingRequests() {
+        pendingRequests = pendingRequests.filter { request in
+            if let contentInformationRequest = request.contentInformationRequest {
+                fillInContentInformation(contentInformationRequest)
+            }
+
+            if let dataRequest = request.dataRequest {
+                if isRequestCompleteAfterRespondingToRequestedData(dataRequest) {
+                    request.finishLoading()
+                    return false
+                }
+            }
+            return true
         }
-        else {
-            currentTask?.finishLoading()
+    }
+
+    private func fillInContentInformation(request: AVAssetResourceLoadingContentInformationRequest) {
+        guard let MIMEType = response?.MIMEType, contentLength = response?.expectedContentLength else {
+            return
         }
-        currentTask = nil
-        currentDownloadTask = nil
+
+        request.byteRangeAccessSupported = true
+        request.contentLength = contentLength
+        if let contentType = UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, MIMEType, nil) {
+            request.contentType = contentType.takeUnretainedValue() as String
+        }
+    }
+
+    private func isRequestCompleteAfterRespondingToRequestedData(request: AVAssetResourceLoadingDataRequest) -> Bool {
+        guard let data = data else {
+            return false
+        }
+
+        let startOffset = request.currentOffset != 0 ? request.currentOffset : request.requestedOffset
+        if Int64(data.length) < startOffset {
+            return false
+        }
+
+        let unreadBytesLength = totalDataLengthReceived - startOffset
+        let responseLength = min(Int64(request.requestedLength), unreadBytesLength)
+
+        let range = NSMakeRange(0, Int(responseLength))
+        request.respondWithData(data.subdataWithRange(range))
+
+        if startOffset > 0 {
+            data.replaceBytesInRange(range, withBytes: nil, length: 0)
+        }
+
+        let endOffset = startOffset + request.requestedLength
+        let didRespondFully = (Int64(data.length) >= endOffset)
+        return didRespondFully
     }
 
     ////////////////////////////////////////////////////////////////////////////
