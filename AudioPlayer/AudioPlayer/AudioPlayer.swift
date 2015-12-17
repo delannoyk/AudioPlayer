@@ -622,29 +622,27 @@ public class AudioPlayer: NSObject {
     }
     
     /**
-     Seeks forward as far as possible
-     
+     Seeks forward as far as possible.
      */
     public func seekToSeekableRangeEnd() {
         let bufferTime = CMTime(seconds: 1, preferredTimescale: 1000000000)
-        let (earliesPoint, latestPoint) = getSeekableBordersWithBufferTime(bufferTime)
-        if earliesPoint != nil && latestPoint != nil {
-            let newPos = max(earliesPoint!, latestPoint!)
+        if let points = getSeekableBordersWithBufferTime(bufferTime) {
+            let newPos = max(points.earliestPoint, points.latestPoint)
             player?.seekToTime(newPos)
+
             updateNowPlayingInfoCenter()
         }
     }
 
     /**
      Seeks backwards as far as possible.
-     
      */
     public func seekToSeekableRangeStart() {
         let bufferTime = CMTime(seconds: 1, preferredTimescale: 1000000000)
-        let (earliesPoint, latestPoint) = getSeekableBordersWithBufferTime(bufferTime)
-        if earliesPoint != nil && latestPoint != nil {
-            let newPos = min(earliesPoint!, latestPoint!)
+        if let points = getSeekableBordersWithBufferTime(bufferTime) {
+            let newPos = min(points.earliestPoint, points.latestPoint)
             player?.seekToTime(newPos)
+
             updateNowPlayingInfoCenter()
         }
     }
@@ -656,25 +654,23 @@ public class AudioPlayer: NSObject {
     - parameter bufferTime: set the margin buffer time of the latest point to the end of the actual
                             seekable range. A minimum of 1 second will be enforced.
     */
-    private func getSeekableBordersWithBufferTime(var bufferTime: CMTime) -> (earliesPoint: CMTime?, latestPoint: CMTime?) {
+    private func getSeekableBordersWithBufferTime(var bufferTime: CMTime) -> (earliestPoint: CMTime, latestPoint: CMTime)? {
         let marginBuffer = CMTime(seconds: 1, preferredTimescale: 1000000000)
         bufferTime = max(bufferTime, marginBuffer)
         
         let seekableRange = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
         if let seekableStart = seekableRange?.start, let seekableEnd = seekableRange?.end {
             let latestPoint = max(seekableStart, seekableEnd - bufferTime)
-            let earliesPoint = min(seekableEnd, seekableStart + marginBuffer)
-            return (earliesPoint, latestPoint)
+            let earliestPoint = min(seekableEnd, seekableStart + marginBuffer)
+            return (earliestPoint, latestPoint)
         }
-        else if let currentTime = player?.currentTime() {
+        if let currentTime = player?.currentTime() {
             // if there is no start and end point of seekable range
             // return the current time, so no seeking possible
             return (currentTime, currentTime)
         }
-        else {
-            // can not seek at all, so return nil
-            return (nil, nil)
-        }
+        // can not seek at all, so return nil
+        return nil
     }
 
     /**
