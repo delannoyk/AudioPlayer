@@ -142,7 +142,7 @@ public protocol AudioPlayerDelegate: NSObjectProtocol {
     func audioPlayer(audioPlayer: AudioPlayer, willStartPlayingItem item: AudioItem)
     func audioPlayer(audioPlayer: AudioPlayer, didUpdateProgressionToTime time: NSTimeInterval, percentageRead: Float)
     func audioPlayer(audioPlayer: AudioPlayer, didFindDuration duration: NSTimeInterval, forItem item: AudioItem)
-    func audioPlayer(audioPlayer: AudioPlayer, didLoadRange: AudioPlayer.TimeRange, forItem item: AudioItem)
+    func audioPlayer(audioPlayer: AudioPlayer, didLoadRange range: AudioPlayer.TimeRange, forItem item: AudioItem)
 }
 
 
