@@ -373,6 +373,23 @@ public class AudioPlayer: NSObject {
     /// The current quality being played.
     public private(set) var currentQuality: AudioQuality?
 
+    public typealias SeekableRange = (earliest: NSTimeInterval, latest: NSTimeInterval)
+
+    /// The current seekable range.
+    public var currentItemSeekableRange: SeekableRange? {
+        let range = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
+        if let seekableStart = range?.start, seekableEnd = range?.end {
+            return (CMTimeGetSeconds(seekableStart), CMTimeGetSeconds(seekableEnd))
+        }
+        if let currentItemProgression = currentItemProgression {
+            // if there is no start and end point of seekable range
+            // return the current time, so no seeking possible
+            return (currentItemProgression, currentItemProgression)
+        }
+        // can not seek at all, so return nil
+        return nil
+    }
+
 
     /// MARK: Public properties
 
