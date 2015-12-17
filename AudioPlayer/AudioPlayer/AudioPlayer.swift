@@ -627,11 +627,11 @@ public class AudioPlayer: NSObject {
             }
             else if time < seekableStart {
                 // time is before seekable start, so just move to the most early position as possible
-                seekToSeekableRangeStart()
+                seekToSeekableRangeStart(1)
             }
             else if time > seekableEnd {
                 // time is larger than possibly, so just move forward as far as possible
-                seekToSeekableRangeEnd()
+                seekToSeekableRangeEnd(1)
             }
             
             updateNowPlayingInfoCenter()
@@ -640,12 +640,15 @@ public class AudioPlayer: NSObject {
     
     /**
      Seeks forward as far as possible.
+
+     - parameter padding: The padding to apply if any.
      */
-    public func seekToSeekableRangeEnd() {
-        let bufferTime = CMTime(seconds: 1, preferredTimescale: 1000000000)
-        if let points = getSeekableBordersWithBufferTime(bufferTime) {
-            let newPos = max(points.earliestPoint, points.latestPoint)
-            player?.seekToTime(newPos)
+    public func seekToSeekableRangeEnd(padding: NSTimeInterval) {
+        if let range = currentItemSeekableRange {
+            let position = max(range.earliest, range.latest - padding)
+
+            let time = CMTime(seconds: position, preferredTimescale: 1000000000)
+            player?.seekToTime(time)
 
             updateNowPlayingInfoCenter()
         }
@@ -653,42 +656,20 @@ public class AudioPlayer: NSObject {
 
     /**
      Seeks backwards as far as possible.
+     
+     - parameter padding: The padding to apply if any.
      */
-    public func seekToSeekableRangeStart() {
-        let bufferTime = CMTime(seconds: 1, preferredTimescale: 1000000000)
-        if let points = getSeekableBordersWithBufferTime(bufferTime) {
-            let newPos = min(points.earliestPoint, points.latestPoint)
-            player?.seekToTime(newPos)
+    public func seekToSeekableRangeStart(padding: NSTimeInterval) {
+        if let range = currentItemSeekableRange {
+            let position = min(range.latest, range.earliest + padding)
+
+            let time = CMTime(seconds: position, preferredTimescale: 1000000000)
+            player?.seekToTime(time)
 
             updateNowPlayingInfoCenter()
         }
     }
     
-    /**
-     Returns the earliest and latest possible point of the current seekable range with a margin to
-     the actual borders of 1 second.
-
-    - parameter bufferTime: set the margin buffer time of the latest point to the end of the actual
-                            seekable range. A minimum of 1 second will be enforced.
-    */
-    private func getSeekableBordersWithBufferTime(var bufferTime: CMTime) -> (earliestPoint: CMTime, latestPoint: CMTime)? {
-        let marginBuffer = CMTime(seconds: 1, preferredTimescale: 1000000000)
-        bufferTime = max(bufferTime, marginBuffer)
-        
-        let seekableRange = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
-        if let seekableStart = seekableRange?.start, let seekableEnd = seekableRange?.end {
-            let latestPoint = max(seekableStart, seekableEnd - bufferTime)
-            let earliestPoint = min(seekableEnd, seekableStart + marginBuffer)
-            return (earliestPoint, latestPoint)
-        }
-        if let currentTime = player?.currentTime() {
-            // if there is no start and end point of seekable range
-            // return the current time, so no seeking possible
-            return (currentTime, currentTime)
-        }
-        // can not seek at all, so return nil
-        return nil
-    }
 
     /**
     Handle events received from Control Center/Lock screen/Other in UIApplicationDelegate.
