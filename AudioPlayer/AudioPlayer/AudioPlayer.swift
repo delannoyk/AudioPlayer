@@ -390,6 +390,15 @@ public class AudioPlayer: NSObject {
         return nil
     }
 
+    /// The current loaded range.
+    public var currentItemLoadedRange: TimeRange? {
+        let range = player?.currentItem?.loadedTimeRanges.last?.CMTimeRangeValue
+        if let seekableStart = range?.start, seekableEnd = range?.end {
+            return (CMTimeGetSeconds(seekableStart), CMTimeGetSeconds(seekableEnd))
+        }
+        return nil
+    }
+
 
     /// MARK: Public properties
 
