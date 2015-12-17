@@ -59,4 +59,12 @@ extension ViewController: AudioPlayerDelegate {
     func audioPlayer(audioPlayer: AudioPlayer, didLoadRange range: AudioPlayer.TimeRange, forItem item: AudioItem) {
         print(range)
     }
+
+    func audioPlayer(audioPlayer: AudioPlayer, didLoadData data: NSData, forItem item: AudioItem) {
+
+    }
+
+    func audioPlayer(audioPlayer: AudioPlayer, didFinishLoadingDataForItem item: AudioItem, withError error: ErrorType) {
+        
+    }
 }
