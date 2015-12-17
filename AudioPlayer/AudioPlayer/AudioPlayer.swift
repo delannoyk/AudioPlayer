@@ -350,7 +350,7 @@ public class AudioPlayer: NSObject {
                 }
 
                 let asset = AVURLAsset(URL: allowsCaching ? URLInfo.URL.audioPlayerURL : URLInfo.URL)
-                currentResourceLoader = AudioResourceLoader(URL: URLInfo.URL)
+                currentResourceLoader = AudioResourceLoader(URL: URLInfo.URL, delegate: self)
                 asset.resourceLoader.setDelegate(currentResourceLoader, queue: dispatch_get_main_queue())
 
                 let item = AVPlayerItem(asset: asset)
@@ -1162,6 +1162,20 @@ public class AudioPlayer: NSObject {
         }
         else {
             enqueuedItems = enqueuedItems?.sort({ $0.position < $1.position })
+        }
+    }
+}
+
+extension AudioPlayer: AudioResourceLoaderDelegate {
+    func resourceLoader(resourceLoader: AudioResourceLoader, didReceiveData data: NSData) {
+        if let currentItem = currentItem {
+            delegate?.audioPlayer(self, didLoadData: data, forItem: currentItem)
+        }
+    }
+
+    func resourceLoader(resourceLoader: AudioResourceLoader, didFinishLoadingWithError error: ErrorType?) {
+        if let currentItem = currentItem {
+            delegate?.audioPlayer(self, didFinishLoadingDataForItem: currentItem, withError: error)
         }
     }
 }

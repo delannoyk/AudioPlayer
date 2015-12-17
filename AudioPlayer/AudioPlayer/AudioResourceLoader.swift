@@ -10,8 +10,14 @@ import UIKit
 import AVFoundation
 import MobileCoreServices
 
+internal protocol AudioResourceLoaderDelegate: NSObjectProtocol {
+    func resourceLoader(resourceLoader: AudioResourceLoader, didReceiveData data: NSData)
+    func resourceLoader(resourceLoader: AudioResourceLoader, didFinishLoadingWithError error: ErrorType?)
+}
+
 internal class AudioResourceLoader: NSObject, AVAssetResourceLoaderDelegate, NSURLSessionDataDelegate {
     private let URL: NSURL
+    private weak var delegate: AudioResourceLoaderDelegate?
 
     private lazy var session: NSURLSession = {
         return NSURLSession(configuration: .defaultSessionConfiguration(),
@@ -28,8 +34,9 @@ internal class AudioResourceLoader: NSObject, AVAssetResourceLoaderDelegate, NSU
     // MARK: Initialization
     ////////////////////////////////////////////////////////////////////////////
 
-    init(URL: NSURL) {
+    init(URL: NSURL, delegate: AudioResourceLoaderDelegate?) {
         self.URL = URL
+        self.delegate = delegate
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -77,10 +84,14 @@ internal class AudioResourceLoader: NSObject, AVAssetResourceLoaderDelegate, NSU
         totalDataLengthReceived += data.length
 
         processPendingRequests()
+
+        delegate?.resourceLoader(self, didReceiveData: data)
     }
 
     func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
         processPendingRequests()
+
+        delegate?.resourceLoader(self, didFinishLoadingWithError: error)
     }
 
     ////////////////////////////////////////////////////////////////////////////

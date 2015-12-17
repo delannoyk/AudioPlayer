@@ -61,10 +61,10 @@ extension ViewController: AudioPlayerDelegate {
     }
 
     func audioPlayer(audioPlayer: AudioPlayer, didLoadData data: NSData, forItem item: AudioItem) {
-
+        print("Received Data")
     }
 
     func audioPlayer(audioPlayer: AudioPlayer, didFinishLoadingDataForItem item: AudioItem, withError error: ErrorType?) {
-        
+        print("Finished Loading (Error: \(error))")
     }
 }
