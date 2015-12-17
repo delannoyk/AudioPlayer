@@ -39,6 +39,28 @@ public enum AudioPlayerState {
     case Paused
     case Stopped
     case WaitingForConnection
+    case Failed(NSError?)
+}
+
+extension AudioPlayerState: Equatable { }
+
+public func ==(lhs: AudioPlayerState, rhs: AudioPlayerState) -> Bool {
+    switch (lhs, rhs) {
+    case (.Buffering, .Buffering):
+        return true
+    case (.Playing, .Playing):
+        return true
+    case (.Paused, .Paused):
+        return true
+    case (.Stopped, .Stopped):
+        return true
+    case (.WaitingForConnection, .WaitingForConnection):
+        return true
+    case (.Failed(let e1), .Failed(let e2)):
+        return e1 == e2
+    default:
+        return false
+    }
 }
 
 
@@ -72,7 +94,9 @@ private extension AVPlayer {
         return [
             "currentItem.playbackBufferEmpty",
             "currentItem.playbackLikelyToKeepUp",
-            "currentItem.duration"
+            "currentItem.duration",
+            "currentItem.status",
+            "currentItem.loadedTimeRanges"
         ]
     }
 }
@@ -131,7 +155,7 @@ public protocol AudioPlayerDelegate: NSObjectProtocol {
     func audioPlayer(audioPlayer: AudioPlayer, willStartPlayingItem item: AudioItem)
     func audioPlayer(audioPlayer: AudioPlayer, didUpdateProgressionToTime time: NSTimeInterval, percentageRead: Float)
     func audioPlayer(audioPlayer: AudioPlayer, didFindDuration duration: NSTimeInterval, forItem item: AudioItem)
-
+    func audioPlayer(audioPlayer: AudioPlayer, didLoadRange: AudioPlayer.TimeRange, forItem item: AudioItem)
 }
 
 
@@ -147,7 +171,6 @@ public class AudioPlayer: NSObject {
     // MARK: Initialization
 
     public override init() {
-        state = .Buffering
         super.init()
 
         observe(ReachabilityChangedNotification, selector: "reachabilityStatusChanged:", object: reachability)
@@ -276,7 +299,7 @@ public class AudioPlayer: NSObject {
     // MARK: Readonly properties
 
     /// The current state of the player.
-    public private(set) var state: AudioPlayerState {
+    public private(set) var state = AudioPlayerState.Stopped {
         didSet {
             if state != oldValue || state == .WaitingForConnection {
                 delegate?.audioPlayer(self, didChangeStateFrom: oldValue, toState: state)
@@ -374,6 +397,32 @@ public class AudioPlayer: NSObject {
 
     /// The current quality being played.
     public private(set) var currentQuality: AudioQuality?
+
+    public typealias TimeRange = (earliest: NSTimeInterval, latest: NSTimeInterval)
+
+    /// The current seekable range.
+    public var currentItemSeekableRange: TimeRange? {
+        let range = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
+        if let seekableStart = range?.start, seekableEnd = range?.end {
+            return (CMTimeGetSeconds(seekableStart), CMTimeGetSeconds(seekableEnd))
+        }
+        if let currentItemProgression = currentItemProgression {
+            // if there is no start and end point of seekable range
+            // return the current time, so no seeking possible
+            return (currentItemProgression, currentItemProgression)
+        }
+        // can not seek at all, so return nil
+        return nil
+    }
+
+    /// The current loaded range.
+    public var currentItemLoadedRange: TimeRange? {
+        let range = player?.currentItem?.loadedTimeRanges.last?.CMTimeRangeValue
+        if let seekableStart = range?.start, seekableEnd = range?.end {
+            return (CMTimeGetSeconds(seekableStart), CMTimeGetSeconds(seekableEnd))
+        }
+        return nil
+    }
 
 
     /// MARK: Public properties
@@ -603,9 +652,59 @@ public class AudioPlayer: NSObject {
     - parameter time: The time to seek to.
     */
     public func seekToTime(time: NSTimeInterval) {
-        player?.seekToTime(CMTimeMake(Int64(time), 1))
-        updateNowPlayingInfoCenter()
+        let time = CMTime(seconds: time, preferredTimescale: 1000000000)
+        let seekableRange = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
+        if let seekableStart = seekableRange?.start, let seekableEnd = seekableRange?.end {
+            // check if time is in seekable range
+            if time >= seekableStart && time <= seekableEnd {
+                // time is in seekable range
+                player?.seekToTime(time)
+            }
+            else if time < seekableStart {
+                // time is before seekable start, so just move to the most early position as possible
+                seekToSeekableRangeStart(1)
+            }
+            else if time > seekableEnd {
+                // time is larger than possibly, so just move forward as far as possible
+                seekToSeekableRangeEnd(1)
+            }
+            
+            updateNowPlayingInfoCenter()
+        }
     }
+    
+    /**
+     Seeks forward as far as possible.
+
+     - parameter padding: The padding to apply if any.
+     */
+    public func seekToSeekableRangeEnd(padding: NSTimeInterval) {
+        if let range = currentItemSeekableRange {
+            let position = max(range.earliest, range.latest - padding)
+
+            let time = CMTime(seconds: position, preferredTimescale: 1000000000)
+            player?.seekToTime(time)
+
+            updateNowPlayingInfoCenter()
+        }
+    }
+
+    /**
+     Seeks backwards as far as possible.
+     
+     - parameter padding: The padding to apply if any.
+     */
+    public func seekToSeekableRangeStart(padding: NSTimeInterval) {
+        if let range = currentItemSeekableRange {
+            let position = min(range.latest, range.earliest + padding)
+
+            let time = CMTime(seconds: position, preferredTimescale: 1000000000)
+            player?.seekToTime(time)
+
+            updateNowPlayingInfoCenter()
+        }
+    }
+    
 
     /**
     Handle events received from Control Center/Lock screen/Other in UIApplicationDelegate.
@@ -739,7 +838,18 @@ public class AudioPlayer: NSObject {
                         
                         endBackgroundTask()
                     }
-                    
+
+                case "currentItem.status":
+                    if let item = player.currentItem where item.status == .Failed {
+                        state = .Failed(item.error)
+                        nextOrStop()
+                    }
+
+                case "currentItem.loadedTimeRanges":
+                    if let currentItem = currentItem, currentItemLoadedRange = currentItemLoadedRange {
+                        delegate?.audioPlayer(self, didLoadRange: currentItemLoadedRange, forItem: currentItem)
+                    }
+
                 default:
                     break
                 }
