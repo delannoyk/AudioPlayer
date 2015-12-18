@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name          = 'KDEAudioPlayer'
-  s.version       = '0.4.0'
+  s.version       = '0.5.0'
   s.license       =  { :type => 'MIT' }
   s.homepage      = 'https://github.com/delannoyk/AudioPlayer'
   s.authors       = {
@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
     :git => 'https://github.com/delannoyk/AudioPlayer.git',
     :tag => s.version.to_s
   }
-  s.source_files  = 'AudioPlayer/**/*.swift'
+  s.source_files  = 'AudioPlayer/AudioPlayer/*.swift'
   s.framework     = 'UIKit', 'AVFoundation', 'MediaPlayer', 'SystemConfiguration', 'MobileCoreServices'
 
   s.requires_arc = true
