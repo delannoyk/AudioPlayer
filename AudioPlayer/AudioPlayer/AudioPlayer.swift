@@ -305,7 +305,7 @@ public class AudioPlayer: NSObject {
                     try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
                 } catch { }
 
-                player?.pause()
+                player?.rate = 0
                 player = nil
 
                 let URLInfo: AudioItemURL = {
@@ -330,11 +330,11 @@ public class AudioPlayer: NSObject {
                 }
 
                 player = AVPlayer(URL: URLInfo.URL)
-                player?.rate = rate
                 player?.volume = volume
                 currentQuality = URLInfo.quality
 
-                player?.play()
+                player?.rate = rate
+
                 updateNowPlayingInfoCenter()
 
                 if oldValue != currentItem {
@@ -540,7 +540,7 @@ public class AudioPlayer: NSObject {
     Resume the player.
     */
     public func resume() {
-        player?.play()
+        player?.rate = rate
         state = .Playing
     }
 
@@ -548,7 +548,7 @@ public class AudioPlayer: NSObject {
     Pauses the player.
     */
     public func pause() {
-        player?.pause()
+        player?.rate = 0
         state = .Paused
     }
 
@@ -557,7 +557,7 @@ public class AudioPlayer: NSObject {
     */
     public func stop() {
         //Stopping player immediately
-        player?.pause()
+        player?.rate = 0
 
         state = .Stopped
 
@@ -799,7 +799,7 @@ public class AudioPlayer: NSObject {
                         //There is enough data in the buffer
                         if !pausedForInterruption && state != .Paused && (stateWhenConnectionLost == nil || stateWhenConnectionLost != .Paused) {
                             state = .Playing
-                            player.play()
+                            player.rate = rate
                         }
                         else {
                             state = .Paused
@@ -945,7 +945,7 @@ public class AudioPlayer: NSObject {
             if state != .Playing {
                 if !pausedForInterruption && state != .Paused && (stateWhenConnectionLost == nil || stateWhenConnectionLost != .Paused) {
                     state = .Playing
-                    player?.play()
+                    player?.rate = rate
                 }
                 else {
                     state = .Paused
