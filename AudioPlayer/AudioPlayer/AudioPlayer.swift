@@ -242,7 +242,10 @@ public class AudioPlayer: NSObject {
 
     /// A boolean value indicating whether the player has been paused because of a system interruption.
     private var pausedForInterruption = false
-
+    
+    /// The state before the player went into .Buffering. It helps to know whether to restart or not the player.
+    private var stateBeforeBuffering: AudioPlayerState?
+    
     /// The time observer
     private var timeObserver: AnyObject?
 
@@ -786,6 +789,7 @@ public class AudioPlayer: NSObject {
                         interruptionCount++
                     }
 
+                    stateBeforeBuffering = state
                     if reachability.isReachable() || (currentItem?.soundURLs[currentQuality ?? defaultQuality]?.isOfflineURL ?? false) {
                         state = .Buffering
                     }
@@ -797,7 +801,8 @@ public class AudioPlayer: NSObject {
                 case "currentItem.playbackLikelyToKeepUp":
                     if let playbackLikelyToKeepUp = player.currentItem?.playbackLikelyToKeepUp where playbackLikelyToKeepUp {
                         //There is enough data in the buffer
-                        if !pausedForInterruption && state != .Paused && (stateWhenConnectionLost == nil || stateWhenConnectionLost != .Paused) {
+                        if !pausedForInterruption && state != .Paused && (stateWhenConnectionLost == nil || stateWhenConnectionLost != .Paused) && (stateBeforeBuffering == nil || stateBeforeBuffering != .Paused) {
+                            stateBeforeBuffering = nil
                             state = .Playing
                             player.play()
                         }
