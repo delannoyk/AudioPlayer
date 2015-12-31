@@ -745,10 +745,11 @@ public class AudioPlayer: NSObject {
             if let trackNumber = currentItem.trackNumber {
                 info[MPMediaItemPropertyAlbumTrackNumber] = trackNumber
             }
-            if let artwork = currentItem.artworkImage {
-                info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(image: artwork)
-            }
-
+            #if os(iOS)
+                if let artwork = currentItem.artworkImage {
+                    info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(image: artwork)
+                }
+            #endif
             if let duration = currentItemDuration {
                 info[MPMediaItemPropertyPlaybackDuration] = duration
             }

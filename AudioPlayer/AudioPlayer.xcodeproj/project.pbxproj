@@ -11,6 +11,11 @@
 		462679681AED5DDC003771C9 /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462679671AED5DDC003771C9 /* AudioPlayer.swift */; };
 		4626796A1AED5DE8003771C9 /* AudioItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462679691AED5DE8003771C9 /* AudioItem.swift */; };
 		4669307A1BAD30AB00C1E97C /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466930791BAD30AB00C1E97C /* Reachability.swift */; };
+		653E18891C354194003C0CAB /* AudioPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 653E18881C354194003C0CAB /* AudioPlayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		653E188A1C354194003C0CAB /* AudioPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 653E18881C354194003C0CAB /* AudioPlayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		653E188B1C3541B0003C0CAB /* AudioItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462679691AED5DE8003771C9 /* AudioItem.swift */; };
+		653E188C1C3541B8003C0CAB /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462679671AED5DDC003771C9 /* AudioPlayer.swift */; };
+		653E188D1C3541BB003C0CAB /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466930791BAD30AB00C1E97C /* Reachability.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,6 +36,9 @@
 		462679671AED5DDC003771C9 /* AudioPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioPlayer.swift; sourceTree = "<group>"; };
 		462679691AED5DE8003771C9 /* AudioItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioItem.swift; sourceTree = "<group>"; };
 		466930791BAD30AB00C1E97C /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
+		653E18801C353DD0003C0CAB /* AudioPlayer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AudioPlayer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		653E18841C353DD0003C0CAB /* Info-tvOS.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-tvOS.plist"; sourceTree = "<group>"; };
+		653E18881C354194003C0CAB /* AudioPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioPlayer.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,14 +57,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		653E187C1C353DD0003C0CAB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		462679331AED567D003771C9 = {
 			isa = PBXGroup;
 			children = (
+				653E18881C354194003C0CAB /* AudioPlayer.h */,
 				4626793F1AED567D003771C9 /* AudioPlayer */,
 				4626794C1AED567D003771C9 /* AudioPlayerTests */,
+				653E18811C353DD0003C0CAB /* AudioPlayer tvOS */,
 				4626793E1AED567D003771C9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -66,6 +83,7 @@
 			children = (
 				4626793D1AED567D003771C9 /* AudioPlayer.framework */,
 				462679481AED567D003771C9 /* AudioPlayerTests.xctest */,
+				653E18801C353DD0003C0CAB /* AudioPlayer.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -105,6 +123,14 @@
 			path = supporting_files;
 			sourceTree = "<group>";
 		};
+		653E18811C353DD0003C0CAB /* AudioPlayer tvOS */ = {
+			isa = PBXGroup;
+			children = (
+				653E18841C353DD0003C0CAB /* Info-tvOS.plist */,
+			);
+			path = "AudioPlayer tvOS";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -112,6 +138,15 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				653E18891C354194003C0CAB /* AudioPlayer.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		653E187D1C353DD0003C0CAB /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				653E188A1C354194003C0CAB /* AudioPlayer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -154,6 +189,24 @@
 			productReference = 462679481AED567D003771C9 /* AudioPlayerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		653E187F1C353DD0003C0CAB /* AudioPlayer tvOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 653E18871C353DD0003C0CAB /* Build configuration list for PBXNativeTarget "AudioPlayer tvOS" */;
+			buildPhases = (
+				653E187B1C353DD0003C0CAB /* Sources */,
+				653E187C1C353DD0003C0CAB /* Frameworks */,
+				653E187D1C353DD0003C0CAB /* Headers */,
+				653E187E1C353DD0003C0CAB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "AudioPlayer tvOS";
+			productName = "AudioPlayer tvOS";
+			productReference = 653E18801C353DD0003C0CAB /* AudioPlayer.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -171,6 +224,9 @@
 					462679471AED567D003771C9 = {
 						CreatedOnToolsVersion = 6.3.1;
 					};
+					653E187F1C353DD0003C0CAB = {
+						CreatedOnToolsVersion = 7.2;
+					};
 				};
 			};
 			buildConfigurationList = 462679371AED567D003771C9 /* Build configuration list for PBXProject "AudioPlayer" */;
@@ -187,6 +243,7 @@
 			targets = (
 				4626793C1AED567D003771C9 /* AudioPlayer */,
 				462679471AED567D003771C9 /* AudioPlayerTests */,
+				653E187F1C353DD0003C0CAB /* AudioPlayer tvOS */,
 			);
 		};
 /* End PBXProject section */
@@ -200,6 +257,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		462679461AED567D003771C9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		653E187E1C353DD0003C0CAB /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -223,6 +287,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		653E187B1C353DD0003C0CAB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				653E188B1C3541B0003C0CAB /* AudioItem.swift in Sources */,
+				653E188C1C3541B8003C0CAB /* AudioPlayer.swift in Sources */,
+				653E188D1C3541BB003C0CAB /* Reachability.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -386,6 +460,45 @@
 			};
 			name = Release;
 		};
+		653E18851C353DD0003C0CAB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "$(SRCROOT)/AudioPlayer tvOS/Info-tvOS.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = be.delannoyk.AudioPlayer;
+				PRODUCT_NAME = AudioPlayer;
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
+			};
+			name = Debug;
+		};
+		653E18861C353DD0003C0CAB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "$(SRCROOT)/AudioPlayer tvOS/Info-tvOS.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = be.delannoyk.AudioPlayer;
+				PRODUCT_NAME = AudioPlayer;
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -415,6 +528,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		653E18871C353DD0003C0CAB /* Build configuration list for PBXNativeTarget "AudioPlayer tvOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				653E18851C353DD0003C0CAB /* Debug */,
+				653E18861C353DD0003C0CAB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};
