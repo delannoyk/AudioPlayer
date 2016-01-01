@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4626793C1AED567D003771C9"
-               BuildableName = "AudioPlayer.framework"
-               BlueprintName = "AudioPlayer"
+               BuildableName = "AudioPlayer iOS.framework"
+               BlueprintName = "AudioPlayer iOS"
                ReferencedContainer = "container:AudioPlayer.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -57,8 +57,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4626793C1AED567D003771C9"
-            BuildableName = "AudioPlayer.framework"
-            BlueprintName = "AudioPlayer"
+            BuildableName = "AudioPlayer iOS.framework"
+            BlueprintName = "AudioPlayer iOS"
             ReferencedContainer = "container:AudioPlayer.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -79,8 +79,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4626793C1AED567D003771C9"
-            BuildableName = "AudioPlayer.framework"
-            BlueprintName = "AudioPlayer"
+            BuildableName = "AudioPlayer iOS.framework"
+            BlueprintName = "AudioPlayer iOS"
             ReferencedContainer = "container:AudioPlayer.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -97,8 +97,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4626793C1AED567D003771C9"
-            BuildableName = "AudioPlayer.framework"
-            BlueprintName = "AudioPlayer"
+            BuildableName = "AudioPlayer iOS.framework"
+            BlueprintName = "AudioPlayer iOS"
             ReferencedContainer = "container:AudioPlayer.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
