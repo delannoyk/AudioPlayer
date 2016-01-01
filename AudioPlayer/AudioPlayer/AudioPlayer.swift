@@ -258,7 +258,10 @@ public class AudioPlayer: NSObject {
 
     /// A boolean value indicating whether the player has been paused because of a system interruption.
     private var pausedForInterruption = false
-
+    
+    /// The state before the player went into .Buffering. It helps to know whether to restart or not the player.
+    private var stateBeforeBuffering: AudioPlayerState?
+    
     /// The time observer
     private var timeObserver: AnyObject?
 
@@ -297,6 +300,14 @@ public class AudioPlayer: NSObject {
 
     /// Resource loader used to buffer/download current item
     private var currentResourceLoader: AudioResourceLoader?
+
+    /// Boolean value indicating whether the player should resume playing (after buffering)
+    private var shouldResumePlaying: Bool {
+        return !pausedForInterruption &&
+            state != .Paused &&
+            (stateWhenConnectionLost == nil || stateWhenConnectionLost != .Paused) &&
+            (stateBeforeBuffering == nil || stateBeforeBuffering != .Paused)
+    }
 
 
     // MARK: Readonly properties
@@ -820,6 +831,7 @@ public class AudioPlayer: NSObject {
                         interruptionCount++
                     }
 
+                    stateBeforeBuffering = state
                     if reachability.isReachable() || (currentItem?.soundURLs[currentQuality ?? defaultQuality]?.isOfflineURL ?? false) {
                         state = .Buffering
                     }
@@ -831,7 +843,8 @@ public class AudioPlayer: NSObject {
                 case "currentItem.playbackLikelyToKeepUp":
                     if let playbackLikelyToKeepUp = player.currentItem?.playbackLikelyToKeepUp where playbackLikelyToKeepUp {
                         //There is enough data in the buffer
-                        if !pausedForInterruption && state != .Paused && (stateWhenConnectionLost == nil || stateWhenConnectionLost != .Paused) {
+                        if shouldResumePlaying {
+                            stateBeforeBuffering = nil
                             state = .Playing
                             player.rate = rate
                         }
@@ -977,7 +990,8 @@ public class AudioPlayer: NSObject {
             //If the current progression is updated, it means we are playing. This fixes the behavior where sometimes
             //the `playbackLikelyToKeepUp` isn't changed even though it's playing (the first play).
             if state != .Playing {
-                if !pausedForInterruption && state != .Paused && (stateWhenConnectionLost == nil || stateWhenConnectionLost != .Paused) {
+                if shouldResumePlaying {
+                    stateBeforeBuffering = nil
                     state = .Playing
                     player?.rate = rate
                 }
