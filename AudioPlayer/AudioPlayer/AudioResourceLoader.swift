@@ -6,9 +6,10 @@
 //  Copyright © 2015 Kevin Delannoy. All rights reserved.
 //
 
-import UIKit
 import AVFoundation
-import MobileCoreServices
+#if os(iOS) || os(tvOS)
+    import MobileCoreServices
+#endif
 
 internal protocol AudioResourceLoaderDelegate: NSObjectProtocol {
     func resourceLoader(resourceLoader: AudioResourceLoader, didReceiveData data: NSData)

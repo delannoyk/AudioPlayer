@@ -3,19 +3,19 @@ Pod::Spec.new do |s|
   s.version       = '0.5.0'
   s.license       =  { :type => 'MIT' }
   s.homepage      = 'https://github.com/delannoyk/AudioPlayer'
-  s.authors       = {
-    'Kevin Delannoy' => 'delannoyk@gmail.com'
-  }
+  s.authors       = { 'Kevin Delannoy' => 'delannoyk@gmail.com' }
   s.summary       = 'AudioPlayer is a wrapper around AVPlayer and also offers cool features.'
 
-# Source Info
-  s.platform      =  :ios, '8.0'
-  s.source        =  {
-    :git => 'https://github.com/delannoyk/AudioPlayer.git',
-    :tag => s.version.to_s
-  }
+  s.source        =  { :git => 'https://github.com/delannoyk/AudioPlayer.git', :tag => s.version.to_s }
   s.source_files  = 'AudioPlayer/AudioPlayer/*.swift'
-  s.framework     = 'UIKit', 'AVFoundation', 'MediaPlayer', 'SystemConfiguration', 'MobileCoreServices'
+  s.requires_arc  = true
 
-  s.requires_arc = true
+  s.ios.deployment_target = '8.0'
+  s.ios.framework = 'UIKit', 'AVFoundation', 'MediaPlayer', 'SystemConfiguration'
+
+  s.tvos.deployment_target = '9.0'
+  s.tvos.framework = 'UIKit', 'AVFoundation', 'MediaPlayer', 'SystemConfiguration'
+
+  s.osx.deployment_target = '10.10'
+  s.osx.framework = 'Foundation', 'AVFoundation', 'SystemConfiguration'
 end

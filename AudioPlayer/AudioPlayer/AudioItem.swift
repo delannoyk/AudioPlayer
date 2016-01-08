@@ -6,7 +6,11 @@
 //  Copyright (c) 2015 Kevin Delannoy. All rights reserved.
 //
 
-import UIKit
+#if os(iOS) || os(tvOS)
+    import UIKit
+#else
+    import Foundation
+#endif
 
 // MARK: - AudioQuality
 
@@ -157,12 +161,14 @@ public class AudioItem: NSObject {
     */
     public dynamic var trackNumber: NSNumber?
 
+    #if os(iOS)
     /**
     The artwork image of the item.
 
     This can change over time which is why the property is dynamic. It enables KVO on the property.
     */
     public dynamic var artworkImage: UIImage?
+    #endif
 
 
     // MARK: KVO
