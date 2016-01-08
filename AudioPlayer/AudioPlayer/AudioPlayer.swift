@@ -6,9 +6,12 @@
 //  Copyright (c) 2015 Kevin Delannoy. All rights reserved.
 //
 
-import UIKit
-import MediaPlayer
 import AVFoundation
+
+#if os(iOS) || os(tvOS)
+    import UIKit
+    import MediaPlayer
+#endif
 
 private class ClosureContainer: NSObject {
     let closure: (sender: AnyObject) -> ()
@@ -200,32 +203,38 @@ public class AudioPlayer: NSObject {
                 }
                 timeObserver = nil
 
-                unobserve(AVAudioSessionInterruptionNotification)
-                unobserve(AVAudioSessionRouteChangeNotification)
-                unobserve(AVAudioSessionMediaServicesWereLostNotification)
-                unobserve(AVAudioSessionMediaServicesWereResetNotification)
+                #if os(iOS) || os(tvOS)
+                    unobserve(AVAudioSessionInterruptionNotification)
+                    unobserve(AVAudioSessionRouteChangeNotification)
+                    unobserve(AVAudioSessionMediaServicesWereLostNotification)
+                    unobserve(AVAudioSessionMediaServicesWereResetNotification)
+                #endif
                 unobserve(AVPlayerItemDidPlayToEndTimeNotification)
             }
 
             if let player = player {
                 //Creating the qualityAdjustment timer
-                let target = ClosureContainer(closure: { [weak self] sender in
+                let target = ClosureContainer() { [weak self] sender in
                     self?.adjustQualityIfNecessary()
-                    })
+                }
                 let timer = NSTimer(timeInterval: adjustQualityTimeInternal, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
                 NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
                 qualityAdjustmentTimer = timer
 
-                timeObserver = player.addPeriodicTimeObserverForInterval(CMTimeMake(1, 2), queue: dispatch_get_main_queue(), usingBlock: {[weak self] time in
+                timeObserver = player.addPeriodicTimeObserverForInterval(CMTimeMake(1, 2), queue: dispatch_get_main_queue()) { [weak self] time in
                     self?.currentProgressionUpdated(time)
-                    })
+                }
 
-                player.allowsExternalPlayback = false
+                if #available(OSX 10.11, *) {
+                    player.allowsExternalPlayback = false
+                }
 
-                observe(AVAudioSessionInterruptionNotification, selector: "audioSessionGotInterrupted:")
-                observe(AVAudioSessionRouteChangeNotification, selector: "audioSessionRouteChanged:")
-                observe(AVAudioSessionMediaServicesWereLostNotification, selector: "audioSessionMessedUp:")
-                observe(AVAudioSessionMediaServicesWereResetNotification, selector: "audioSessionMessedUp:")
+                #if os(iOS) || os(tvOS)
+                    observe(AVAudioSessionInterruptionNotification, selector: "audioSessionGotInterrupted:")
+                    observe(AVAudioSessionRouteChangeNotification, selector: "audioSessionRouteChanged:")
+                    observe(AVAudioSessionMediaServicesWereLostNotification, selector: "audioSessionMessedUp:")
+                    observe(AVAudioSessionMediaServicesWereResetNotification, selector: "audioSessionMessedUp:")
+                #endif
                 observe(AVPlayerItemDidPlayToEndTimeNotification, selector: "playerItemDidEnd:")
             }
         }
@@ -311,10 +320,12 @@ public class AudioPlayer: NSObject {
             }
 
             if let currentItem = currentItem {
-                do {
-                    try AVAudioSession.sharedInstance().setActive(true)
-                    try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
-                } catch { }
+                #if os(iOS) || os(tvOS)
+                    do {
+                        try AVAudioSession.sharedInstance().setActive(true)
+                        try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+                    } catch { }
+                #endif
 
                 player?.rate = 0
                 player = nil
@@ -463,8 +474,10 @@ public class AudioPlayer: NSObject {
         }
     }
 
+    #if os(iOS) || os(tvOS)
     /// Defines the rate multiplier of the player when the backward/forward buttons are pressed. Default value is 2.
     public var rateMultiplerOnSeeking = Float(2)
+    #endif
 
     /// The delegate that will be called upon special events
     public weak var delegate: AudioPlayerDelegate?
@@ -692,11 +705,12 @@ public class AudioPlayer: NSObject {
     }
     
 
+    #if os(iOS) || os(tvOS)
     /**
-    Handle events received from Control Center/Lock screen/Other in UIApplicationDelegate.
+     Handle events received from Control Center/Lock screen/Other in UIApplicationDelegate.
 
-    - parameter event: The event received.
-    */
+     - parameter event: The event received.
+     */
     public func remoteControlReceivedWithEvent(event: UIEvent) {
         if event.type == .RemoteControl {
             //ControlCenter Or Lock screen
@@ -731,6 +745,7 @@ public class AudioPlayer: NSObject {
             }
         }
     }
+    #endif
 
 
     // MARK: MPNowPlayingInfoCenter
@@ -739,42 +754,44 @@ public class AudioPlayer: NSObject {
     Updates the MPNowPlayingInfoCenter with current item's info.
     */
     private func updateNowPlayingInfoCenter() {
-        if let currentItem = currentItem {
-            var info = [String: AnyObject]()
-            if let title = currentItem.title {
-                info[MPMediaItemPropertyTitle] = title
-            }
-            if let artist = currentItem.artist {
-                info[MPMediaItemPropertyArtist] = artist
-            }
-            if let album = currentItem.album {
-                info[MPMediaItemPropertyAlbumTitle] = album
-            }
-            if let trackCount = currentItem.trackCount {
-                info[MPMediaItemPropertyAlbumTrackCount] = trackCount
-            }
-            if let trackNumber = currentItem.trackNumber {
-                info[MPMediaItemPropertyAlbumTrackNumber] = trackNumber
-            }
-            #if os(iOS)
-                if let artwork = currentItem.artworkImage {
-                    info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(image: artwork)
+        #if os(iOS) || os(tvOS)
+            if let currentItem = currentItem {
+                var info = [String: AnyObject]()
+                if let title = currentItem.title {
+                    info[MPMediaItemPropertyTitle] = title
                 }
-            #endif
-            if let duration = currentItemDuration {
-                info[MPMediaItemPropertyPlaybackDuration] = duration
-            }
-            if let progression = currentItemProgression {
-                info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = progression
-            }
+                if let artist = currentItem.artist {
+                    info[MPMediaItemPropertyArtist] = artist
+                }
+                if let album = currentItem.album {
+                    info[MPMediaItemPropertyAlbumTitle] = album
+                }
+                if let trackCount = currentItem.trackCount {
+                    info[MPMediaItemPropertyAlbumTrackCount] = trackCount
+                }
+                if let trackNumber = currentItem.trackNumber {
+                    info[MPMediaItemPropertyAlbumTrackNumber] = trackNumber
+                }
+                #if os(iOS)
+                    if let artwork = currentItem.artworkImage {
+                        info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(image: artwork)
+                    }
+                #endif
+                if let duration = currentItemDuration {
+                    info[MPMediaItemPropertyPlaybackDuration] = duration
+                }
+                if let progression = currentItemProgression {
+                    info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = progression
+                }
 
-            info[MPNowPlayingInfoPropertyPlaybackRate] = rate
+                info[MPNowPlayingInfoPropertyPlaybackRate] = rate
 
-            MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = info
-        }
-        else {
-            MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = nil
-        }
+                MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = info
+            }
+            else {
+                MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = nil
+            }
+        #endif
     }
 
 
@@ -849,6 +866,7 @@ public class AudioPlayer: NSObject {
         }
     }
 
+    #if os(iOS) || os(tvOS)
     /**
     Audio session got interrupted by the system (call, Siri, ...). If interruption begins,
     we should ensure the audio pauses and if it ends, we should restart playing if state was
@@ -910,6 +928,7 @@ public class AudioPlayer: NSObject {
         interruptionCount++
         retryOrPlayNext()
     }
+    #endif
 
     /**
     Playing item did end. We can play next or stop the player if queue is empty.
@@ -1000,9 +1019,9 @@ public class AudioPlayer: NSObject {
                 retryCount++
 
                 //We gonna cancel this current retry and create a new one if the player isn't playing after a certain delay
-                let target = ClosureContainer(closure: { [weak self] sender in
+                let target = ClosureContainer() { [weak self] sender in
                     self?.retryOrPlayNext()
-                    })
+                }
                 let timer = NSTimer(timeInterval: retryTimeout, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
                 NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
                 retryTimer = timer
@@ -1093,9 +1112,9 @@ public class AudioPlayer: NSObject {
 
             interruptionCount = 0
 
-            let target = ClosureContainer(closure: { [weak self] sender in
+            let target = ClosureContainer() { [weak self] sender in
                 self?.adjustQualityIfNecessary()
-                })
+            }
             let timer = NSTimer(timeInterval: adjustQualityTimeInternal, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
             NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
             qualityAdjustmentTimer = timer
@@ -1112,25 +1131,29 @@ public class AudioPlayer: NSObject {
     Starts a background task if there isn't already one running.
     */
     private func beginBackgroundTask() {
-        if backgroundTaskIdentifier == nil {
-            UIApplication.sharedApplication().beginBackgroundTaskWithExpirationHandler({[weak self] () -> Void in
-                self?.backgroundTaskIdentifier = nil
-                })
-        }
+        #if os(iOS) || os(tvOS)
+            if backgroundTaskIdentifier == nil {
+                UIApplication.sharedApplication().beginBackgroundTaskWithExpirationHandler { [weak self] in
+                    self?.backgroundTaskIdentifier = nil
+                }
+            }
+        #endif
     }
     
     /**
     Ends the background task if there is one.
     */
     private func endBackgroundTask() {
-        if let backgroundTaskIdentifier = backgroundTaskIdentifier {
-            if backgroundTaskIdentifier != UIBackgroundTaskInvalid {
-                UIApplication.sharedApplication().endBackgroundTask(backgroundTaskIdentifier)
+        #if os(iOS) || os(tvOS)
+            if let backgroundTaskIdentifier = backgroundTaskIdentifier {
+                if backgroundTaskIdentifier != UIBackgroundTaskInvalid {
+                    UIApplication.sharedApplication().endBackgroundTask(backgroundTaskIdentifier)
+                }
+                self.backgroundTaskIdentifier = nil
             }
-            self.backgroundTaskIdentifier = nil
-        }
+        #endif
     }
-    
+
     
     // MARK: Mode
     

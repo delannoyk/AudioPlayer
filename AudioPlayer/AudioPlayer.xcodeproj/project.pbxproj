@@ -11,6 +11,9 @@
 		462679681AED5DDC003771C9 /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462679671AED5DDC003771C9 /* AudioPlayer.swift */; };
 		4626796A1AED5DE8003771C9 /* AudioItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462679691AED5DE8003771C9 /* AudioItem.swift */; };
 		4669307A1BAD30AB00C1E97C /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466930791BAD30AB00C1E97C /* Reachability.swift */; };
+		46DAE4BB1C40275F00572EB2 /* AudioItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462679691AED5DE8003771C9 /* AudioItem.swift */; };
+		46DAE4BC1C40275F00572EB2 /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462679671AED5DDC003771C9 /* AudioPlayer.swift */; };
+		46DAE4BD1C40275F00572EB2 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466930791BAD30AB00C1E97C /* Reachability.swift */; };
 		653E188B1C3541B0003C0CAB /* AudioItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462679691AED5DE8003771C9 /* AudioItem.swift */; };
 		653E188C1C3541B8003C0CAB /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462679671AED5DDC003771C9 /* AudioPlayer.swift */; };
 		653E188D1C3541BB003C0CAB /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466930791BAD30AB00C1E97C /* Reachability.swift */; };
@@ -34,6 +37,8 @@
 		462679671AED5DDC003771C9 /* AudioPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AudioPlayer.swift; path = AudioPlayer/AudioPlayer.swift; sourceTree = SOURCE_ROOT; };
 		462679691AED5DE8003771C9 /* AudioItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AudioItem.swift; path = AudioPlayer/AudioItem.swift; sourceTree = SOURCE_ROOT; };
 		466930791BAD30AB00C1E97C /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Reachability.swift; path = AudioPlayer/Reachability.swift; sourceTree = SOURCE_ROOT; };
+		46DAE4B31C4026E100572EB2 /* AudioPlayer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AudioPlayer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		46DAE4B71C4026E200572EB2 /* Info-OSX.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-OSX.plist"; sourceTree = "<group>"; };
 		653E18801C353DD0003C0CAB /* AudioPlayer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AudioPlayer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		653E18841C353DD0003C0CAB /* Info-tvOS.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-tvOS.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -54,6 +59,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		46DAE4AF1C4026E100572EB2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		653E187C1C353DD0003C0CAB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -70,6 +82,7 @@
 				46F96FC71C3682B200E56082 /* AudioPlayer */,
 				4626793F1AED567D003771C9 /* AudioPlayer iOS */,
 				653E18811C353DD0003C0CAB /* AudioPlayer tvOS */,
+				46DAE4B41C4026E200572EB2 /* AudioPlayer OSX */,
 				4626794C1AED567D003771C9 /* AudioPlayerTests */,
 				4626793E1AED567D003771C9 /* Products */,
 			);
@@ -81,6 +94,7 @@
 				4626793D1AED567D003771C9 /* AudioPlayer.framework */,
 				462679481AED567D003771C9 /* AudioPlayerTests.xctest */,
 				653E18801C353DD0003C0CAB /* AudioPlayer.framework */,
+				46DAE4B31C4026E100572EB2 /* AudioPlayer.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -109,6 +123,14 @@
 			path = supporting_files;
 			sourceTree = "<group>";
 		};
+		46DAE4B41C4026E200572EB2 /* AudioPlayer OSX */ = {
+			isa = PBXGroup;
+			children = (
+				46DAE4B71C4026E200572EB2 /* Info-OSX.plist */,
+			);
+			path = "AudioPlayer OSX";
+			sourceTree = "<group>";
+		};
 		46F96FC71C3682B200E56082 /* AudioPlayer */ = {
 			isa = PBXGroup;
 			children = (
@@ -131,6 +153,13 @@
 
 /* Begin PBXHeadersBuildPhase section */
 		4626793A1AED567D003771C9 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		46DAE4B01C4026E100572EB2 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -183,6 +212,24 @@
 			productReference = 462679481AED567D003771C9 /* AudioPlayerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		46DAE4B21C4026E100572EB2 /* AudioPlayer OSX */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 46DAE4BA1C4026E200572EB2 /* Build configuration list for PBXNativeTarget "AudioPlayer OSX" */;
+			buildPhases = (
+				46DAE4AE1C4026E100572EB2 /* Sources */,
+				46DAE4AF1C4026E100572EB2 /* Frameworks */,
+				46DAE4B01C4026E100572EB2 /* Headers */,
+				46DAE4B11C4026E100572EB2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "AudioPlayer OSX";
+			productName = "AudioPlayer OSX";
+			productReference = 46DAE4B31C4026E100572EB2 /* AudioPlayer.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 		653E187F1C353DD0003C0CAB /* AudioPlayer tvOS */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 653E18871C353DD0003C0CAB /* Build configuration list for PBXNativeTarget "AudioPlayer tvOS" */;
@@ -218,6 +265,9 @@
 					462679471AED567D003771C9 = {
 						CreatedOnToolsVersion = 6.3.1;
 					};
+					46DAE4B21C4026E100572EB2 = {
+						CreatedOnToolsVersion = 7.2;
+					};
 					653E187F1C353DD0003C0CAB = {
 						CreatedOnToolsVersion = 7.2;
 					};
@@ -237,6 +287,7 @@
 			targets = (
 				4626793C1AED567D003771C9 /* AudioPlayer iOS */,
 				653E187F1C353DD0003C0CAB /* AudioPlayer tvOS */,
+				46DAE4B21C4026E100572EB2 /* AudioPlayer OSX */,
 				462679471AED567D003771C9 /* AudioPlayerTests */,
 			);
 		};
@@ -251,6 +302,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		462679461AED567D003771C9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		46DAE4B11C4026E100572EB2 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -281,6 +339,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		46DAE4AE1C4026E100572EB2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				46DAE4BB1C40275F00572EB2 /* AudioItem.swift in Sources */,
+				46DAE4BC1C40275F00572EB2 /* AudioPlayer.swift in Sources */,
+				46DAE4BD1C40275F00572EB2 /* Reachability.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -456,6 +524,49 @@
 			};
 			name = Release;
 		};
+		46DAE4B81C4026E200572EB2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = "$(SRCROOT)/AudioPlayer OSX/Info-OSX.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				PRODUCT_BUNDLE_IDENTIFIER = be.delannoyk.AudioPlayer;
+				PRODUCT_NAME = AudioPlayer;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		46DAE4B91C4026E200572EB2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = "$(SRCROOT)/AudioPlayer OSX/Info-OSX.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				PRODUCT_BUNDLE_IDENTIFIER = be.delannoyk.AudioPlayer;
+				PRODUCT_NAME = AudioPlayer;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 		653E18851C353DD0003C0CAB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -524,6 +635,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		46DAE4BA1C4026E200572EB2 /* Build configuration list for PBXNativeTarget "AudioPlayer OSX" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				46DAE4B81C4026E200572EB2 /* Debug */,
+				46DAE4B91C4026E200572EB2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		653E18871C353DD0003C0CAB /* Build configuration list for PBXNativeTarget "AudioPlayer tvOS" */ = {
 			isa = XCConfigurationList;
