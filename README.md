@@ -1,4 +1,10 @@
-# AudioPlayer
+AudioPlayer
+===========
+[![Build Status](https://travis-ci.org/delannoyk/AudioPlayer.svg)](https://travis-ci.org/delannoyk/AudioPlayer)
+[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
+![Cocoapods Compatible](https://img.shields.io/cocoapods/v/KDEAudioPlayer.svg)
+![Platform iOS | tvOS](https://img.shields.io/badge/platform-iOS%20%7C%20tvOS%20%7C%20OSX-lightgrey.svg)
+[![Contact](https://img.shields.io/badge/contact-%40kdelannoy-blue.svg)](https://twitter.com/kdelannoy)
 
 AudioPlayer is a wrapper around AVPlayer. It also offers cool features such as:
 * Quality control based on number of interruption (buffering) and time delay
