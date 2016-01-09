@@ -30,6 +30,10 @@ public enum AudioQuality {
 
 // MARK: - AudioItemURL
 
+/**
+`AudioItemURL` contains information about an Item URL such as its
+quality.
+*/
 public struct AudioItemURL {
     public let quality: AudioQuality
     public let URL: NSURL

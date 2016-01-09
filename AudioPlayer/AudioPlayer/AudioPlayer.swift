@@ -30,11 +30,12 @@ private class ClosureContainer: NSObject {
 /**
 `AudioPlayerState` defines 4 state an `AudioPlayer` instance can be in.
 
-- `Buffering`:            Represents that the player is buffering data before playing them.
-- `Playing`:              Represents that the player is playing.
-- `Paused`:               Represents that the player is paused.
-- `Stopped`:              Represents that the player is stopped.
-- `WaitingForConnection`: Represents the state where the player is waiting for internet connection.
+- `Buffering`:            The player is buffering data before playing them.
+- `Playing`:              The player is playing.
+- `Paused`:               The player is paused.
+- `Stopped`:              The player is stopped.
+- `WaitingForConnection`: The player is waiting for internet connection.
+- `Failed`:               An error occured. It contains AVPlayer's error if any.
 */
 public enum AudioPlayerState {
     case Buffering
@@ -69,6 +70,14 @@ public func ==(lhs: AudioPlayerState, rhs: AudioPlayerState) -> Bool {
 
 // MARK: - AudioPlayerMode
 
+/**
+Represents the mode in which the player should play. Modes can be used as masks
+so that you can play in `.Shuffle` mode and still `.RepeatAll`.
+
+- `.Shuffle`:   In this mode, player's queue is shuffled randomly.
+- `.Repeat`:    In this mode, the player will continuously play the same item over and over.
+- `.RepeatAll`: In this mode, the player will continuously play the same queue over and over.
+*/
 public struct AudioPlayerModeMask: OptionSetType {
     public let rawValue: UInt
 
@@ -140,11 +149,61 @@ private extension NSURL {
 
 // MARK: - AudioPlayerDelegate
 
+/**
+This protocol contains helpful methods to alert you of specific events.
+If you want to be notified about those events, you will have to set a delegate
+to your `audioPlayer` instance.
+*/
 public protocol AudioPlayerDelegate: NSObjectProtocol {
+    /**
+     This method is called when the audio player changes its state.
+     A fresh created audioPlayer starts in `.Stopped` mode.
+
+     - parameter audioPlayer: The audio player.
+     - parameter from:        The state before any changes.
+     - parameter to:          The new state.
+     */
     func audioPlayer(audioPlayer: AudioPlayer, didChangeStateFrom from: AudioPlayerState, toState to: AudioPlayerState)
+
+    /**
+     This method is called when the audio player is about to start playing
+     a new item.
+
+     - parameter audioPlayer: The audio player.
+     - parameter item:        The item that is about to start being played.
+     */
     func audioPlayer(audioPlayer: AudioPlayer, willStartPlayingItem item: AudioItem)
+
+    /**
+     This method is called a regular time interval while playing. It notifies
+     the delegate that the current playing progression changed.
+
+     - parameter audioPlayer:    The audio player.
+     - parameter time:           The current progression.
+     - parameter percentageRead: The percentage of the file that has been read. 
+                                 It's a Float value between 0 & 100 so that you can
+                                easily update an `UISlider` for example.
+     */
     func audioPlayer(audioPlayer: AudioPlayer, didUpdateProgressionToTime time: NSTimeInterval, percentageRead: Float)
+
+    /**
+     This method gets called when the current item duration has been found.
+
+     - parameter audioPlayer: The audio player.
+     - parameter duration:    Current item's duration.
+     - parameter item:        Current item.
+     */
     func audioPlayer(audioPlayer: AudioPlayer, didFindDuration duration: NSTimeInterval, forItem item: AudioItem)
+
+    /**
+     This method gets called while the audio player is loading the file (over
+     the network or locally). It lets the delegate know what time range has
+     already been loaded.
+
+     - parameter audioPlayer: The audio player.
+     - parameter range:       The time range that the audio player loaded.
+     - parameter item:        Current item.
+     */
     func audioPlayer(audioPlayer: AudioPlayer, didLoadRange range: AudioPlayer.TimeRange, forItem item: AudioItem)
 }
 
@@ -548,6 +607,13 @@ public class AudioPlayer: NSObject {
         }
     }
 
+    /**
+     Removes an item at a specific index in the queue.
+
+     - warning: It asserts that the index is valid for the current "enqueueItems".
+
+     - parameter index: The index of the item to remove.
+     */
     public func removeItemAtIndex(index: Int) {
         assert(enqueuedItems != nil, "cannot remove an item when queue is nil")
         assert(index >= 0, "cannot remove an item at negative index")
