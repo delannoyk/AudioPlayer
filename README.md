@@ -23,7 +23,10 @@ AudioPlayer is a wrapper around AVPlayer. It also offers cool features such as:
 ## Usage
 ### Basics
 ```swift
+let delegate: AudioPlayerDelegate = ...
+
 let player = AudioPlayer()
+player.delegate = delegate
 let item = AudioItem(mediumQualitySoundURL: track.streamURL)
 player.playItem(item)
 ```
