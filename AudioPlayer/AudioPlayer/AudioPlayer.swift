@@ -313,6 +313,7 @@ public class AudioPlayer: NSObject {
     
     /// The state before the player went into .Buffering. It helps to know whether to restart or not the player.
     private var stateBeforeBuffering: AudioPlayerState?
+    private var shouldBePlaying : Bool = false
     
     /// The time observer
     private var timeObserver: AnyObject?
@@ -355,7 +356,7 @@ public class AudioPlayer: NSObject {
         return !pausedForInterruption &&
             state != .Paused &&
             (stateWhenConnectionLost == nil || stateWhenConnectionLost != .Paused) &&
-            (stateBeforeBuffering == nil || stateBeforeBuffering != .Paused)
+            (stateBeforeBuffering == nil || stateBeforeBuffering != .Paused) && shouldBePlaying
     }
 
 
@@ -414,6 +415,7 @@ public class AudioPlayer: NSObject {
                 player?.volume = volume
                 currentQuality = URLInfo.quality
 
+                shouldBePlaying = true
                 player?.rate = rate
 
                 updateNowPlayingInfoCenter()
@@ -632,6 +634,7 @@ public class AudioPlayer: NSObject {
     public func resume() {
         player?.rate = rate
         state = .Playing
+        shouldBePlaying = true
     }
 
     /**
@@ -640,6 +643,7 @@ public class AudioPlayer: NSObject {
     public func pause() {
         player?.rate = 0
         state = .Paused
+        shouldBePlaying = false
     }
 
     /**
@@ -650,6 +654,7 @@ public class AudioPlayer: NSObject {
         player?.rate = 0
 
         state = .Stopped
+        shouldBePlaying = false
 
         enqueuedItems = nil
         currentItem = nil
