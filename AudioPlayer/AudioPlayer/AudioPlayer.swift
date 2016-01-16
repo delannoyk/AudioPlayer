@@ -1204,7 +1204,10 @@ public class AudioPlayer: NSObject {
     private func beginBackgroundTask() {
         #if os(iOS) || os(tvOS)
             if backgroundTaskIdentifier == nil {
-                UIApplication.sharedApplication().beginBackgroundTaskWithExpirationHandler { [weak self] in
+                backgroundTaskIdentifier = UIApplication.sharedApplication().beginBackgroundTaskWithExpirationHandler { [weak self] in
+                    if self?.backgroundTaskIdentifier != nil  {
+                        UIApplication.sharedApplication().endBackgroundTask(self!.backgroundTaskIdentifier!)
+                    }
                     self?.backgroundTaskIdentifier = nil
                 }
             }
