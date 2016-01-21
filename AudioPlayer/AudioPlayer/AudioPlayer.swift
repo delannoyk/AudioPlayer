@@ -411,7 +411,9 @@ public class AudioPlayer: NSObject {
                     return
                 }
 
-                player = AVPlayer(URL: URLInfo.URL)
+                let item = self.getAVPlayerItem(URLInfo.URL)
+                player = AVPlayer(playerItem: item)
+
                 player?.volume = volume
                 currentQuality = URLInfo.quality
 
@@ -432,6 +434,11 @@ public class AudioPlayer: NSObject {
         }
     }
 
+    /// This function allows overriding class to instanciate a specific AVPlayerItem and set custom HTTP headers. For instance:
+    public func getAVPlayerItem(url : NSURL) -> AVPlayerItem {
+        return AVPlayerItem(URL: url)
+    }
+    
     /// The current item duration or nil if no item or unknown duration.
     public var currentItemDuration: NSTimeInterval? {
         if let currentItem = player?.currentItem {
@@ -1145,7 +1152,8 @@ public class AudioPlayer: NSObject {
 
                 if let URLInfo = URLInfo where URLInfo.quality != currentQuality {
                     let cip = currentItemProgression
-                    let item = AVPlayerItem(URL: URLInfo.URL)
+
+                    let item = self.getAVPlayerItem(URLInfo.URL)
 
                     qualityIsBeingChanged = true
                     player?.replaceCurrentItemWithPlayerItem(item)
@@ -1171,7 +1179,8 @@ public class AudioPlayer: NSObject {
 
                 if let URLInfo = URLInfo where URLInfo.quality != currentQuality {
                     let cip = currentItemProgression
-                    let item = AVPlayerItem(URL: URLInfo.URL)
+
+                    let item = self.getAVPlayerItem(URLInfo.URL)
 
                     qualityIsBeingChanged = true
                     player?.replaceCurrentItemWithPlayerItem(item)
