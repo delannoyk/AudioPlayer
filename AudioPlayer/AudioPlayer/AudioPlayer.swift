@@ -919,7 +919,10 @@ public class AudioPlayer: NSObject {
                 case "currentItem.status":
                     if let item = player.currentItem where item.status == .Failed {
                         state = .Failed(item.error)
-                        nextOrStop()
+                        if self.shouldBePlaying {
+                            self.retryOrPlayNext()
+                        }
+                        
                     }
 
                 case "currentItem.loadedTimeRanges":
