@@ -926,9 +926,7 @@ public class AudioPlayer: NSObject {
                 case "currentItem.status":
                     if let item = player.currentItem where item.status == .Failed {
                         state = .Failed(item.error)
-                        if self.shouldBePlaying {
-                            self.retryOrPlayNext()
-                        }
+                        self.retryOrPlayNext()
                         
                     }
 
@@ -1082,6 +1080,9 @@ public class AudioPlayer: NSObject {
     it'll just play the next item in queue.
     */
     private func retryOrPlayNext() {
+        if shouldBePlaying == false {
+            return
+        }
         if state == .Playing {
             return
         }
