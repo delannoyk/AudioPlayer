@@ -984,8 +984,11 @@ public class AudioPlayer: NSObject {
     - parameter note: The notification information.
     */
     @objc private func audioSessionRouteChanged(note: NSNotification) {
-        if let player = player where player.rate == 0 {
-            state = .Paused
+        
+        if let interuption : NSDictionary = note.userInfo {
+            if interuption.valueForKey(AVAudioSessionRouteChangeReasonKey)?.integerValue == AVAudioSessionRouteChangeReason.OldDeviceUnavailable.hashValue {
+                    self.pause()
+            }
         }
     }
 
