@@ -1039,9 +1039,9 @@ public class AudioPlayer: NSObject {
     */
     private func currentProgressionUpdated(time: CMTime) {
         if let currentItemProgression = currentItemProgression, currentItemDuration = currentItemDuration where currentItemDuration > 0 {
-            //If the current progression is updated, it means we are playing. This fixes the behavior where sometimes
-            //the `playbackLikelyToKeepUp` isn't changed even though it's playing (the first play).
-            if state != .Playing {
+            //This fixes the behavior where sometimes the `playbackLikelyToKeepUp`
+            //isn't changed even though it's playing (happens mostly at the first play though).
+            if state == .Buffering || state == .Paused {
                 if shouldResumePlaying {
                     stateBeforeBuffering = nil
                     state = .Playing
