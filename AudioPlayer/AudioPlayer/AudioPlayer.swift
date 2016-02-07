@@ -851,7 +851,7 @@ public class AudioPlayer: NSObject {
                     info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = progression
                 }
 
-                info[MPNowPlayingInfoPropertyPlaybackRate] = rate
+                info[MPNowPlayingInfoPropertyPlaybackRate] = player?.rate ?? 0
 
                 MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = info
             }
