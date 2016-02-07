@@ -364,6 +364,7 @@ public class AudioPlayer: NSObject {
     /// The current state of the player.
     public private(set) var state = AudioPlayerState.Stopped {
         didSet {
+            updateNowPlayingInfoCenter()
             if state != oldValue || state == .WaitingForConnection {
                 delegate?.audioPlayer(self, didChangeStateFrom: oldValue, toState: state)
             }
