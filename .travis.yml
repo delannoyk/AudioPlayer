@@ -33,3 +33,6 @@ script:
     else
       xcodebuild -project "$PROJECT" -scheme "$SCHEME" -sdk "$SDK" -destination "$DESTINATION" -configuration Debug ONLY_ACTIVE_ARCH=NO build | xcpretty -c;
     fi
+notifications:
+  slack:
+    secure: JGuQNTO7Aeu4Jtm3enUT/TSoDeIkcBCFH4He3QfnBS19VVDPb3mxX+Qfy2HY5EG6u1IcNbBuBzhjGb1phBrCoDdQM7AWac24hFku1mVQykxW6wgrAVAOYfvffZmBzgno3OyEzODF4MgZJKR24B577YplsBCa64lWAkAGceCZGHo=
