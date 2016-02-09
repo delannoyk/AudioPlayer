@@ -146,7 +146,7 @@ private extension NSURL {
     }
 
     var isOfflineURL: Bool {
-        return fileURL || scheme == "ipod-library"
+        return fileURL || scheme == "ipod-library" || host == "localhost"
     }
 
     var audioPlayerURL: NSURL {
@@ -383,6 +383,7 @@ public class AudioPlayer: NSObject {
     /// The current state of the player.
     public private(set) var state = AudioPlayerState.Stopped {
         didSet {
+            updateNowPlayingInfoCenter()
             if state != oldValue || state == .WaitingForConnection {
                 delegate?.audioPlayer(self, didChangeStateFrom: oldValue, toState: state)
             }
@@ -750,14 +751,14 @@ public class AudioPlayer: NSObject {
 
     - parameter time: The time to seek to.
     */
-    public func seekToTime(time: NSTimeInterval) {
+    public func seekToTime(time: NSTimeInterval, toleranceBefore: CMTime = kCMTimePositiveInfinity, toleranceAfter: CMTime = kCMTimePositiveInfinity) {
         let time = CMTime(seconds: time, preferredTimescale: 1000000000)
         let seekableRange = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
         if let seekableStart = seekableRange?.start, let seekableEnd = seekableRange?.end {
             // check if time is in seekable range
             if time >= seekableStart && time <= seekableEnd {
                 // time is in seekable range
-                player?.seekToTime(time)
+                player?.seekToTime(time, toleranceBefore: toleranceBefore, toleranceAfter: toleranceAfter)
             }
             else if time < seekableStart {
                 // time is before seekable start, so just move to the most early position as possible
@@ -884,7 +885,7 @@ public class AudioPlayer: NSObject {
                     info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = progression
                 }
 
-                info[MPNowPlayingInfoPropertyPlaybackRate] = rate
+                info[MPNowPlayingInfoPropertyPlaybackRate] = player?.rate ?? 0
 
                 MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = info
             }
@@ -1073,9 +1074,9 @@ public class AudioPlayer: NSObject {
     */
     private func currentProgressionUpdated(time: CMTime) {
         if let currentItemProgression = currentItemProgression, currentItemDuration = currentItemDuration where currentItemDuration > 0 {
-            //If the current progression is updated, it means we are playing. This fixes the behavior where sometimes
-            //the `playbackLikelyToKeepUp` isn't changed even though it's playing (the first play).
-            if state != .Playing {
+            //This fixes the behavior where sometimes the `playbackLikelyToKeepUp`
+            //isn't changed even though it's playing (happens mostly at the first play though).
+            if state == .Buffering || state == .Paused {
                 if shouldResumePlaying {
                     stateBeforeBuffering = nil
                     state = .Playing
@@ -1233,7 +1234,10 @@ public class AudioPlayer: NSObject {
     private func beginBackgroundTask() {
         #if os(iOS) || os(tvOS)
             if backgroundTaskIdentifier == nil {
-                UIApplication.sharedApplication().beginBackgroundTaskWithExpirationHandler { [weak self] in
+                backgroundTaskIdentifier = UIApplication.sharedApplication().beginBackgroundTaskWithExpirationHandler { [weak self] in
+                    if let backgroundTaskIdentifier = self?.backgroundTaskIdentifier {
+                        UIApplication.sharedApplication().endBackgroundTask(backgroundTaskIdentifier)
+                    }
                     self?.backgroundTaskIdentifier = nil
                 }
             }
