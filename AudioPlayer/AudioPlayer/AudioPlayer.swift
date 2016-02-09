@@ -142,7 +142,7 @@ private extension Array {
 
 private extension NSURL {
     var isOfflineURL: Bool {
-        return fileURL || scheme == "ipod-library"
+        return fileURL || scheme == "ipod-library" || host == "localhost"
     }
 }
 
