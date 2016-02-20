@@ -876,6 +876,11 @@ public class AudioPlayer: NSObject {
                         delegate?.audioPlayer(self, didFindDuration: currentItemDuration, forItem: currentItem)
                     }
 
+                    //And that certainly means metadata are available too
+                    if let metadata = player.currentItem?.asset.commonMetadata {
+                        currentItem?.parseMetadata(metadata)
+                    }
+
                 case "currentItem.playbackBufferEmpty":
                     //The buffer is empty and player is loading
                     if state == .Playing && !qualityIsBeingChanged {
