@@ -197,10 +197,12 @@ public class AudioItem: NSObject {
                     album = $0.value as? String
                 case AVMetadataID3MetadataKeyTrackNumber where trackNumber == nil:
                     trackNumber = $0.value as? NSNumber
-                case AVMetadataCommonKeyArtwork where artworkImage == nil:
-                    artworkImage = ($0.value as? NSData).map { UIImage(data: $0) } ?? nil
                 default:
-                    break
+                    #if os(iOS)
+                        if commonKey == AVMetadataCommonKeyArtwork && artworkImage == nil {
+                            artworkImage = ($0.value as? NSData).map { UIImage(data: $0) } ?? nil
+                        }
+                    #endif
                 }
             }
         }
