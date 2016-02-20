@@ -149,6 +149,9 @@ private extension NSURL {
 
 // MARK: - AudioPlayerDelegate
 
+/// This typealias only serves the purpose of saving user to `import AVFoundation`.
+public typealias Metadata = [AVMetadataItem]
+
 /**
 This protocol contains helpful methods to alert you of specific events.
 If you want to be notified about those events, you will have to set a delegate
@@ -194,6 +197,15 @@ public protocol AudioPlayerDelegate: NSObjectProtocol {
      - parameter item:        Current item.
      */
     func audioPlayer(audioPlayer: AudioPlayer, didFindDuration duration: NSTimeInterval, forItem item: AudioItem)
+
+    /**
+     This methods gets called before duration gets updated with discovered metadata.
+
+     - parameter audioPlayer: The audio player.
+     - parameter item:        Found metadata.
+     - parameter data:        Current item.
+     */
+    func audioPlayer(audioPlayer: AudioPlayer, didUpdateEmptyMetadataOnItem item: AudioItem, withData data: Metadata)
 
     /**
      This method gets called while the audio player is loading the file (over
@@ -870,15 +882,17 @@ public class AudioPlayer: NSObject {
                 switch keyPath {
                 case "currentItem.duration":
                     //Duration is available
-                    updateNowPlayingInfoCenter()
+                    if let currentItem = currentItem {
+                        //Let's check for metadata too
+                        if let metadata = player.currentItem?.asset.commonMetadata where metadata.count > 0 {
+                            currentItem.parseMetadata(metadata)
+                            delegate?.audioPlayer(self, didUpdateEmptyMetadataOnItem: currentItem, withData: metadata)
+                        }
 
-                    //And that certainly means metadata are available too
-                    if let metadata = player.currentItem?.asset.commonMetadata {
-                        currentItem?.parseMetadata(metadata)
-                    }
-
-                    if let currentItem = currentItem, currentItemDuration = currentItemDuration where currentItemDuration > 0 {
-                        delegate?.audioPlayer(self, didFindDuration: currentItemDuration, forItem: currentItem)
+                        if let currentItemDuration = currentItemDuration where currentItemDuration > 0 {
+                            updateNowPlayingInfoCenter()
+                            delegate?.audioPlayer(self, didFindDuration: currentItemDuration, forItem: currentItem)
+                        }
                     }
 
                 case "currentItem.playbackBufferEmpty":
