@@ -872,13 +872,13 @@ public class AudioPlayer: NSObject {
                     //Duration is available
                     updateNowPlayingInfoCenter()
 
-                    if let currentItem = currentItem, currentItemDuration = currentItemDuration where currentItemDuration > 0 {
-                        delegate?.audioPlayer(self, didFindDuration: currentItemDuration, forItem: currentItem)
-                    }
-
                     //And that certainly means metadata are available too
                     if let metadata = player.currentItem?.asset.commonMetadata {
                         currentItem?.parseMetadata(metadata)
+                    }
+
+                    if let currentItem = currentItem, currentItemDuration = currentItemDuration where currentItemDuration > 0 {
+                        delegate?.audioPlayer(self, didFindDuration: currentItemDuration, forItem: currentItem)
                     }
 
                 case "currentItem.playbackBufferEmpty":
