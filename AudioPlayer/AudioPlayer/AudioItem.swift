@@ -195,12 +195,10 @@ public class AudioItem: NSObject {
                     artist = $0.value as? String
                 case AVMetadataCommonKeyAlbumName where album == nil:
                     album = $0.value as? String
-                //TODO: trackCount
                 case AVMetadataID3MetadataKeyTrackNumber where trackNumber == nil:
                     trackNumber = $0.value as? NSNumber
                 case AVMetadataCommonKeyArtwork where artworkImage == nil:
                     artworkImage = ($0.value as? NSData).map { UIImage(data: $0) } ?? nil
-
                 default:
                     break
                 }
