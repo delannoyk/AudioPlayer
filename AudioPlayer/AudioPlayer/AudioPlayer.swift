@@ -325,6 +325,7 @@ public class AudioPlayer: NSObject {
     
     /// The state before the player went into .Buffering. It helps to know whether to restart or not the player.
     private var stateBeforeBuffering: AudioPlayerState?
+    private var shouldBePlaying : Bool = false
     
     /// The time observer
     private var timeObserver: AnyObject?
@@ -367,7 +368,7 @@ public class AudioPlayer: NSObject {
         return !pausedForInterruption &&
             state != .Paused &&
             (stateWhenConnectionLost == nil || stateWhenConnectionLost != .Paused) &&
-            (stateBeforeBuffering == nil || stateBeforeBuffering != .Paused)
+            (stateBeforeBuffering == nil || stateBeforeBuffering != .Paused) && shouldBePlaying
     }
 
 
@@ -423,10 +424,13 @@ public class AudioPlayer: NSObject {
                     return
                 }
 
-                player = AVPlayer(URL: URLInfo.URL)
+                let item = self.getAVPlayerItem(URLInfo.URL)
+                player = AVPlayer(playerItem: item)
+
                 player?.volume = volume
                 currentQuality = URLInfo.quality
 
+                shouldBePlaying = true
                 player?.rate = rate
 
                 updateNowPlayingInfoCenter()
@@ -443,6 +447,11 @@ public class AudioPlayer: NSObject {
         }
     }
 
+    /// This function allows overriding class to instanciate a specific AVPlayerItem and set custom HTTP headers. For instance:
+    public func getAVPlayerItem(url : NSURL) -> AVPlayerItem {
+        return AVPlayerItem(URL: url)
+    }
+    
     /// The current item duration or nil if no item or unknown duration.
     public var currentItemDuration: NSTimeInterval? {
         if let currentItem = player?.currentItem {
@@ -645,6 +654,7 @@ public class AudioPlayer: NSObject {
     public func resume() {
         player?.rate = rate
         state = .Playing
+        shouldBePlaying = true
     }
 
     /**
@@ -653,6 +663,7 @@ public class AudioPlayer: NSObject {
     public func pause() {
         player?.rate = 0
         state = .Paused
+        shouldBePlaying = false
     }
 
     /**
@@ -663,6 +674,7 @@ public class AudioPlayer: NSObject {
         player?.rate = 0
 
         state = .Stopped
+        shouldBePlaying = false
 
         enqueuedItems = nil
         currentItem = nil
@@ -934,7 +946,8 @@ public class AudioPlayer: NSObject {
                 case "currentItem.status":
                     if let item = player.currentItem where item.status == .Failed {
                         state = .Failed(item.error)
-                        nextOrStop()
+                        self.retryOrPlayNext()
+                        
                     }
 
                 case "currentItem.loadedTimeRanges":
@@ -991,8 +1004,11 @@ public class AudioPlayer: NSObject {
     - parameter note: The notification information.
     */
     @objc private func audioSessionRouteChanged(note: NSNotification) {
-        if let player = player where player.rate == 0 {
-            state = .Paused
+        
+        if let interuption : NSDictionary = note.userInfo {
+            if interuption.valueForKey(AVAudioSessionRouteChangeReasonKey)?.integerValue == AVAudioSessionRouteChangeReason.OldDeviceUnavailable.hashValue {
+                    self.pause()
+            }
         }
     }
 
@@ -1094,6 +1110,9 @@ public class AudioPlayer: NSObject {
     it'll just play the next item in queue.
     */
     private func retryOrPlayNext() {
+        if shouldBePlaying == false {
+            return
+        }
         if state == .Playing {
             return
         }
@@ -1129,7 +1148,7 @@ public class AudioPlayer: NSObject {
         nextOrStop()
     }
 
-    private func nextOrStop() {
+    public func nextOrStop() {
         if mode.intersect(.Repeat) != [] {
             seekToTime(0)
             resume()
@@ -1164,7 +1183,8 @@ public class AudioPlayer: NSObject {
 
                 if let URLInfo = URLInfo where URLInfo.quality != currentQuality {
                     let cip = currentItemProgression
-                    let item = AVPlayerItem(URL: URLInfo.URL)
+
+                    let item = self.getAVPlayerItem(URLInfo.URL)
 
                     qualityIsBeingChanged = true
                     player?.replaceCurrentItemWithPlayerItem(item)
@@ -1190,7 +1210,8 @@ public class AudioPlayer: NSObject {
 
                 if let URLInfo = URLInfo where URLInfo.quality != currentQuality {
                     let cip = currentItemProgression
-                    let item = AVPlayerItem(URL: URLInfo.URL)
+
+                    let item = self.getAVPlayerItem(URLInfo.URL)
 
                     qualityIsBeingChanged = true
                     player?.replaceCurrentItemWithPlayerItem(item)
