@@ -1047,6 +1047,13 @@ public class AudioPlayer: NSObject {
             else {
                 connectionLossDate = NSDate()
                 stateWhenConnectionLost = state
+                if let currentItem = player?.currentItem where currentItem.playbackBufferEmpty {
+                    if state == .Playing && !qualityIsBeingChanged {
+                        interruptionCount++
+                    }
+                    state = .WaitingForConnection
+                    beginBackgroundTask()
+                }
             }
         }
     }
