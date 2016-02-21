@@ -417,7 +417,7 @@ public class AudioPlayer: NSObject {
                     state = .Buffering
                 }
                 else {
-                    connectionLossDate = nil
+                    connectionLossDate = NSDate()
                     stateWhenConnectionLost = .Buffering
                     state = .WaitingForConnection
                     return
