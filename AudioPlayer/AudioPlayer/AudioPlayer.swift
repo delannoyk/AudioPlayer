@@ -142,12 +142,15 @@ private extension Array {
 
 private extension NSURL {
     var isOfflineURL: Bool {
-        return fileURL || scheme == "ipod-library" || self.host == "localhost"
+        return fileURL || scheme == "ipod-library" || host == "localhost"
     }
 }
 
 
 // MARK: - AudioPlayerDelegate
+
+/// This typealias only serves the purpose of saving user to `import AVFoundation`.
+public typealias Metadata = [AVMetadataItem]
 
 /**
 This protocol contains helpful methods to alert you of specific events.
@@ -194,6 +197,15 @@ public protocol AudioPlayerDelegate: NSObjectProtocol {
      - parameter item:        Current item.
      */
     func audioPlayer(audioPlayer: AudioPlayer, didFindDuration duration: NSTimeInterval, forItem item: AudioItem)
+
+    /**
+     This methods gets called before duration gets updated with discovered metadata.
+
+     - parameter audioPlayer: The audio player.
+     - parameter item:        Found metadata.
+     - parameter data:        Current item.
+     */
+    func audioPlayer(audioPlayer: AudioPlayer, didUpdateEmptyMetadataOnItem item: AudioItem, withData data: Metadata)
 
     /**
      This method gets called while the audio player is loading the file (over
@@ -365,6 +377,7 @@ public class AudioPlayer: NSObject {
     /// The current state of the player.
     public private(set) var state = AudioPlayerState.Stopped {
         didSet {
+            updateNowPlayingInfoCenter()
             if state != oldValue || state == .WaitingForConnection {
                 delegate?.audioPlayer(self, didChangeStateFrom: oldValue, toState: state)
             }
@@ -728,14 +741,14 @@ public class AudioPlayer: NSObject {
 
     - parameter time: The time to seek to.
     */
-    public func seekToTime(time: NSTimeInterval) {
+    public func seekToTime(time: NSTimeInterval, toleranceBefore: CMTime = kCMTimePositiveInfinity, toleranceAfter: CMTime = kCMTimePositiveInfinity) {
         let time = CMTime(seconds: time, preferredTimescale: 1000000000)
         let seekableRange = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
         if let seekableStart = seekableRange?.start, let seekableEnd = seekableRange?.end {
             // check if time is in seekable range
             if time >= seekableStart && time <= seekableEnd {
                 // time is in seekable range
-                player?.seekToTime(time)
+                player?.seekToTime(time, toleranceBefore: toleranceBefore, toleranceAfter: toleranceAfter)
             }
             else if time < seekableStart {
                 // time is before seekable start, so just move to the most early position as possible
@@ -862,7 +875,7 @@ public class AudioPlayer: NSObject {
                     info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = progression
                 }
 
-                info[MPNowPlayingInfoPropertyPlaybackRate] = rate
+                info[MPNowPlayingInfoPropertyPlaybackRate] = player?.rate ?? 0
 
                 MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = info
             }
@@ -881,10 +894,17 @@ public class AudioPlayer: NSObject {
                 switch keyPath {
                 case "currentItem.duration":
                     //Duration is available
-                    updateNowPlayingInfoCenter()
+                    if let currentItem = currentItem {
+                        //Let's check for metadata too
+                        if let metadata = player.currentItem?.asset.commonMetadata where metadata.count > 0 {
+                            currentItem.parseMetadata(metadata)
+                            delegate?.audioPlayer(self, didUpdateEmptyMetadataOnItem: currentItem, withData: metadata)
+                        }
 
-                    if let currentItem = currentItem, currentItemDuration = currentItemDuration where currentItemDuration > 0 {
-                        delegate?.audioPlayer(self, didFindDuration: currentItemDuration, forItem: currentItem)
+                        if let currentItemDuration = currentItemDuration where currentItemDuration > 0 {
+                            updateNowPlayingInfoCenter()
+                            delegate?.audioPlayer(self, didFindDuration: currentItemDuration, forItem: currentItem)
+                        }
                     }
 
                 case "currentItem.playbackBufferEmpty":
@@ -1055,9 +1075,9 @@ public class AudioPlayer: NSObject {
     */
     private func currentProgressionUpdated(time: CMTime) {
         if let currentItemProgression = currentItemProgression, currentItemDuration = currentItemDuration where currentItemDuration > 0 {
-            //If the current progression is updated, it means we are playing. This fixes the behavior where sometimes
-            //the `playbackLikelyToKeepUp` isn't changed even though it's playing (the first play).
-            if state != .Playing {
+            //This fixes the behavior where sometimes the `playbackLikelyToKeepUp`
+            //isn't changed even though it's playing (happens mostly at the first play though).
+            if state == .Buffering || state == .Paused {
                 if shouldResumePlaying {
                     stateBeforeBuffering = nil
                     state = .Playing
@@ -1221,8 +1241,8 @@ public class AudioPlayer: NSObject {
         #if os(iOS) || os(tvOS)
             if backgroundTaskIdentifier == nil {
                 backgroundTaskIdentifier = UIApplication.sharedApplication().beginBackgroundTaskWithExpirationHandler { [weak self] in
-                    if self?.backgroundTaskIdentifier != nil  {
-                        UIApplication.sharedApplication().endBackgroundTask(self!.backgroundTaskIdentifier!)
+                    if let backgroundTaskIdentifier = self?.backgroundTaskIdentifier {
+                        UIApplication.sharedApplication().endBackgroundTask(backgroundTaskIdentifier)
                     }
                     self?.backgroundTaskIdentifier = nil
                 }
