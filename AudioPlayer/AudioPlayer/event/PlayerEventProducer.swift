@@ -22,6 +22,7 @@ class PlayerEventProducer: NSObject, EventProducer {
        - LoadedDuration:   The player has found audio item duration.
        - EndedPlaying:     The player ended playing the current item because it went through the
             file or because of an error.
+       - Interrupted:      The player got interrupted (phone call, Siri, ...).
      */
     enum PlayerEvent: Event {
         case StartedBuffering
@@ -30,6 +31,7 @@ class PlayerEventProducer: NSObject, EventProducer {
         case LoadedMetadata([AVMetadataItem])
         case LoadedDuration(NSTimeInterval)
         case EndedPlaying(NSError?)
+        case Interrupted
     }
 
     /// The player to produce events with.
