@@ -48,6 +48,13 @@ class NetworkEventProducer: NSObject, EventProducer {
     }
 
     /**
+     Stops producing events on deinitialization.
+     */
+    deinit {
+        stopProducingEvents()
+    }
+
+    /**
      Starts listening to the player events.
      */
     func startProducingEvents() {
