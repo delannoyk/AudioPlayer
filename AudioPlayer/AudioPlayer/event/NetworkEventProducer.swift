@@ -34,12 +34,16 @@ class NetworkEventProducer: NSObject, EventProducer {
     /// A boolean value indicating whether we're currently listening to events on the player.
     private var listening = false
 
+    /// The last status received.
+    private var lastStatus: Reachability.NetworkStatus
+
     /**
      Initializes a `NetworkEventProducer` with a reachability.
 
      - parameter reachability: The reachability to work with.
      */
     init(reachability: Reachability) {
+        lastStatus = reachability.currentReachabilityStatus
         self.reachability = reachability
     }
 
@@ -51,6 +55,17 @@ class NetworkEventProducer: NSObject, EventProducer {
             return
         }
 
+        //Saving current status
+        lastStatus = reachability.currentReachabilityStatus
+
+        //Starting to listen to events
+        NSNotificationCenter.defaultCenter().addObserver(self,
+            selector: "reachabilityStatusChanged:",
+            name: ReachabilityChangedNotification,
+            object: reachability)
+        reachability.startNotifier()
+
+        //Saving that we're currently listening
         listening = true
     }
 
@@ -62,6 +77,13 @@ class NetworkEventProducer: NSObject, EventProducer {
             return
         }
 
+        //Stops listening to events
+        NSNotificationCenter.defaultCenter().removeObserver(self,
+            name: ReachabilityChangedNotification,
+            object: reachability)
+        reachability.stopNotifier()
+
+        //Saving that we're not listening anymore
         listening = false
     }
 
@@ -71,6 +93,18 @@ class NetworkEventProducer: NSObject, EventProducer {
      - parameter note: The sender information.
      */
     @objc private func reachabilityStatusChanged(note: NSNotification) {
-
+        let newStatus = reachability.currentReachabilityStatus
+        if newStatus != lastStatus {
+            if newStatus == .NotReachable {
+                eventListener?.onEvent(NetworkEvent.ConnectionLost)
+            }
+            else if lastStatus == .NotReachable {
+                eventListener?.onEvent(NetworkEvent.ConnectionRetrieved)
+            }
+            else {
+                eventListener?.onEvent(NetworkEvent.NetworkChanged)
+            }
+            lastStatus = newStatus
+        }
     }
 }
