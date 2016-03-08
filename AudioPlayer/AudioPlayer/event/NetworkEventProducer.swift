@@ -96,13 +96,13 @@ class NetworkEventProducer: NSObject, EventProducer {
         let newStatus = reachability.currentReachabilityStatus
         if newStatus != lastStatus {
             if newStatus == .NotReachable {
-                eventListener?.onEvent(NetworkEvent.ConnectionLost)
+                eventListener?.onEvent(NetworkEvent.ConnectionLost, generetedBy: self)
             }
             else if lastStatus == .NotReachable {
-                eventListener?.onEvent(NetworkEvent.ConnectionRetrieved)
+                eventListener?.onEvent(NetworkEvent.ConnectionRetrieved, generetedBy: self)
             }
             else {
-                eventListener?.onEvent(NetworkEvent.NetworkChanged)
+                eventListener?.onEvent(NetworkEvent.NetworkChanged, generetedBy: self)
             }
             lastStatus = newStatus
         }
