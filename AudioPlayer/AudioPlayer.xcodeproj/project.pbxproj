@@ -20,6 +20,8 @@
 		46D3A2E91C8F4A7B00635FE4 /* NetworkEventProducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D3A2E81C8F4A7B00635FE4 /* NetworkEventProducer.swift */; };
 		46D3A2EA1C8F4A7B00635FE4 /* NetworkEventProducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D3A2E81C8F4A7B00635FE4 /* NetworkEventProducer.swift */; };
 		46D3A2EB1C8F4A7B00635FE4 /* NetworkEventProducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D3A2E81C8F4A7B00635FE4 /* NetworkEventProducer.swift */; };
+		46D3A2F91C90905C00635FE4 /* NetworkEventProducer_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D3A2F71C90905C00635FE4 /* NetworkEventProducer_Tests.swift */; };
+		46D3A2FA1C90905C00635FE4 /* PlayerEventProducer_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D3A2F81C90905C00635FE4 /* PlayerEventProducer_Tests.swift */; };
 		46DAE4BB1C40275F00572EB2 /* AudioItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462679691AED5DE8003771C9 /* AudioItem.swift */; };
 		46DAE4BC1C40275F00572EB2 /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462679671AED5DDC003771C9 /* AudioPlayer.swift */; };
 		46DAE4BD1C40275F00572EB2 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466930791BAD30AB00C1E97C /* Reachability.swift */; };
@@ -49,6 +51,8 @@
 		46D3A2E01C8F480A00635FE4 /* EventProducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventProducer.swift; sourceTree = "<group>"; };
 		46D3A2E41C8F489700635FE4 /* PlayerEventProducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerEventProducer.swift; sourceTree = "<group>"; };
 		46D3A2E81C8F4A7B00635FE4 /* NetworkEventProducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkEventProducer.swift; sourceTree = "<group>"; };
+		46D3A2F71C90905C00635FE4 /* NetworkEventProducer_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkEventProducer_Tests.swift; sourceTree = "<group>"; };
+		46D3A2F81C90905C00635FE4 /* PlayerEventProducer_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerEventProducer_Tests.swift; sourceTree = "<group>"; };
 		46DAE4B31C4026E100572EB2 /* AudioPlayer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AudioPlayer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		46DAE4B71C4026E200572EB2 /* Info-OSX.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-OSX.plist"; sourceTree = "<group>"; };
 		653E18801C353DD0003C0CAB /* AudioPlayer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AudioPlayer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -122,6 +126,8 @@
 		4626794C1AED567D003771C9 /* AudioPlayerTests */ = {
 			isa = PBXGroup;
 			children = (
+				46D3A2F71C90905C00635FE4 /* NetworkEventProducer_Tests.swift */,
+				46D3A2F81C90905C00635FE4 /* PlayerEventProducer_Tests.swift */,
 				4626794D1AED567D003771C9 /* supporting_files */,
 			);
 			path = AudioPlayerTests;
@@ -278,7 +284,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftMigration = 0700;
-				LastSwiftUpdateCheck = 0700;
+				LastSwiftUpdateCheck = 0720;
 				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = "Kevin Delannoy";
 				TargetAttributes = {
@@ -365,6 +371,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				46D3A2F91C90905C00635FE4 /* NetworkEventProducer_Tests.swift in Sources */,
+				46D3A2FA1C90905C00635FE4 /* PlayerEventProducer_Tests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -535,6 +543,7 @@
 		462679571AED567D003771C9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -543,12 +552,14 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "be.delannoyk.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		462679581AED567D003771C9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = AudioPlayerTests/supporting_files/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "be.delannoyk.$(PRODUCT_NAME:rfc1034identifier)";
