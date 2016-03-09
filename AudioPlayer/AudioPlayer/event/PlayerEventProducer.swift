@@ -209,6 +209,7 @@ class PlayerEventProducer: NSObject, EventProducer {
             }
     }
 
+    #if os(iOS) || os(tvOS)
     /**
      Audio session got interrupted by the system (call, Siri, ...). If interruption begins,
      we should ensure the audio pauses and if it ends, we should restart playing if state was
@@ -233,6 +234,7 @@ class PlayerEventProducer: NSObject, EventProducer {
                 }
         }
     }
+    #endif
 
     /**
      Audio session route changed (ex: earbuds plugged in/out). This can change the player
