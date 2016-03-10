@@ -69,16 +69,19 @@ class PlayerEventProducer: NSObject, EventProducer {
                 return 4
             case .Progressed:
                 return 5
-            case .EndedPlaying:
-                return 6
-            case .InterruptionBegan:
+            case .EndedPlaying(let err):
+                if let _ = err {
+                    return 6
+                }
                 return 7
-            case .InterruptionEnded:
+            case .InterruptionBegan:
                 return 8
-            case .RouteChanged:
+            case .InterruptionEnded:
                 return 9
-            case .SessionMessedUp:
+            case .RouteChanged:
                 return 10
+            case .SessionMessedUp:
+                return 11
             }
         }
     }
