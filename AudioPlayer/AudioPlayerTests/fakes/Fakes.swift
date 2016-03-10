@@ -6,7 +6,7 @@
 //  Copyright © 2016 Kevin Delannoy. All rights reserved.
 //
 
-import Foundation
+import AVFoundation
 import SystemConfiguration
 @testable import AudioPlayer
 
@@ -41,4 +41,122 @@ class FakeReachability: Reachability {
         }
         return FakeReachability(reachabilityRef: ref)
     }
+}
+
+class FakeItem: AVPlayerItem {
+    var bufferEmpty = true {
+        willSet {
+            willChangeValueForKey("playbackBufferEmpty")
+        }
+        didSet {
+            didChangeValueForKey("playbackBufferEmpty")
+        }
+    }
+
+    override var playbackBufferEmpty: Bool {
+        return bufferEmpty
+    }
+
+    var likelyToKeepUp = false {
+        willSet {
+            willChangeValueForKey("playbackLikelyToKeepUp")
+        }
+        didSet {
+            didChangeValueForKey("playbackLikelyToKeepUp")
+        }
+    }
+
+    override var playbackLikelyToKeepUp: Bool {
+        return likelyToKeepUp
+    }
+
+    var timeRanges = [NSValue]() {
+        willSet {
+            willChangeValueForKey("loadedTimeRanges")
+        }
+        didSet {
+            didChangeValueForKey("loadedTimeRanges")
+        }
+    }
+
+    override var loadedTimeRanges: [NSValue] {
+        return timeRanges
+    }
+
+    var stat = AVPlayerItemStatus.Unknown {
+        willSet {
+            willChangeValueForKey("status")
+        }
+        didSet {
+            didChangeValueForKey("status")
+        }
+    }
+
+    override var status: AVPlayerItemStatus {
+        return stat
+    }
+
+    var dur = CMTime() {
+        willSet {
+            willChangeValueForKey("duration")
+        }
+        didSet {
+            didChangeValueForKey("duration")
+        }
+    }
+
+    override var duration: CMTime {
+        return dur
+    }
+}
+
+class FakePlayer: AVPlayer {
+    var timer: NSTimer?
+    var startDate: NSDate?
+    var observerClosure: (CMTime -> Void)?
+    var item: FakeItem? {
+        willSet {
+            willChangeValueForKey("currentItem")
+        }
+        didSet {
+            didChangeValueForKey("currentItem")
+        }
+    }
+
+    override var currentItem: AVPlayerItem? {
+        return item
+    }
+
+    override func addPeriodicTimeObserverForInterval(interval: CMTime, queue: dispatch_queue_t?, usingBlock block: (CMTime) -> Void) -> AnyObject {
+        observerClosure = block
+        startDate = NSDate()
+        timer = NSTimer.scheduledTimerWithTimeInterval(CMTimeGetSeconds(interval), target: self, selector: "timerTicked:", userInfo: nil, repeats: true)
+        return self
+    }
+
+    override func removeTimeObserver(observer: AnyObject) {
+        timer?.invalidate()
+        timer = nil
+        startDate = nil
+        observerClosure = nil
+    }
+
+    @objc private func timerTicked(_: NSTimer) {
+        let t = fabs(startDate!.timeIntervalSinceNow)
+        observerClosure?(CMTime(seconds: t, preferredTimescale: 1000000000))
+    }
+
+    //TODO:
+        /*#if os(iOS) || os(tvOS)
+            center.addObserver(self, selector: "audioSessionGotInterrupted:",
+                name: AVAudioSessionInterruptionNotification, object: player)
+            center.addObserver(self, selector: "audioSessionRouteChanged:",
+                name: AVAudioSessionRouteChangeNotification, object: player)
+            center.addObserver(self, selector: "audioSessionMessedUp:",
+                name: AVAudioSessionMediaServicesWereLostNotification, object: player)
+            center.addObserver(self, selector: "audioSessionMessedUp:",
+                name: AVAudioSessionMediaServicesWereResetNotification, object: player)
+        #endif
+        center.addObserver(self, selector: "playerItemDidEnd:",
+            name: AVPlayerItemDidPlayToEndTimeNotification, object: player)*/
 }
