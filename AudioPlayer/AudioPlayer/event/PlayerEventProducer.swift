@@ -42,7 +42,7 @@ class PlayerEventProducer: NSObject, EventProducer {
        - RouteChanged:      The player's route changed.
        - SessionMessedUp:   The audio session is messed up.
      */
-    enum PlayerEvent: Event {
+    enum PlayerEvent: Event, Equatable {
         case StartedBuffering
         case ReadyToPlay
         case LoadedMoreRange(CMTime, CMTime)
@@ -54,6 +54,33 @@ class PlayerEventProducer: NSObject, EventProducer {
         case InterruptionEnded
         case RouteChanged
         case SessionMessedUp
+
+        private var hash: UInt {
+            switch self {
+            case .StartedBuffering:
+                return 0
+            case .ReadyToPlay:
+                return 1
+            case .LoadedMoreRange:
+                return 2
+            case .LoadedMetadata:
+                return 3
+            case .LoadedDuration:
+                return 4
+            case .Progressed:
+                return 5
+            case .EndedPlaying:
+                return 6
+            case .InterruptionBegan:
+                return 7
+            case .InterruptionEnded:
+                return 8
+            case .RouteChanged:
+                return 9
+            case .SessionMessedUp:
+                return 10
+            }
+        }
     }
 
     /// The player to produce events with.
@@ -264,4 +291,8 @@ class PlayerEventProducer: NSObject, EventProducer {
     @objc private func playerItemDidEnd(note: NSNotification) {
         eventListener?.onEvent(PlayerEvent.EndedPlaying(nil), generetedBy: self)
     }
+}
+
+func ==(lhs: PlayerEventProducer.PlayerEvent, rhs: PlayerEventProducer.PlayerEvent) -> Bool {
+    return lhs.hash == rhs.hash
 }
