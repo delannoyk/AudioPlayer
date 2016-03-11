@@ -217,7 +217,7 @@ class PlayerEventProducer: NSObject, EventProducer {
                     }
 
                 case "currentItem.playbackLikelyToKeepUp":
-                    if let keepUp = player.currentItem?.playbackBufferEmpty where keepUp {
+                    if let keepUp = player.currentItem?.playbackLikelyToKeepUp where keepUp {
                         eventListener?.onEvent(PlayerEvent.ReadyToPlay, generetedBy: self)
                     }
 
