@@ -20,7 +20,8 @@ class PlayerEventProducer_Tests: XCTestCase {
         super.setUp()
         listener = FakeEventListener()
         player = FakePlayer()
-        item = FakeItem(URL: NSURL())
+        item = FakeItem(URL: NSURL(string: "https://github.com")!)
+        player.item = item
         producer = PlayerEventProducer()
         producer.player = player
         producer.eventListener = listener
@@ -205,6 +206,165 @@ class PlayerEventProducer_Tests: XCTestCase {
 
         NSNotificationCenter.defaultCenter().postNotificationName(AVAudioSessionMediaServicesWereLostNotification,
             object: player)
+
+        waitForExpectationsWithTimeout(1) { e in
+            if let _ = e {
+                XCTFail()
+            }
+        }
+    }
+
+    func testEventListenerGetsCalledWhenRouteChanges() {
+        let expectation = expectationWithDescription("Waiting for `onEvent` to get called")
+        listener.eventClosure = { event, producer in
+            if let event = event as? PlayerEventProducer.PlayerEvent
+                where event == PlayerEventProducer.PlayerEvent.RouteChanged {
+                    expectation.fulfill()
+            }
+        }
+
+        NSNotificationCenter.defaultCenter().postNotificationName(AVAudioSessionRouteChangeNotification,
+            object: player)
+
+        waitForExpectationsWithTimeout(1) { e in
+            if let _ = e {
+                XCTFail()
+            }
+        }
+    }
+
+    func testEventListenerGetsCalledWhenInterruptionBeginsAndEnds() {
+        let expectationBegins = expectationWithDescription("Waiting for `onEvent` to get called")
+        listener.eventClosure = { event, producer in
+            if let event = event as? PlayerEventProducer.PlayerEvent
+                where event == PlayerEventProducer.PlayerEvent.InterruptionBegan {
+                    expectationBegins.fulfill()
+            }
+        }
+
+        NSNotificationCenter.defaultCenter().postNotificationName(AVAudioSessionInterruptionNotification,
+            object: player,
+            userInfo: [
+                AVAudioSessionInterruptionTypeKey: NSNumber(unsignedInteger: AVAudioSessionInterruptionType.Began.rawValue)
+            ])
+
+        let expectationEnds = expectationWithDescription("Waiting for `onEvent` to get called")
+        listener.eventClosure = { event, producer in
+            if let event = event as? PlayerEventProducer.PlayerEvent
+                where event == PlayerEventProducer.PlayerEvent.InterruptionEnded {
+                    expectationEnds.fulfill()
+            }
+        }
+
+        NSNotificationCenter.defaultCenter().postNotificationName(AVAudioSessionInterruptionNotification,
+            object: player,
+            userInfo: [
+                AVAudioSessionInterruptionTypeKey: NSNumber(unsignedInteger: AVAudioSessionInterruptionType.Ended.rawValue),
+                AVAudioSessionInterruptionOptionKey: NSNumber(unsignedInteger: AVAudioSessionInterruptionOptions.ShouldResume.rawValue)
+            ])
+
+        waitForExpectationsWithTimeout(1) { e in
+            if let _ = e {
+                XCTFail()
+            }
+        }
+    }
+
+    func testEventListenerGetsCalledWhenItemDurationIsAvailable() {
+        let expectation = expectationWithDescription("Waiting for `onEvent` to get called")
+        listener.eventClosure = { event, producer in
+            if let event = event as? PlayerEventProducer.PlayerEvent
+                where event == PlayerEventProducer.PlayerEvent.LoadedDuration(CMTime()) {
+                    expectation.fulfill()
+            }
+        }
+
+        item.dur = CMTime(seconds: 10, preferredTimescale: 10000000)
+
+        waitForExpectationsWithTimeout(1) { e in
+            if let _ = e {
+                XCTFail()
+            }
+        }
+    }
+
+    func testEventListenerGetsCalledWhenItemBufferIsEmpty() {
+        let expectation = expectationWithDescription("Waiting for `onEvent` to get called")
+        listener.eventClosure = { event, producer in
+            if let event = event as? PlayerEventProducer.PlayerEvent
+                where event == PlayerEventProducer.PlayerEvent.StartedBuffering {
+                    expectation.fulfill()
+            }
+        }
+
+        item.bufferEmpty = true
+
+        waitForExpectationsWithTimeout(1) { e in
+            if let _ = e {
+                XCTFail()
+            }
+        }
+    }
+
+    func testEventListenerGetsCalledWhenItemBufferIsReadyToPlay() {
+        let expectation = expectationWithDescription("Waiting for `onEvent` to get called")
+        listener.eventClosure = { event, producer in
+            if let event = event as? PlayerEventProducer.PlayerEvent
+                where event == PlayerEventProducer.PlayerEvent.ReadyToPlay {
+                    expectation.fulfill()
+            }
+        }
+
+        item.likelyToKeepUp = true
+
+        waitForExpectationsWithTimeout(1) { e in
+            if let _ = e {
+                XCTFail()
+            }
+        }
+    }
+
+    func testEventListenerDoesNotGetCalledWhenItemStatusChangesToAnyOtherThanError() {
+        listener.eventClosure = { event, producer in
+            if let event = event as? PlayerEventProducer.PlayerEvent
+                where event != .Progressed(CMTime()) {
+                    XCTFail()
+            }
+        }
+
+        item.stat = AVPlayerItemStatus.Unknown
+        item.stat = AVPlayerItemStatus.ReadyToPlay
+    }
+
+    func testEventListenerGetsCalledWhenItemStatusChangesToError() {
+        let expectation = expectationWithDescription("Waiting for `onEvent` to get called")
+        listener.eventClosure = { event, producer in
+            if let event = event as? PlayerEventProducer.PlayerEvent
+                where event == PlayerEventProducer.PlayerEvent.EndedPlaying(nil) {
+                    expectation.fulfill()
+            }
+        }
+
+        item.stat = AVPlayerItemStatus.Failed
+
+        waitForExpectationsWithTimeout(1) { e in
+            if let _ = e {
+                XCTFail()
+            }
+        }
+    }
+
+    func testEventListenerGetsCalledWhenNewItemRangesAreAvailable() {
+        let expectation = expectationWithDescription("Waiting for `onEvent` to get called")
+        listener.eventClosure = { event, producer in
+            if let event = event as? PlayerEventProducer.PlayerEvent
+                where event == PlayerEventProducer.PlayerEvent.LoadedMoreRange(CMTime(), CMTime()) {
+                    expectation.fulfill()
+            }
+        }
+
+        item.timeRanges = [NSValue(CMTimeRange: CMTimeRange(start: CMTime(),
+            duration: CMTime(seconds: 10, preferredTimescale: 1000000)))]
 
         waitForExpectationsWithTimeout(1) { e in
             if let _ = e {
