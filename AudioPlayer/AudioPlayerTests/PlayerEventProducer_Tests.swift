@@ -372,4 +372,16 @@ class PlayerEventProducer_Tests: XCTestCase {
             }
         }
     }
+
+    func testEventListenerDoesNotGetCalledWhenItemLikelyToKeepUpChangesToFalse() {
+        listener.eventClosure = { event, producer in
+            if let event = event as? PlayerEventProducer.PlayerEvent
+                where event != .Progressed(CMTime()) {
+                    XCTFail()
+            }
+        }
+
+        item.likelyToKeepUp = false
+        item.likelyToKeepUp = false
+    }
 }
