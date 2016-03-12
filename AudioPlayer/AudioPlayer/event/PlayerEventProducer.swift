@@ -253,8 +253,7 @@ class PlayerEventProducer: NSObject, EventProducer {
             type = AVAudioSessionInterruptionType(rawValue: typeInt) {
                 if type == .Began {
                     eventListener?.onEvent(PlayerEvent.InterruptionBegan, generetedBy: self)
-                }
-                else {
+                } else {
                     if let optionInt = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
                         let options = AVAudioSessionInterruptionOptions(rawValue: optionInt)
                         if options.contains(.ShouldResume) {
