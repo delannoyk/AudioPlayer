@@ -2,16 +2,16 @@
 //  AudioItem.swift
 //  AudioPlayer
 //
-//  Created by Kevin DELANNOY on 26/04/15.
-//  Copyright (c) 2015 Kevin Delannoy. All rights reserved.
+//  Created by Kevin DELANNOY on 12/03/16.
+//  Copyright © 2016 Kevin Delannoy. All rights reserved.
 //
 
+import AVFoundation
 #if os(iOS) || os(tvOS)
     import UIKit
 #else
     import Foundation
 #endif
-import AVFoundation
 
 // MARK: - AudioQuality
 
@@ -43,8 +43,7 @@ public struct AudioItemURL {
         if let URL = URL {
             self.quality = quality
             self.URL = URL
-        }
-        else {
+        } else {
             return nil
         }
     }
@@ -71,30 +70,29 @@ public class AudioItem: NSObject {
     - parameter highQualitySoundURL:   The URL for the high quality sound.
     - parameter mediumQualitySoundURL: The URL for the medium quality sound.
     - parameter lowQualitySoundURL:    The URL for the low quality sound.
-
-    - returns: An initialized `AudioItem` if there is at least a non-null URL.
     */
-    public convenience init?(highQualitySoundURL: NSURL? = nil, mediumQualitySoundURL: NSURL? = nil, lowQualitySoundURL: NSURL? = nil) {
-        var URLs = [AudioQuality: NSURL]()
-        if let highURL = highQualitySoundURL {
-            URLs[.High] = highURL
-        }
-        if let mediumURL = mediumQualitySoundURL {
-            URLs[.Medium] = mediumURL
-        }
-        if let lowURL = lowQualitySoundURL {
-            URLs[.Low] = lowURL
-        }
-        self.init(soundURLs: URLs)
+    public convenience init?(highQualitySoundURL: NSURL? = nil,
+        mediumQualitySoundURL: NSURL? = nil,
+        lowQualitySoundURL: NSURL? = nil) {
+            var URLs = [AudioQuality: NSURL]()
+            if let highURL = highQualitySoundURL {
+                URLs[.High] = highURL
+            }
+            if let mediumURL = mediumQualitySoundURL {
+                URLs[.Medium] = mediumURL
+            }
+            if let lowURL = lowQualitySoundURL {
+                URLs[.Low] = lowURL
+            }
+            self.init(soundURLs: URLs)
     }
 
     /**
-    Initializes an `AudioItem`.
+     Initializes an `AudioItem`.
 
-    - parameter soundURLs: The URLs of the sound associated with its quality wrapped in a `Dictionary`.
-
-    - returns: An initialized `AudioItem` if there is at least an URL in the `soundURLs` dictionary.
-    */
+     - parameter soundURLs: The URLs of the sound associated with its quality wrapped in a
+     `Dictionary`.
+     */
     public init?(soundURLs: [AudioQuality: NSURL]) {
         self.soundURLs = soundURLs
         super.init()
@@ -139,46 +137,46 @@ public class AudioItem: NSObject {
     public dynamic var artist: String?
 
     /**
-    The title of the item.
+     The title of the item.
 
-    This can change over time which is why the property is dynamic. It enables KVO on the property.
-    */
+     This can change over time which is why the property is dynamic. It enables KVO on the property.
+     */
     public dynamic var title: String?
 
     /**
-    The album of the item.
+     The album of the item.
 
-    This can change over time which is why the property is dynamic. It enables KVO on the property.
-    */
+     This can change over time which is why the property is dynamic. It enables KVO on the property.
+     */
     public dynamic var album: String?
 
     /**
-    The track count of the item's album.
+     The track count of the item's album.
 
-    This can change over time which is why the property is dynamic. It enables KVO on the property.
-    */
+     This can change over time which is why the property is dynamic. It enables KVO on the property.
+     */
     public dynamic var trackCount: NSNumber?
 
     /**
-    The track number of the item in its album.
+     The track number of the item in its album.
 
-    This can change over time which is why the property is dynamic. It enables KVO on the property.
-    */
+     This can change over time which is why the property is dynamic. It enables KVO on the property.
+     */
     public dynamic var trackNumber: NSNumber?
 
     #if os(iOS)
     /**
-    The artwork image of the item.
+     The artwork image of the item.
 
-    This can change over time which is why the property is dynamic. It enables KVO on the property.
-    */
+     This can change over time which is why the property is dynamic. It enables KVO on the property.
+     */
     public dynamic var artworkImage: UIImage?
     #endif
 
 
     // MARK: KVO
 
-    internal static var ap_KVOItems: [String] {
+    internal static var KVOProperties: [String] {
         return ["artist", "title", "album", "trackCount", "trackNumber", "artworkImage"]
     }
 
