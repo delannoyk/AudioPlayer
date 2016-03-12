@@ -145,18 +145,4 @@ class FakePlayer: AVPlayer {
         let t = fabs(startDate!.timeIntervalSinceNow)
         observerClosure?(CMTime(seconds: t, preferredTimescale: 1000000000))
     }
-
-    //TODO:
-        /*#if os(iOS) || os(tvOS)
-            center.addObserver(self, selector: "audioSessionGotInterrupted:",
-                name: AVAudioSessionInterruptionNotification, object: player)
-            center.addObserver(self, selector: "audioSessionRouteChanged:",
-                name: AVAudioSessionRouteChangeNotification, object: player)
-            center.addObserver(self, selector: "audioSessionMessedUp:",
-                name: AVAudioSessionMediaServicesWereLostNotification, object: player)
-            center.addObserver(self, selector: "audioSessionMessedUp:",
-                name: AVAudioSessionMediaServicesWereResetNotification, object: player)
-        #endif
-        center.addObserver(self, selector: "playerItemDidEnd:",
-            name: AVPlayerItemDidPlayToEndTimeNotification, object: player)*/
 }
