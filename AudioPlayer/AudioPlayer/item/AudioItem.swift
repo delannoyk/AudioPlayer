@@ -18,14 +18,14 @@ import AVFoundation
 /**
 `AudioQuality` differentiates qualities for audio.
 
-- `High`:   The highest quality.
-- `Medium`: The quality between highest and lowest.
 - `Low`:    The lowest quality.
+- `Medium`: The quality between highest and lowest.
+- `High`:   The highest quality.
 */
-public enum AudioQuality {
-    case High
-    case Medium
-    case Low
+public enum AudioQuality: Int {
+    case Low = 0
+    case Medium = 1
+    case High = 2
 }
 
 
