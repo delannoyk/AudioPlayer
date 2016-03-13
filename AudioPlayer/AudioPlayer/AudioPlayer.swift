@@ -183,15 +183,6 @@ public class AudioPlayer: NSObject {
     /// the player.
     private var stateBeforeBuffering: AudioPlayerState?
 
-    /// The number of interruption since last quality adjustment/begin playing
-    private var interruptionCount = 0 {
-        didSet {
-            if adjustQualityAutomatically && interruptionCount > adjustQualityAfterInterruptionCount {
-                adjustQualityIfNecessary()
-            }
-        }
-    }
-
     /// A boolean value indicating if quality is being changed. It's necessary for the interruption
     /// count to not be incremented while new quality is buffering.
     private var qualityIsBeingChanged = false
@@ -717,7 +708,7 @@ public class AudioPlayer: NSObject {
                 stateWhenConnectionLost = state
                 if let currentItem = player?.currentItem where currentItem.playbackBufferEmpty {
                     if state == .Playing && !qualityIsBeingChanged {
-                        interruptionCount++
+                        qualityAdjustmentEventProducer.interruptionCount += 1
                     }
                     state = .WaitingForConnection
                     beginBackgroundTask()
@@ -1018,14 +1009,14 @@ extension AudioPlayer: EventListener {
 
                 //Aaaaand we: restart playing/go to next
                 state = .Stopped
-                interruptionCount++
+                qualityAdjustmentEventProducer.interruptionCount += 1
                 retryOrPlayNext()
             #endif
 
         case .StartedBuffering:
             //The buffer is empty and player is loading
             if state == .Playing && !qualityIsBeingChanged {
-                interruptionCount++
+                qualityAdjustmentEventProducer.interruptionCount += 1
             }
 
             stateBeforeBuffering = state
