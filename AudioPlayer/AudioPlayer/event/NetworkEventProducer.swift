@@ -68,7 +68,7 @@ class NetworkEventProducer: NSObject, EventProducer {
         //Starting to listen to events
         NSNotificationCenter.defaultCenter().addObserver(self,
             selector: "reachabilityStatusChanged:",
-            name: ReachabilityChangedNotification,
+            name: kReachabilityChangedNotification,
             object: reachability)
         reachability.startNotifier()
 
@@ -86,7 +86,7 @@ class NetworkEventProducer: NSObject, EventProducer {
 
         //Stops listening to events
         NSNotificationCenter.defaultCenter().removeObserver(self,
-            name: ReachabilityChangedNotification,
+            name: kReachabilityChangedNotification,
             object: reachability)
         reachability.stopNotifier()
 

@@ -35,7 +35,7 @@ public enum AudioPlayerState: Equatable {
 
  - returns: true if `lhs` is equal to `rhs`.
  */
-public func ==(lhs: AudioPlayerState, rhs: AudioPlayerState) -> Bool {
+public func == (lhs: AudioPlayerState, rhs: AudioPlayerState) -> Bool {
     switch (lhs, rhs) {
     case (.Buffering, .Buffering):
         return true

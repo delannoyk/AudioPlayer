@@ -21,7 +21,7 @@ class FakeEventListener: EventListener {
 class FakeReachability: Reachability {
     var reachabilityStatus = Reachability.NetworkStatus.NotReachable {
         didSet {
-            NSNotificationCenter.defaultCenter().postNotificationName(ReachabilityChangedNotification,
+            NSNotificationCenter.defaultCenter().postNotificationName(kReachabilityChangedNotification,
                 object: self)
         }
     }

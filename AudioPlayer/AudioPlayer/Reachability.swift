@@ -28,14 +28,16 @@ POSSIBILITY OF SUCH DAMAGE.
 import SystemConfiguration
 import Foundation
 
-public let ReachabilityChangedNotification = "ReachabilityChangedNotification"
+public let kReachabilityChangedNotification = "ReachabilityChangedNotification"
 
-func callback(reachability:SCNetworkReachability, flags: SCNetworkReachabilityFlags, info: UnsafeMutablePointer<Void>) {
-    let reachability = Unmanaged<Reachability>.fromOpaque(COpaquePointer(info)).takeUnretainedValue()
+func callback(reachability: SCNetworkReachability, flags: SCNetworkReachabilityFlags,
+    info: UnsafeMutablePointer<Void>) {
+        let reachability = Unmanaged<Reachability>.fromOpaque(COpaquePointer(info))
+            .takeUnretainedValue()
 
-    dispatch_async(dispatch_get_main_queue()) {
-        reachability.reachabilityChanged(flags)
-    }
+        dispatch_async(dispatch_get_main_queue()) {
+            reachability.reachabilityChanged(flags)
+        }
 }
 
 
@@ -112,8 +114,12 @@ public class Reachability: NSObject {
     }
 
     public class func reachabilityForLocalWiFi() -> Reachability {
+        var localWifiAddress = sockaddr_in(sin_len: __uint8_t(0),
+            sin_family: sa_family_t(0),
+            sin_port: in_port_t(0),
+            sin_addr: in_addr(s_addr: 0),
+            sin_zero: (0, 0, 0, 0, 0, 0, 0, 0))
 
-        var localWifiAddress: sockaddr_in = sockaddr_in(sin_len: __uint8_t(0), sin_family: sa_family_t(0), sin_port: in_port_t(0), sin_addr: in_addr(s_addr: 0), sin_zero: (0, 0, 0, 0, 0, 0, 0, 0))
         localWifiAddress.sin_len = UInt8(sizeofValue(localWifiAddress))
         localWifiAddress.sin_family = sa_family_t(AF_INET)
 
@@ -132,7 +138,8 @@ public class Reachability: NSObject {
 
         if notifierRunning { return true }
 
-        var context = SCNetworkReachabilityContext(version: 0, info: nil, retain: nil, release: nil, copyDescription: nil)
+        var context = SCNetworkReachabilityContext(version: 0, info: nil, retain: nil, release: nil,
+            copyDescription: nil)
         context.info = UnsafeMutablePointer(Unmanaged.passUnretained(self).toOpaque())
 
         if SCNetworkReachabilitySetCallback(reachabilityRef!, callback, &context) {
@@ -211,7 +218,8 @@ public class Reachability: NSObject {
 
     private var notifierRunning = false
     private var reachabilityRef: SCNetworkReachability?
-    private let reachabilitySerialQueue = dispatch_queue_create("uk.co.ashleymills.reachability", DISPATCH_QUEUE_SERIAL)
+    private let reachabilitySerialQueue = dispatch_queue_create("uk.co.ashleymills.reachability",
+        DISPATCH_QUEUE_SERIAL)
 
     private func reachabilityChanged(flags: SCNetworkReachabilityFlags) {
         if isReachableWithFlags(flags) {
@@ -224,7 +232,7 @@ public class Reachability: NSObject {
             }
         }
 
-        notificationCenter.postNotificationName(ReachabilityChangedNotification, object:self)
+        notificationCenter.postNotificationName(kReachabilityChangedNotification, object:self)
     }
 
     private func isReachableWithFlags(flags: SCNetworkReachabilityFlags) -> Bool {
@@ -327,7 +335,7 @@ public class Reachability: NSObject {
         return flags.contains(.IsDirect)
     }
     private func isConnectionRequiredOrTransient(flags: SCNetworkReachabilityFlags) -> Bool {
-        let testcase:SCNetworkReachabilityFlags = [.ConnectionRequired, .TransientConnection]
+        let testcase: SCNetworkReachabilityFlags = [.ConnectionRequired, .TransientConnection]
         return flags.intersect(testcase) == testcase
     }
 
@@ -363,13 +371,13 @@ public class Reachability: NSObject {
         let D = isConnectionOnDemand(reachabilityFlags) ? "D" : "-"
         let l = isLocalAddress(reachabilityFlags) ? "l" : "-"
         let d = isDirect(reachabilityFlags) ? "d" : "-"
-        
+
         return "\(W)\(R) \(c)\(t)\(i)\(C)\(D)\(l)\(d)"
     }
-    
+
     deinit {
         stopNotifier()
-        
+
         reachabilityRef = nil
         whenReachable = nil
         whenUnreachable = nil

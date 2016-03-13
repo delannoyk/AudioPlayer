@@ -58,8 +58,7 @@ class QualityAdjustmentEventProducer: NSObject, EventProducer {
                     //In this case, the timer should have been fired based on the last
                     //fire date and the new `adjustQualityTimeInternal`. So we fire now.
                     timerTicked(timer)
-                }
-                else {
+                } else {
                     //In this case, the timer fire date just needs to be adjusted.
                     self.timer = NSTimer.scheduledTimerWithTimeInterval(timeInterval,
                         target: self, selector: "timerTicked:", userInfo: nil, repeats: false)

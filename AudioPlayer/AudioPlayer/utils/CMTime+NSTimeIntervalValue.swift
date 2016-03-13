@@ -9,6 +9,7 @@
 import CoreMedia
 
 extension CMTime {
+    /// Returns the NSTimerInterval value of CMTime (only if it's a valid value).
     var timeIntervalValue: NSTimeInterval? {
         let seconds = CMTimeGetSeconds(self)
         if !isnan(seconds) {

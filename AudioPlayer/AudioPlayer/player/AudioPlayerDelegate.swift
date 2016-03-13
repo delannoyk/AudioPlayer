@@ -18,18 +18,18 @@ public typealias Metadata = [AVMetadataItem]
  */
 public protocol AudioPlayerDelegate: NSObjectProtocol {
     /**
-     This method is called when the audio player changes its state.
-     A fresh created audioPlayer starts in `.Stopped` mode.
+     This method is called when the audio player changes its state. A fresh created audioPlayer
+     starts in `.Stopped` mode.
 
      - parameter audioPlayer: The audio player.
-     - parameter from:        The state before any changes.
-     - parameter to:          The new state.
+     - parameter fromState:   The state before any changes.
+     - parameter toState:     The new state.
      */
-    func audioPlayer(audioPlayer: AudioPlayer, didChangeStateFrom from: AudioPlayerState, toState to: AudioPlayerState)
+    func audioPlayer(audioPlayer: AudioPlayer, didChangeFromState fromState: AudioPlayerState,
+        toState: AudioPlayerState)
 
     /**
-     This method is called when the audio player is about to start playing
-     a new item.
+     This method is called when the audio player is about to start playing a new item.
 
      - parameter audioPlayer: The audio player.
      - parameter item:        The item that is about to start being played.
@@ -37,16 +37,16 @@ public protocol AudioPlayerDelegate: NSObjectProtocol {
     func audioPlayer(audioPlayer: AudioPlayer, willStartPlayingItem item: AudioItem)
 
     /**
-     This method is called a regular time interval while playing. It notifies
-     the delegate that the current playing progression changed.
+     This method is called a regular time interval while playing. It notifies the delegate that the
+     current playing progression changed.
 
      - parameter audioPlayer:    The audio player.
      - parameter time:           The current progression.
-     - parameter percentageRead: The percentage of the file that has been read.
-     It's a Float value between 0 & 100 so that you can
-     easily update an `UISlider` for example.
+     - parameter percentageRead: The percentage of the file that has been read. It's a Float value
+        between 0 & 100 so that you can easily update an `UISlider` for example.
      */
-    func audioPlayer(audioPlayer: AudioPlayer, didUpdateProgressionToTime time: NSTimeInterval, percentageRead: Float)
+    func audioPlayer(audioPlayer: AudioPlayer, didUpdateProgressionToTime time: NSTimeInterval,
+        percentageRead: Float)
 
     /**
      This method gets called when the current item duration has been found.
@@ -55,7 +55,8 @@ public protocol AudioPlayerDelegate: NSObjectProtocol {
      - parameter duration:    Current item's duration.
      - parameter item:        Current item.
      */
-    func audioPlayer(audioPlayer: AudioPlayer, didFindDuration duration: NSTimeInterval, forItem item: AudioItem)
+    func audioPlayer(audioPlayer: AudioPlayer, didFindDuration duration: NSTimeInterval,
+        forItem item: AudioItem)
 
     /**
      This methods gets called before duration gets updated with discovered metadata.
@@ -64,16 +65,17 @@ public protocol AudioPlayerDelegate: NSObjectProtocol {
      - parameter item:        Found metadata.
      - parameter data:        Current item.
      */
-    func audioPlayer(audioPlayer: AudioPlayer, didUpdateEmptyMetadataOnItem item: AudioItem, withData data: Metadata)
+    func audioPlayer(audioPlayer: AudioPlayer, didUpdateEmptyMetadataOnItem item: AudioItem,
+        withData data: Metadata)
 
     /**
-     This method gets called while the audio player is loading the file (over
-     the network or locally). It lets the delegate know what time range has
-     already been loaded.
+     This method gets called while the audio player is loading the file (over the network or
+     locally). It lets the delegate know what time range has already been loaded.
 
      - parameter audioPlayer: The audio player.
      - parameter range:       The time range that the audio player loaded.
      - parameter item:        Current item.
      */
-    func audioPlayer(audioPlayer: AudioPlayer, didLoadRange range: AudioPlayer.TimeRange, forItem item: AudioItem)
+    func audioPlayer(audioPlayer: AudioPlayer, didLoadRange range: AudioPlayer.TimeRange,
+        forItem item: AudioItem)
 }
