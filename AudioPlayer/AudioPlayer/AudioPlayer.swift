@@ -770,78 +770,6 @@ public class AudioPlayer: NSObject {
         }
     }
 
-
-    // MARK: Quality adjustment
-
-    /**
-    Adjusts quality if necessary based on interruption count.
-    */
-    private func adjustQualityIfNecessary() {
-        /*if let currentQuality = currentQuality where adjustQualityAutomatically {
-            if interruptionCount >= adjustQualityAfterInterruptionCount {
-                //Decreasing audio quality
-                let URLInfo: AudioItemURL? = {
-                    if currentQuality == .High {
-                        return self.currentItem?.mediumQualityURL
-                    }
-                    if currentQuality == .Medium {
-                        return self.currentItem?.lowestQualityURL
-                    }
-                    return nil
-                    }()
-
-                if let URLInfo = URLInfo where URLInfo.quality != currentQuality {
-                    let cip = currentItemProgression
-                    let item = AVPlayerItem(URL: URLInfo.URL)
-
-                    qualityIsBeingChanged = true
-                    player?.replaceCurrentItemWithPlayerItem(item)
-                    if let cip = cip {
-                        seekToTime(cip)
-                    }
-                    qualityIsBeingChanged = false
-
-                    self.currentQuality = URLInfo.quality
-                }
-            } else if interruptionCount == 0 {
-                //Increasing audio quality
-                let URLInfo: AudioItemURL? = {
-                    if currentQuality == .Low {
-                        return self.currentItem?.mediumQualityURL
-                    }
-                    if currentQuality == .Medium {
-                        return self.currentItem?.highestQualityURL
-                    }
-                    return nil
-                    }()
-
-                if let URLInfo = URLInfo where URLInfo.quality != currentQuality {
-                    let cip = currentItemProgression
-                    let item = AVPlayerItem(URL: URLInfo.URL)
-
-                    qualityIsBeingChanged = true
-                    player?.replaceCurrentItemWithPlayerItem(item)
-                    if let cip = cip {
-                        seekToTime(cip)
-                    }
-                    qualityIsBeingChanged = false
-
-                    self.currentQuality = URLInfo.quality
-                }
-            }
-
-            interruptionCount = 0
-
-            /*let target = ClosureContainer() { [weak self] sender in
-                self?.adjustQualityIfNecessary()
-            }
-            let timer = NSTimer(timeInterval: adjustQualityTimeInternal, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
-            NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
-            qualityAdjustmentTimer = timer*/
-        }*/
-    }
-
-
     // MARK: Background
 
     /// The backround task identifier if a background task started. Nil if not.
@@ -1030,7 +958,19 @@ extension AudioPlayer: EventListener {
     }
 
     private func handleQualityEvent(event: QualityAdjustmentEventProducer.QualityAdjustmentEvent) {
+        switch event {
+        case .GoDown:
+            guard let quality = AudioQuality(rawValue: currentQuality.rawValue - 1) else {
+                return
+            }
+            handleQualityChange(quality)
 
+        case .GoUp:
+            guard let quality = AudioQuality(rawValue: currentQuality.rawValue + 1) else {
+                return
+            }
+            handleQualityChange(quality)
+        }
     }
 
     func onEvent(event: Event, generetedBy eventProducer: EventProducer) {
@@ -1041,5 +981,26 @@ extension AudioPlayer: EventListener {
         } else if let event = event as? QualityAdjustmentEventProducer.QualityAdjustmentEvent {
             handleQualityEvent(event)
         }
+    }
+}
+
+extension AudioPlayer {
+    // MARK: Private handlers
+    private func handleQualityChange(newQuality: AudioQuality) {
+        guard let URL = currentItem?.soundURLs[newQuality] else {
+            return
+        }
+
+        let cip = currentItemProgression
+        let item = AVPlayerItem(URL: URL)
+
+        qualityIsBeingChanged = true
+        player?.replaceCurrentItemWithPlayerItem(item)
+        if let cip = cip {
+            seekToTime(cip)
+        }
+        qualityIsBeingChanged = false
+
+        currentQuality = newQuality
     }
 }
