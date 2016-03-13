@@ -46,6 +46,12 @@ class QualityAdjustmentEventProducer_Tests: XCTestCase {
         }
     }
 
+    func testInterruptionCountIsResetAfterHittingLimit() {
+        producer.adjustQualityAfterInterruptionCount = 5
+        producer.interruptionCount = producer.adjustQualityAfterInterruptionCount
+        XCTAssertEqual(producer.interruptionCount, 0)
+    }
+
     func testEventListenerDoesNotGetCalledWhenInterruptionCountIsIncrementedToLessThanLimits() {
         listener.eventClosure = { event, producer in
             XCTFail()
