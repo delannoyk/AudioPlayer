@@ -883,23 +883,25 @@ extension AudioPlayer: EventListener {
             }
 
         case .Progressed(let time):
-            if let currentItemProgression = currentItemProgression, currentItemDuration = currentItemDuration where currentItemDuration > 0 {
-                //This fixes the behavior where sometimes the `playbackLikelyToKeepUp`
-                //isn't changed even though it's playing (happens mostly at the first play though).
-                if state == .Buffering || state == .Paused {
-                    if shouldResumePlaying {
-                        stateBeforeBuffering = nil
-                        state = .Playing
-                        player?.rate = rate
-                    } else {
-                        state = .Paused
+            if let currentItemProgression = time.timeIntervalValue,
+                currentItemDuration = currentItemDuration where currentItemDuration > 0 {
+                    //This fixes the behavior where sometimes the `playbackLikelyToKeepUp` isn't
+                    //changed even though it's playing (happens mostly at the first play though).
+                    if state == .Buffering || state == .Paused {
+                        if shouldResumePlaying {
+                            stateBeforeBuffering = nil
+                            state = .Playing
+                            player?.rate = rate
+                        } else {
+                            state = .Paused
+                        }
+                        endBackgroundTask()
                     }
-                    endBackgroundTask()
-                }
 
-                //Then we can call the didUpdateProgressionToTime: delegate method
-                let percentage = Float(currentItemProgression / currentItemDuration) * 100
-                delegate?.audioPlayer(self, didUpdateProgressionToTime: currentItemProgression, percentageRead: percentage)
+                    //Then we can call the didUpdateProgressionToTime: delegate method
+                    let percentage = Float(currentItemProgression / currentItemDuration) * 100
+                    delegate?.audioPlayer(self, didUpdateProgressionToTime: currentItemProgression,
+                        percentageRead: percentage)
             }
 
         case .ReadyToPlay:
