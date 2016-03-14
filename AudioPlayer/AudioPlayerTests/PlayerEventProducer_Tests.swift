@@ -279,7 +279,7 @@ class PlayerEventProducer_Tests: XCTestCase {
             }
         }
 
-        item.dur = CMTime(seconds: 10, preferredTimescale: 10000000)
+        item.dur = CMTime(timeInterval: 10)
 
         waitForExpectationsWithTimeout(1) { e in
             if let _ = e {
@@ -364,7 +364,7 @@ class PlayerEventProducer_Tests: XCTestCase {
         }
 
         item.timeRanges = [NSValue(CMTimeRange: CMTimeRange(start: CMTime(),
-            duration: CMTime(seconds: 10, preferredTimescale: 1000000)))]
+            duration: CMTime(timeInterval: 10)))]
 
         waitForExpectationsWithTimeout(1) { e in
             if let _ = e {

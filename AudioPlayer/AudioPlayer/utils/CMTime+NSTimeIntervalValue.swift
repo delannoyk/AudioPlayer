@@ -9,6 +9,15 @@
 import CoreMedia
 
 extension CMTime {
+    /**
+     Initializes a `CMTime` instance from a time interval.
+
+     - parameter timeInterval: The time in seconds.
+     */
+    init(timeInterval: NSTimeInterval) {
+        self.init(seconds: timeInterval, preferredTimescale: 1000000000)
+    }
+
     /// Returns the NSTimerInterval value of CMTime (only if it's a valid value).
     var timeIntervalValue: NSTimeInterval? {
         let seconds = CMTimeGetSeconds(self)

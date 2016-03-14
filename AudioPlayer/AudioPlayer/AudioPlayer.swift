@@ -32,6 +32,9 @@ public struct AudioPlayerModeMask: OptionSetType {
         self.rawValue = rawValue
     }
 
+    /// In this mode, player's queue will be played as given.
+    public static var Normal = AudioPlayerModeMask(rawValue: 0)
+
     /// In this mode, player's queue is shuffled randomly.
     public static var Shuffle = AudioPlayerModeMask(rawValue: 0b001)
 
@@ -41,18 +44,6 @@ public struct AudioPlayerModeMask: OptionSetType {
     /// In this mode, the player will continuously play the same queue over and over.
     public static var RepeatAll = AudioPlayerModeMask(rawValue: 0b100)
 }
-
-
-// MARK: - Array+Shuffe
-
-private extension Array {
-    func shuffled() -> [Element] {
-        return sort { element1, element2 in
-            random() % 2 == 0
-        }
-    }
-}
-
 
 // MARK: - NSURL+iPodLibrary
 
@@ -87,7 +78,16 @@ public class AudioPlayer: NSObject {
     /// The quality adjustment event producer
     private var qualityAdjustmentEventProducer = QualityAdjustmentEventProducer()
 
+
     // MARK: Public properties
+
+    /// The queue containing items to play.
+    private var queue: AudioItemQueue?
+
+    /// The items in the queue if any.
+    public var items: [AudioItem]? {
+        return queue?.queue
+    }
 
     /// Defines the maximum to wait after a connection loss before putting the player to Stopped
     /// mode and cancelling the resume. Default value is 60seconds.
@@ -166,15 +166,6 @@ public class AudioPlayer: NSObject {
         }
     }
 
-    private typealias AudioQueueItem = (position: Int, item: AudioItem)
-
-    /// The queue containing items to play.
-    private var enqueuedItems: [AudioQueueItem]?
-
-    public var items: [AudioItem]? {
-        return enqueuedItems?.map { $0.item }
-    }
-
     /// A boolean value indicating whether the player has been paused because of a system
     /// interruption.
     private var pausedForInterruption = false
@@ -198,9 +189,6 @@ public class AudioPlayer: NSObject {
 
     /// The date of the connection loss
     private var connectionLossDate: NSDate?
-
-    /// The index of the current item in the queue
-    public private(set) var currentItemIndexInQueue: Int?
 
     /// Boolean value indicating whether the player should resume playing (after buffering)
     private var shouldResumePlaying: Bool {
@@ -336,9 +324,9 @@ public class AudioPlayer: NSObject {
     public var resumeAfterConnectionLoss = true
 
     /// Defines the mode of the player. Default is `.Normal`.
-    public var mode: AudioPlayerModeMask = [] {
+    public var mode = AudioPlayerModeMask.Normal {
         didSet {
-            adaptQueueToPlayerMode()
+            queue?.mode = mode
         }
     }
 
@@ -386,22 +374,14 @@ public class AudioPlayer: NSObject {
     */
     public func playItems(items: [AudioItem], startAtIndex index: Int = 0) {
         if items.count > 0 {
-            var idx = 0
-            enqueuedItems = items.map { (position: idx++, item: $0) }
-            adaptQueueToPlayerMode()
-
-            let startIndex: Int = {
-                if index >= items.count || index < 0 {
-                    return 0
-                }
-                return enqueuedItems?.indexOf { $0.position == index } ?? 0
-            }()
-            currentItemIndexInQueue = startIndex
-            currentItem = enqueuedItems?[startIndex].item
+            queue = AudioItemQueue(items: items, mode: mode)
+            if let realIndex = queue?.queue.indexOf(items[index]) {
+                queue?.nextPosition = realIndex
+            }
+            currentItem = queue?.nextItem()
         } else {
             stop()
-            enqueuedItems = nil
-            currentItemIndexInQueue = nil
+            queue = nil
         }
     }
 
@@ -422,10 +402,8 @@ public class AudioPlayer: NSObject {
     - parameter items: The items to add.
     */
     public func addItemsToQueue(items: [AudioItem]) {
-        if currentItem != nil {
-            var idx = 0
-            enqueuedItems = (enqueuedItems ?? []) + items.map { (position: idx++, item: $0) }
-            adaptQueueToPlayerMode()
+        if let queue = queue {
+            queue.addItems(items)
         } else {
             playItems(items)
         }
@@ -434,19 +412,11 @@ public class AudioPlayer: NSObject {
     /**
      Removes an item at a specific index in the queue.
 
-     - warning: It asserts that the index is valid for the current "enqueueItems".
-
      - parameter index: The index of the item to remove.
      */
     public func removeItemAtIndex(index: Int) {
-        assert(enqueuedItems != nil, "cannot remove an item when queue is nil")
-        assert(index >= 0, "cannot remove an item at negative index")
-        assert(index < enqueuedItems?.count, "cannot remove an item at an index > queue.count")
-
-        if let enqueuedItems = enqueuedItems {
-            if index >= 0 && index < enqueuedItems.count {
-                self.enqueuedItems?.removeAtIndex(index)
-            }
+        if let queue = queue {
+            queue.removeItemAtIndex(index)
         }
     }
 
@@ -475,7 +445,7 @@ public class AudioPlayer: NSObject {
 
         state = .Stopped
 
-        enqueuedItems = nil
+        queue = nil
         currentItem = nil
         player = nil
     }
@@ -484,19 +454,10 @@ public class AudioPlayer: NSObject {
     Plays next item in the queue.
     */
     public func next() {
-        if let currentItemIndexInQueue = currentItemIndexInQueue where hasNext() {
+        if let queue = queue where queue.hasNextItem {
             //The background task will end when the player will have enough data to play
             beginBackgroundTask()
-            //pause()
-
-            let newIndex = currentItemIndexInQueue + 1
-            if newIndex < enqueuedItems?.count {
-                self.currentItemIndexInQueue = newIndex
-                currentItem = enqueuedItems?[newIndex].item
-            } else if mode.intersect(.RepeatAll) != [] {
-                self.currentItemIndexInQueue = 0
-                currentItem = enqueuedItems?.first?.item
-            }
+            currentItem = queue.nextItem()
         }
     }
 
@@ -506,26 +467,16 @@ public class AudioPlayer: NSObject {
     - returns: A boolean value indicating whether there is a next item to play or not.
     */
     public func hasNext() -> Bool {
-        if let enqueuedItems = enqueuedItems, currentItemIndexInQueue = currentItemIndexInQueue {
-            if currentItemIndexInQueue + 1 < enqueuedItems.count || mode.intersect(.RepeatAll) != [] {
-                return true
-            }
-        }
-        return false
+        return queue?.hasNextItem ?? false
     }
 
     /**
-    Plays previous item in the queue.
+    Plays previous item in the queue or rewind current item.
     */
     public func previous() {
-        if let currentItemIndexInQueue = currentItemIndexInQueue, enqueuedItems = enqueuedItems {
-            let newIndex = currentItemIndexInQueue - 1
-            if newIndex >= 0 {
-                self.currentItemIndexInQueue = newIndex
-                currentItem = enqueuedItems[newIndex].item
-            } else if mode.intersect(.RepeatAll) != [] {
-                self.currentItemIndexInQueue = enqueuedItems.count - 1
-                currentItem = enqueuedItems.last?.item
+        if let queue = queue {
+            if queue.hasPreviousItem {
+                currentItem = queue.previousItem()
             } else {
                 seekToTime(0)
             }
@@ -538,7 +489,7 @@ public class AudioPlayer: NSObject {
     - parameter time: The time to seek to.
     */
     public func seekToTime(time: NSTimeInterval, toleranceBefore: CMTime = kCMTimePositiveInfinity, toleranceAfter: CMTime = kCMTimePositiveInfinity) {
-        let time = CMTime(seconds: time, preferredTimescale: 1000000000)
+        let time = CMTime(timeInterval: time)
         let seekableRange = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
         if let seekableStart = seekableRange?.start, let seekableEnd = seekableRange?.end {
             // check if time is in seekable range
@@ -566,7 +517,7 @@ public class AudioPlayer: NSObject {
         if let range = currentItemSeekableRange {
             let position = max(range.earliest, range.latest - padding)
 
-            let time = CMTime(seconds: position, preferredTimescale: 1000000000)
+            let time = CMTime(timeInterval: position)
             player?.seekToTime(time)
 
             updateNowPlayingInfoCenter()
@@ -582,7 +533,7 @@ public class AudioPlayer: NSObject {
         if let range = currentItemSeekableRange {
             let position = min(range.latest, range.earliest + padding)
 
-            let time = CMTime(seconds: position, preferredTimescale: 1000000000)
+            let time = CMTime(timeInterval: position)
             player?.seekToTime(time)
 
             updateNowPlayingInfoCenter()
@@ -803,20 +754,6 @@ public class AudioPlayer: NSObject {
                 self.backgroundTaskIdentifier = nil
             }
         #endif
-    }
-
-    
-    // MARK: Mode
-    
-    /**
-    Sorts the queue depending on the current mode.
-    */
-    private func adaptQueueToPlayerMode() {
-        if mode.intersect(.Shuffle) != [] {
-            enqueuedItems = enqueuedItems?.shuffled()
-        } else {
-            enqueuedItems = enqueuedItems?.sort({ $0.position < $1.position })
-        }
     }
 }
 

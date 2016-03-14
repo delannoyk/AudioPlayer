@@ -143,6 +143,6 @@ class FakePlayer: AVPlayer {
 
     @objc private func timerTicked(_: NSTimer) {
         let t = fabs(startDate!.timeIntervalSinceNow)
-        observerClosure?(CMTime(seconds: t, preferredTimescale: 1000000000))
+        observerClosure?(CMTime(timeInterval: t))
     }
 }
