@@ -43,6 +43,7 @@
 		46D3A3271C94469E00635FE4 /* QualityAdjustmentEventProducer_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D3A3261C94469E00635FE4 /* QualityAdjustmentEventProducer_Tests.swift */; };
 		46DAE4BC1C40275F00572EB2 /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462679671AED5DDC003771C9 /* AudioPlayer.swift */; };
 		46DAE4BD1C40275F00572EB2 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466930791BAD30AB00C1E97C /* Reachability.swift */; };
+		46E49EF41C94B27000490721 /* AudioItemQueue_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46E49EF31C94B27000490721 /* AudioItemQueue_Tests.swift */; };
 		653E188C1C3541B8003C0CAB /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462679671AED5DDC003771C9 /* AudioPlayer.swift */; };
 		653E188D1C3541BB003C0CAB /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466930791BAD30AB00C1E97C /* Reachability.swift */; };
 /* End PBXBuildFile section */
@@ -79,6 +80,7 @@
 		46D3A3261C94469E00635FE4 /* QualityAdjustmentEventProducer_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QualityAdjustmentEventProducer_Tests.swift; sourceTree = "<group>"; };
 		46DAE4B31C4026E100572EB2 /* AudioPlayer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AudioPlayer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		46DAE4B71C4026E200572EB2 /* Info-OSX.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-OSX.plist"; sourceTree = "<group>"; };
+		46E49EF31C94B27000490721 /* AudioItemQueue_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioItemQueue_Tests.swift; sourceTree = "<group>"; };
 		653E18801C353DD0003C0CAB /* AudioPlayer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AudioPlayer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		653E18841C353DD0003C0CAB /* Info-tvOS.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-tvOS.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -154,6 +156,7 @@
 				46D3A2F71C90905C00635FE4 /* NetworkEventProducer_Tests.swift */,
 				46D3A2F81C90905C00635FE4 /* PlayerEventProducer_Tests.swift */,
 				46D3A3261C94469E00635FE4 /* QualityAdjustmentEventProducer_Tests.swift */,
+				46E49EF31C94B27000490721 /* AudioItemQueue_Tests.swift */,
 				4626794D1AED567D003771C9 /* supporting_files */,
 			);
 			path = AudioPlayerTests;
@@ -440,6 +443,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				46D3A2F91C90905C00635FE4 /* NetworkEventProducer_Tests.swift in Sources */,
+				46E49EF41C94B27000490721 /* AudioItemQueue_Tests.swift in Sources */,
 				46D3A3271C94469E00635FE4 /* QualityAdjustmentEventProducer_Tests.swift in Sources */,
 				46D3A2FA1C90905C00635FE4 /* PlayerEventProducer_Tests.swift in Sources */,
 				46D3A2FD1C90922700635FE4 /* Fakes.swift in Sources */,
