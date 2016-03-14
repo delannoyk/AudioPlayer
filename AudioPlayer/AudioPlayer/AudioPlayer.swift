@@ -96,15 +96,7 @@ public class AudioPlayer: NSObject {
     /// Defines whether the player should automatically adjust sound quality based on the number of
     /// interruption before a delay and the maximum number of interruption whithin this delay.
     /// Default value is `true`.
-    public var adjustQualityAutomatically = true {
-        didSet {
-            if adjustQualityAutomatically {
-                qualityAdjustmentEventProducer.startProducingEvents()
-            } else {
-                qualityAdjustmentEventProducer.stopProducingEvents()
-            }
-        }
-    }
+    public var adjustQualityAutomatically = true
 
     /// Defines the default quality used to play. Default value is `.Medium`
     public var defaultQuality = AudioQuality.Medium
@@ -143,6 +135,10 @@ public class AudioPlayer: NSObject {
     public override init() {
         currentQuality = defaultQuality
         super.init()
+
+        playerEventProducer.eventListener = self
+        networkEventProducer.eventListener = self
+        qualityAdjustmentEventProducer.eventListener = self
     }
 
     deinit {
@@ -162,6 +158,18 @@ public class AudioPlayer: NSObject {
         didSet {
             if #available(OSX 10.11, *) {
                 player?.allowsExternalPlayback = false
+            }
+
+            if let player = player {
+                playerEventProducer.player = player
+                playerEventProducer.startProducingEvents()
+                networkEventProducer.startProducingEvents()
+                qualityAdjustmentEventProducer.startProducingEvents()
+            } else {
+                playerEventProducer.player = nil
+                playerEventProducer.stopProducingEvents()
+                networkEventProducer.stopProducingEvents()
+                qualityAdjustmentEventProducer.stopProducingEvents()
             }
         }
     }
@@ -897,6 +905,11 @@ extension AudioPlayer: EventListener {
     }
 
     private func handleQualityEvent(event: QualityAdjustmentEventProducer.QualityAdjustmentEvent) {
+        //Early exit if user doesn't want to adjust quality
+        guard adjustQualityAutomatically else {
+            return
+        }
+
         switch event {
         case .GoDown:
             guard let quality = AudioQuality(rawValue: currentQuality.rawValue - 1) else {
