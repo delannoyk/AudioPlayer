@@ -647,35 +647,6 @@ public class AudioPlayer: NSObject {
         }
     }
 
-    @objc private func reachabilityStatusChanged(note: NSNotification) {
-        if state == .WaitingForConnection {
-            if let connectionLossDate = connectionLossDate where reachability.isReachable() {
-                if let stateWhenConnectionLost = stateWhenConnectionLost where stateWhenConnectionLost != .Stopped {
-                    if fabs(connectionLossDate.timeIntervalSinceNow) < maximumConnectionLossTime {
-                        retryOrPlayNext()
-                    }
-                }
-                self.connectionLossDate = nil
-            }
-        } else if state != .Stopped && state != .Paused {
-            if reachability.isReachable() || (currentItem?.soundURLs[currentQuality ?? defaultQuality]?.isOfflineURL ?? false) {
-                retryOrPlayNext()
-                connectionLossDate = nil
-                stateWhenConnectionLost = nil
-            } else {
-                connectionLossDate = NSDate()
-                stateWhenConnectionLost = state
-                if let currentItem = player?.currentItem where currentItem.playbackBufferEmpty {
-                    if state == .Playing && !qualityIsBeingChanged {
-                        qualityAdjustmentEventProducer.interruptionCount += 1
-                    }
-                    state = .WaitingForConnection
-                    beginBackgroundTask()
-                }
-            }
-        }
-    }
-
 
     // MARK: Retrying
 
@@ -769,10 +740,42 @@ extension AudioPlayer: EventListener {
     private func handleNetworkEvent(event: NetworkEventProducer.NetworkEvent) {
         switch event {
         case .ConnectionLost:
-            break
+            //Early exit if state prevents us to handle connection loss
+            guard let currentItem = currentItem where state != .WaitingForConnection else {
+                return
+            }
+
+            //In case we're not playing offline file
+            if !(currentItem.soundURLs[currentQuality]?.isOfflineURL ?? false) {
+                connectionLossDate = NSDate()
+                stateWhenConnectionLost = state
+
+                if let currentItem = player?.currentItem where currentItem.playbackBufferEmpty {
+                    if state == .Playing {
+                        qualityAdjustmentEventProducer.interruptionCount += 1
+                    }
+
+                    state = .WaitingForConnection
+                    beginBackgroundTask()
+                }
+            }
 
         case .ConnectionRetrieved:
-            break
+            //Early exit if connection wasn't lost during playing
+            guard let lossDate = connectionLossDate,
+                stateWhenLost = stateWhenConnectionLost else {
+                    return
+            }
+
+            let isAllowedToRestart = lossDate.timeIntervalSinceNow < maximumConnectionLossTime
+            let wasPlayingBeforeLoss = stateWhenLost != .Stopped
+
+            if isAllowedToRestart && wasPlayingBeforeLoss {
+                retryOrPlayNext()
+            }
+
+            connectionLossDate = nil
+            stateWhenConnectionLost = nil
 
         case .NetworkChanged:
             break
