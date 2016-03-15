@@ -146,3 +146,21 @@ class FakePlayer: AVPlayer {
         observerClosure?(CMTime(timeInterval: t))
     }
 }
+
+class FakeMetadataItem: AVMetadataItem {
+    var _commonKey: String
+    var _value: protocol<NSCopying, NSObjectProtocol>
+
+    init(commonKey: String, value: protocol<NSCopying, NSObjectProtocol>) {
+        _commonKey = commonKey
+        _value = value
+    }
+
+    override var commonKey: String? {
+        return _commonKey
+    }
+
+    override var value: protocol<NSCopying, NSObjectProtocol>? {
+        return _value
+    }
+}
