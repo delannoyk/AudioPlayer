@@ -174,13 +174,6 @@ public class AudioItem: NSObject {
     #endif
 
 
-    // MARK: KVO
-
-    internal static var KVOProperties: [String] {
-        return ["artist", "title", "album", "trackCount", "trackNumber", "artworkImage"]
-    }
-
-
     // MARK: Metadata
 
     public func parseMetadata(items: [AVMetadataItem]) {

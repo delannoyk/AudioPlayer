@@ -78,15 +78,71 @@ public class AudioPlayer: NSObject {
     /// The quality adjustment event producer.
     private var qualityAdjustmentEventProducer = QualityAdjustmentEventProducer()
 
-
-    // MARK: Public properties
+    /// The audio item event producer.
+    private var audioItemEventProducer = AudioItemEventProducer()
 
     /// The queue containing items to play.
     private var queue: AudioItemQueue?
 
+
+    // MARK: Public properties
+
     /// The items in the queue if any.
     public var items: [AudioItem]? {
         return queue?.queue
+    }
+
+    /// The current item being played.
+    public private(set) var currentItem: AudioItem? {
+        didSet {
+            if let currentItem = currentItem {
+                #if os(iOS) || os(tvOS)
+                    do {
+                        try AVAudioSession.sharedInstance().setActive(true)
+                        try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+                    } catch { }
+                #endif
+
+                player?.rate = 0
+                player = nil
+
+                let URLInfo: AudioItemURL = {
+                    switch (self.currentQuality ?? self.defaultQuality) {
+                    case .High:
+                        return currentItem.highestQualityURL
+                    case .Medium:
+                        return currentItem.mediumQualityURL
+                    default:
+                        return currentItem.lowestQualityURL
+                    }
+                }()
+
+                if reachability.isReachable() || URLInfo.URL.isOfflineURL {
+                    state = .Buffering
+                } else {
+                    connectionLossDate = NSDate()
+                    stateWhenConnectionLost = .Buffering
+                    state = .WaitingForConnection
+                    return
+                }
+
+                player = AVPlayer(URL: URLInfo.URL)
+                player?.volume = volume
+                currentQuality = URLInfo.quality
+
+                player?.rate = rate
+
+                updateNowPlayingInfoCenter()
+
+                if oldValue != currentItem {
+                    delegate?.audioPlayer(self, willStartPlayingItem: currentItem)
+                }
+            } else {
+                if let _ = oldValue {
+                    stop()
+                }
+            }
+        }
     }
 
     /// The current item duration or nil if no item or unknown duration.
@@ -148,6 +204,7 @@ public class AudioPlayer: NSObject {
 
         playerEventProducer.eventListener = self
         networkEventProducer.eventListener = self
+        audioItemEventProducer.eventListener = self
         qualityAdjustmentEventProducer.eventListener = self
     }
 
@@ -172,13 +229,17 @@ public class AudioPlayer: NSObject {
 
             if let player = player {
                 playerEventProducer.player = player
+                audioItemEventProducer.item = currentItem
                 playerEventProducer.startProducingEvents()
                 networkEventProducer.startProducingEvents()
+                audioItemEventProducer.startProducingEvents()
                 qualityAdjustmentEventProducer.startProducingEvents()
             } else {
                 playerEventProducer.player = nil
+                audioItemEventProducer.item = nil
                 playerEventProducer.stopProducingEvents()
                 networkEventProducer.stopProducingEvents()
+                audioItemEventProducer.stopProducingEvents()
                 qualityAdjustmentEventProducer.stopProducingEvents()
             }
         }
@@ -225,64 +286,6 @@ public class AudioPlayer: NSObject {
             updateNowPlayingInfoCenter()
             if state != oldValue || state == .WaitingForConnection {
                 delegate?.audioPlayer(self, didChangeFromState: oldValue, toState: state)
-            }
-        }
-    }
-
-    /// The current item being played.
-    public private(set) var currentItem: AudioItem? {
-        didSet {
-            for keyPath in AudioItem.KVOProperties {
-                oldValue?.removeObserver(self, forKeyPath: keyPath)
-                currentItem?.addObserver(self, forKeyPath: keyPath, options: .New, context: nil)
-            }
-
-            if let currentItem = currentItem {
-                #if os(iOS) || os(tvOS)
-                    do {
-                        try AVAudioSession.sharedInstance().setActive(true)
-                        try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
-                    } catch { }
-                #endif
-
-                player?.rate = 0
-                player = nil
-
-                let URLInfo: AudioItemURL = {
-                    switch (self.currentQuality ?? self.defaultQuality) {
-                    case .High:
-                        return currentItem.highestQualityURL
-                    case .Medium:
-                        return currentItem.mediumQualityURL
-                    default:
-                        return currentItem.lowestQualityURL
-                    }
-                    }()
-
-                if reachability.isReachable() || URLInfo.URL.isOfflineURL {
-                    state = .Buffering
-                } else {
-                    connectionLossDate = NSDate()
-                    stateWhenConnectionLost = .Buffering
-                    state = .WaitingForConnection
-                    return
-                }
-
-                player = AVPlayer(URL: URLInfo.URL)
-                player?.volume = volume
-                currentQuality = URLInfo.quality
-
-                player?.rate = rate
-
-                updateNowPlayingInfoCenter()
-
-                if oldValue != currentItem {
-                    delegate?.audioPlayer(self, willStartPlayingItem: currentItem)
-                }
-            } else {
-                if let _ = oldValue {
-                    stop()
-                }
             }
         }
     }
@@ -637,17 +640,6 @@ public class AudioPlayer: NSObject {
     }
 
 
-    // MARK: Events
-
-    public override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
-        if let object = object as? NSObject {
-            if let currentItem = currentItem where object == currentItem {
-                updateNowPlayingInfoCenter()
-            }
-        }
-    }
-
-
     // MARK: Retrying
 
     /**
@@ -928,11 +920,17 @@ extension AudioPlayer: EventListener {
         }
     }
 
+    private func handleAudioItemEvent(event: AudioItemEventProducer.AudioItemEvent) {
+        updateNowPlayingInfoCenter()
+    }
+
     func onEvent(event: Event, generetedBy eventProducer: EventProducer) {
         if let event = event as? NetworkEventProducer.NetworkEvent {
             handleNetworkEvent(event)
         } else if let event = event as? PlayerEventProducer.PlayerEvent {
             handlePlayerEvent(event)
+        } else if let event = event as? AudioItemEventProducer.AudioItemEvent {
+            handleAudioItemEvent(event)
         } else if let event = event as? QualityAdjustmentEventProducer.QualityAdjustmentEvent {
             handleQualityEvent(event)
         }
