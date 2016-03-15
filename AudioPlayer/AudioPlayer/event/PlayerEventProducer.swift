@@ -9,6 +9,7 @@
 import AVFoundation
 
 // MARK: - AVPlayer+KVO
+
 private extension AVPlayer {
     /// The list of properties that is observed through KVO.
     static var KVOProperties: [String] {
@@ -29,7 +30,7 @@ private extension AVPlayer {
  */
 class PlayerEventProducer: NSObject, EventProducer {
     /**
-       A `PlayerEvent` is an event an player generates over time.
+       A `PlayerEvent` is an event a player generates over time.
 
        - StartedBuffering:  The player started buffering the audio file.
        - ReadyToPlay:       The player is ready to play. It buffered enough data.

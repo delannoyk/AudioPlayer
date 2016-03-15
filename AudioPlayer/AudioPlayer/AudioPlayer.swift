@@ -64,18 +64,18 @@ You can get events (such as state change or time observation) by registering a d
 public class AudioPlayer: NSObject {
     // MARK: Private properties
 
-    /// Reachability for network connection
+    /// Reachability for network connection.
     private let reachability = Reachability.reachabilityForInternetConnection()
 
-    /// The network event producer
+    /// The network event producer.
     private lazy var networkEventProducer: NetworkEventProducer = {
         NetworkEventProducer(reachability: self.reachability)
     }()
 
-    /// The player event producer
+    /// The player event producer.
     private let playerEventProducer = PlayerEventProducer()
 
-    /// The quality adjustment event producer
+    /// The quality adjustment event producer.
     private var qualityAdjustmentEventProducer = QualityAdjustmentEventProducer()
 
 
@@ -87,6 +87,16 @@ public class AudioPlayer: NSObject {
     /// The items in the queue if any.
     public var items: [AudioItem]? {
         return queue?.queue
+    }
+
+    /// The current item duration or nil if no item or unknown duration.
+    public var currentItemDuration: NSTimeInterval? {
+        return player?.currentItem?.duration.timeIntervalValue
+    }
+
+    /// The current item progression or nil if no item.
+    public var currentItemProgression: NSTimeInterval? {
+        return player?.currentItem?.currentTime().timeIntervalValue
     }
 
     /// Defines the maximum to wait after a connection loss before putting the player to Stopped
@@ -275,16 +285,6 @@ public class AudioPlayer: NSObject {
                 }
             }
         }
-    }
-
-    /// The current item duration or nil if no item or unknown duration.
-    public var currentItemDuration: NSTimeInterval? {
-        return player?.currentItem?.duration.timeIntervalValue
-    }
-
-    /// The current item progression or nil if no item.
-    public var currentItemProgression: NSTimeInterval? {
-        return player?.currentItem?.currentTime().timeIntervalValue
     }
 
     public typealias TimeRange = (earliest: NSTimeInterval, latest: NSTimeInterval)
