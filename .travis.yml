@@ -25,8 +25,8 @@ script:
 
   # Build Framework in Debug and Run Tests if specified
   - if [ $RUN_TESTS == "YES" ]; then
-      xcodebuild -project "$PROJECT" -scheme "$SCHEME" -sdk "$SDK" -destination "$DESTINATION" build test | xcpretty -c;
-      slather coverage --input-format profdata -i ".*Tests.*" --scheme "AudioPlayer iOS" AudioPlayer/AudioPlayer.xcodeproj
+      xcodebuild -project "$PROJECT" -scheme "$SCHEME" -sdk "$SDK" -destination "$DESTINATION" build test | xcpretty -c; &&
+      slather coverage --input-format profdata -i ".*Tests.*" --scheme "AudioPlayer iOS" AudioPlayer/AudioPlayer.xcodeproj &&
       bash <(curl -s https://codecov.io/bash) -f cobertura.xml
     else
       xcodebuild -project "$PROJECT" -scheme "$SCHEME" -sdk "$SDK" -destination "$DESTINATION" build | xcpretty -c;
