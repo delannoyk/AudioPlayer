@@ -752,9 +752,10 @@ extension AudioPlayer: EventListener {
             }
 
         case .ConnectionRetrieved:
-            //Early exit if connection wasn't lost during playing
+            //Early exit if connection wasn't lost during playing or `resumeAfterConnectionLoss`
+            //isn't enabled.
             guard let lossDate = connectionLossDate,
-                stateWhenLost = stateWhenConnectionLost else {
+                stateWhenLost = stateWhenConnectionLost where resumeAfterConnectionLoss else {
                     return
             }
 
