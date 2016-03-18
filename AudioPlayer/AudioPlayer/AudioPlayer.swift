@@ -7,7 +7,6 @@
 //
 
 import AVFoundation
-
 #if os(iOS) || os(tvOS)
     import MediaPlayer
 #endif
@@ -294,9 +293,9 @@ public class AudioPlayer: NSObject {
 
     /// The current seekable range.
     public var currentItemSeekableRange: TimeRange? {
-        let range = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
-        if let seekableStart = range?.start, seekableEnd = range?.end {
-            return (CMTimeGetSeconds(seekableStart), CMTimeGetSeconds(seekableEnd))
+        if let range = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue,
+            start = range.start.timeIntervalValue, end = range.end.timeIntervalValue {
+                return (start, end)
         }
         if let currentItemProgression = currentItemProgression {
             // if there is no start and end point of seekable range
