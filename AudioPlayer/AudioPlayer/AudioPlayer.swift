@@ -11,39 +11,6 @@ import AVFoundation
     import MediaPlayer
 #endif
 
-
-// MARK: - AudioPlayerMode
-
-/**
-Represents the mode in which the player should play. Modes can be used as masks
-so that you can play in `.Shuffle` mode and still `.RepeatAll`.
-*/
-public struct AudioPlayerModeMask: OptionSetType {
-    /// The raw value describing the mode.
-    public let rawValue: UInt
-
-    /**
-     Initializes an `AudioPlayerModeMask` from a `rawValue`.
-
-     - parameter rawValue: The raw value describing the mode.
-     */
-    public init(rawValue: UInt) {
-        self.rawValue = rawValue
-    }
-
-    /// In this mode, player's queue will be played as given.
-    public static var Normal = AudioPlayerModeMask(rawValue: 0)
-
-    /// In this mode, player's queue is shuffled randomly.
-    public static var Shuffle = AudioPlayerModeMask(rawValue: 0b001)
-
-    /// In this mode, the player will continuously play the same item over and over.
-    public static var Repeat = AudioPlayerModeMask(rawValue: 0b010)
-
-    /// In this mode, the player will continuously play the same queue over and over.
-    public static var RepeatAll = AudioPlayerModeMask(rawValue: 0b100)
-}
-
 // MARK: - NSURL+iPodLibrary
 
 private extension NSURL {
@@ -334,7 +301,7 @@ public class AudioPlayer: NSObject {
     public var resumeAfterConnectionLoss = true
 
     /// Defines the mode of the player. Default is `.Normal`.
-    public var mode = AudioPlayerModeMask.Normal {
+    public var mode = AudioPlayerMode.Normal {
         didSet {
             queue?.mode = mode
         }

@@ -42,7 +42,7 @@ class AudioItemQueue {
     var nextPosition = 0
 
     /// The player mode. It will affect the queue.
-    var mode: AudioPlayerModeMask {
+    var mode: AudioPlayerMode {
         didSet {
             adaptQueue(oldValue)
         }
@@ -54,7 +54,7 @@ class AudioItemQueue {
      - parameter items: The list of items to play.
      - parameter mode:  The mode to play items with.
      */
-    init(items: [AudioItem], mode: AudioPlayerModeMask) {
+    init(items: [AudioItem], mode: AudioPlayerMode) {
         self.items = items
         self.mode = mode
         queue = mode.contains(.Shuffle) ? items.shuffled() : items
@@ -75,7 +75,7 @@ class AudioItemQueue {
 
      - parameter oldMode: The mode before it changed.
      */
-    private func adaptQueue(oldMode: AudioPlayerModeMask) {
+    private func adaptQueue(oldMode: AudioPlayerMode) {
         //Early exit if queue is empty
         guard queue.count > nextPosition else {
             return
