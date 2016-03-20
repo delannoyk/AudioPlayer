@@ -17,7 +17,7 @@ public struct AudioPlayerMode: OptionSetType {
     public let rawValue: UInt
 
     /**
-     Initializes an `AudioPlayerModeMask` from a `rawValue`.
+     Initializes an `AudioPlayerMode` from a `rawValue`.
 
      - parameter rawValue: The raw value describing the mode.
      */
