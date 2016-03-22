@@ -30,6 +30,9 @@ You can get events (such as state change or time observation) by registering a d
 public class AudioPlayer: NSObject {
     // MARK: Private properties
 
+    /// The background handler.
+    private let backgroundHandler = BackgroundHandler()
+
     /// Reachability for network connection.
     private let reachability = Reachability.reachabilityForInternetConnection()
 
@@ -180,7 +183,7 @@ public class AudioPlayer: NSObject {
 
         stop()
 
-        endBackgroundTask()
+        backgroundHandler.endBackgroundTask()
     }
 
 
@@ -433,7 +436,7 @@ public class AudioPlayer: NSObject {
     public func next() {
         if let queue = queue where queue.hasNextItem {
             //The background task will end when the player will have enough data to play
-            beginBackgroundTask()
+            backgroundHandler.beginBackgroundTask()
             currentItem = queue.nextItem()
         }
     }
@@ -657,41 +660,6 @@ public class AudioPlayer: NSObject {
             stop()
         }
     }
-
-    // MARK: Background
-
-    /// The backround task identifier if a background task started. Nil if not.
-    private var backgroundTaskIdentifier: Int?
-
-    /**
-    Starts a background task if there isn't already one running.
-    */
-    private func beginBackgroundTask() {
-        #if os(iOS) || os(tvOS)
-            if backgroundTaskIdentifier == nil {
-                backgroundTaskIdentifier = UIApplication.sharedApplication().beginBackgroundTaskWithExpirationHandler { [weak self] in
-                    if let backgroundTaskIdentifier = self?.backgroundTaskIdentifier {
-                        UIApplication.sharedApplication().endBackgroundTask(backgroundTaskIdentifier)
-                    }
-                    self?.backgroundTaskIdentifier = nil
-                }
-            }
-        #endif
-    }
-    
-    /**
-    Ends the background task if there is one.
-    */
-    private func endBackgroundTask() {
-        #if os(iOS) || os(tvOS)
-            if let backgroundTaskIdentifier = backgroundTaskIdentifier {
-                if backgroundTaskIdentifier != UIBackgroundTaskInvalid {
-                    UIApplication.sharedApplication().endBackgroundTask(backgroundTaskIdentifier)
-                }
-                self.backgroundTaskIdentifier = nil
-            }
-        #endif
-    }
 }
 
 extension AudioPlayer: EventListener {
@@ -714,7 +682,7 @@ extension AudioPlayer: EventListener {
                     }
 
                     state = .WaitingForConnection
-                    beginBackgroundTask()
+                    backgroundHandler.beginBackgroundTask()
                 }
             }
 
@@ -754,7 +722,7 @@ extension AudioPlayer: EventListener {
         case .InterruptionBegan:
             if state == .Playing || state == .Buffering {
                 //We pause the player when an interruption is detected
-                beginBackgroundTask()
+                backgroundHandler.beginBackgroundTask()
                 pausedForInterruption = true
                 pause()
             }
@@ -765,7 +733,7 @@ extension AudioPlayer: EventListener {
                     resume()
                 }
                 pausedForInterruption = false
-                endBackgroundTask()
+                backgroundHandler.endBackgroundTask()
             }
 
         case .LoadedDuration(let time):
@@ -802,7 +770,7 @@ extension AudioPlayer: EventListener {
                         } else {
                             state = .Paused
                         }
-                        endBackgroundTask()
+                        backgroundHandler.endBackgroundTask()
                     }
 
                     //Then we can call the didUpdateProgressionToTime: delegate method
@@ -827,7 +795,7 @@ extension AudioPlayer: EventListener {
             retryTimer?.invalidate()
             retryTimer = nil
 
-            endBackgroundTask()
+            backgroundHandler.endBackgroundTask()
 
         case .RouteChanged:
             //In some route changes, the player pause automatically
@@ -862,7 +830,7 @@ extension AudioPlayer: EventListener {
             } else {
                 state = .WaitingForConnection
             }
-            beginBackgroundTask()
+            backgroundHandler.beginBackgroundTask()
         }
     }
 
