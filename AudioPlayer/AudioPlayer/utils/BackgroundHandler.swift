@@ -19,6 +19,15 @@ class BackgroundHandler: NSObject {
     /// The backround task identifier if a background task started. Nil if not.
     private var backgroundTaskIdentifier: Int?
 
+    #if !os(OSX)
+    /// The application to create background task from.
+    private let application: UIApplication
+
+    init(application: UIApplication = UIApplication.sharedApplication()) {
+        self.application = application
+    }
+    #endif
+
     /**
      Starts a background task if there isn't already one.
      */
@@ -28,12 +37,11 @@ class BackgroundHandler: NSObject {
                 return
             }
 
-            let application = UIApplication.sharedApplication()
             backgroundTaskIdentifier = application.beginBackgroundTaskWithExpirationHandler {
                 [weak self] in
 
                 if let backgroundTaskIdentifier = self?.backgroundTaskIdentifier {
-                    application.endBackgroundTask(backgroundTaskIdentifier)
+                    self?.application.endBackgroundTask(backgroundTaskIdentifier)
                 }
                 self?.backgroundTaskIdentifier = nil
             }
@@ -50,7 +58,6 @@ class BackgroundHandler: NSObject {
             }
 
             if backgroundTaskIdentifier != UIBackgroundTaskInvalid {
-                let application = UIApplication.sharedApplication()
                 application.endBackgroundTask(backgroundTaskIdentifier)
             }
             self.backgroundTaskIdentifier = nil
