@@ -8,6 +8,12 @@
 
 import Foundation
 
+private extension Selector {
+    /// The selector to call when reachability status changes.
+    static let reachabilityStatusChanged =
+        #selector(NetworkEventProducer.reachabilityStatusChanged(_:))
+}
+
 /**
  *  A `NetworkEventProducer` generates `NetworkEvent`s when there is changes on the network.
  */
@@ -66,10 +72,8 @@ class NetworkEventProducer: NSObject, EventProducer {
         lastStatus = reachability.currentReachabilityStatus
 
         //Starting to listen to events
-        NSNotificationCenter.defaultCenter().addObserver(self,
-            selector: "reachabilityStatusChanged:",
-            name: kReachabilityChangedNotification,
-            object: reachability)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: .reachabilityStatusChanged,
+            name: kReachabilityChangedNotification, object: reachability)
         reachability.startNotifier()
 
         //Saving that we're currently listening

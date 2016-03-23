@@ -8,6 +8,11 @@
 
 import Foundation
 
+private extension Selector {
+    /// The selector to call when the timer ticks.
+    static let timerTicked = #selector(QualityAdjustmentEventProducer.timerTicked(_:))
+}
+
 /**
  *  A `QualityAdjustmentEventProducer` generates `QualityAdjustmentEvent`s when there
  *  should be a change of quality based on some information about interruptions.
@@ -60,8 +65,9 @@ class QualityAdjustmentEventProducer: NSObject, EventProducer {
                     timerTicked(timer)
                 } else {
                     //In this case, the timer fire date just needs to be adjusted.
-                    self.timer = NSTimer.scheduledTimerWithTimeInterval(timeInterval,
-                        target: self, selector: "timerTicked:", userInfo: nil, repeats: false)
+                    self.timer = NSTimer.scheduledTimerWithTimeInterval(
+                        timeInterval, target: self, selector: .timerTicked,
+                        userInfo: nil, repeats: false)
                 }
             }
         }
@@ -120,8 +126,9 @@ class QualityAdjustmentEventProducer: NSObject, EventProducer {
         interruptionCount = 0
 
         timer?.invalidate()
-        timer = NSTimer.scheduledTimerWithTimeInterval(adjustQualityTimeInternal,
-            target: self, selector: "timerTicked:", userInfo: nil, repeats: false)
+        timer = NSTimer.scheduledTimerWithTimeInterval(
+            adjustQualityTimeInternal, target: self, selector: .timerTicked,
+            userInfo: nil, repeats: false)
     }
 
     /**

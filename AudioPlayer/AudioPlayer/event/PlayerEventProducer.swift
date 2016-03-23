@@ -23,6 +23,23 @@ private extension AVPlayer {
     }
 }
 
+// MARK: - Selector+PlayerEventProducer
+
+private extension Selector {
+    /// The selector to call when the audio session is interrupted.
+    static let audioSessionInterrupted =
+        #selector(PlayerEventProducer.audioSessionGotInterrupted(_:))
+
+    /// The selector to call when the audio session route changes.
+    static let audioRouteChanged = #selector(PlayerEventProducer.audioSessionRouteChanged(_:))
+
+    /// The selector to call when the audio session get messed up.
+    static let audioSessionMessedUp = #selector(PlayerEventProducer.audioSessionMessedUp(_:))
+
+    /// The selector to call when an audio item ends playing.
+    static let itemDidEnd = #selector(PlayerEventProducer.playerItemDidEnd(_:))
+}
+
 // MARK: - PlayerEventProducer
 
 /**
@@ -124,16 +141,16 @@ class PlayerEventProducer: NSObject, EventProducer {
         //Observing notifications sent through `NSNotificationCenter`
         let center = NSNotificationCenter.defaultCenter()
         #if os(iOS) || os(tvOS)
-            center.addObserver(self, selector: "audioSessionGotInterrupted:",
+            center.addObserver(self, selector: .audioSessionInterrupted,
                 name: AVAudioSessionInterruptionNotification, object: player)
-            center.addObserver(self, selector: "audioSessionRouteChanged:",
+            center.addObserver(self, selector: .audioRouteChanged,
                 name: AVAudioSessionRouteChangeNotification, object: player)
-            center.addObserver(self, selector: "audioSessionMessedUp:",
+            center.addObserver(self, selector: .audioSessionMessedUp,
                 name: AVAudioSessionMediaServicesWereLostNotification, object: player)
-            center.addObserver(self, selector: "audioSessionMessedUp:",
+            center.addObserver(self, selector: .audioSessionMessedUp,
                 name: AVAudioSessionMediaServicesWereResetNotification, object: player)
         #endif
-        center.addObserver(self, selector: "playerItemDidEnd:",
+        center.addObserver(self, selector: .itemDidEnd,
             name: AVPlayerItemDidPlayToEndTimeNotification, object: player)
 
         //Observing AVPlayer's property

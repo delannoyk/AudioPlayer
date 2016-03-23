@@ -631,7 +631,7 @@ public class AudioPlayer: NSObject {
                     seekToTime(cip)
                 }
 
-                retryCount++
+                retryCount += 1
 
                 //We gonna cancel this current retry and create a new one if the player isn't playing after a certain delay
                 /*let target = ClosureContainer() { [weak self] sender in

@@ -83,7 +83,7 @@ class AudioItemQueue {
 
         if oldMode.contains(.Repeat) && !mode.contains(.Repeat) &&
             historic.last == queue[nextPosition] {
-                nextPosition++
+                nextPosition += 1
         }
         if oldMode.contains(.Shuffle) && !mode.contains(.Shuffle) {
             queue = items

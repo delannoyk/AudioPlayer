@@ -110,6 +110,10 @@ class FakeItem: AVPlayerItem {
     }
 }
 
+private extension Selector {
+    static let fakePlayerTimerTicked = #selector(FakePlayer.timerTicked(_:))
+}
+
 class FakePlayer: AVPlayer {
     var timer: NSTimer?
     var startDate: NSDate?
@@ -130,7 +134,7 @@ class FakePlayer: AVPlayer {
     override func addPeriodicTimeObserverForInterval(interval: CMTime, queue: dispatch_queue_t?, usingBlock block: (CMTime) -> Void) -> AnyObject {
         observerClosure = block
         startDate = NSDate()
-        timer = NSTimer.scheduledTimerWithTimeInterval(CMTimeGetSeconds(interval), target: self, selector: "timerTicked:", userInfo: nil, repeats: true)
+        timer = NSTimer.scheduledTimerWithTimeInterval(CMTimeGetSeconds(interval), target: self, selector: .fakePlayerTimerTicked, userInfo: nil, repeats: true)
         return self
     }
 
