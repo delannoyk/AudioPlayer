@@ -19,48 +19,51 @@ class BackgroundHandler: NSObject {
     /// The backround task identifier if a background task started. Nil if not.
     private var backgroundTaskIdentifier: Int?
 
-    #if !os(OSX)
-    /// The application to create background task from.
-    private let application: UIApplication
-
-    init(application: UIApplication = UIApplication.sharedApplication()) {
-        self.application = application
-    }
-    #endif
-
     /**
      Starts a background task if there isn't already one.
+
+     - returns: A boolean value indicating whether a background task was created or not.
      */
-    func beginBackgroundTask() {
-        #if !os(OSX)
+    func beginBackgroundTask() -> Bool {
+        #if os(OSX)
+            return false
+        #else
             guard backgroundTaskIdentifier == nil else {
-                return
+                return false
             }
 
+            let application = UIApplication.sharedApplication()
             backgroundTaskIdentifier = application.beginBackgroundTaskWithExpirationHandler {
                 [weak self] in
 
                 if let backgroundTaskIdentifier = self?.backgroundTaskIdentifier {
-                    self?.application.endBackgroundTask(backgroundTaskIdentifier)
+                    application.endBackgroundTask(backgroundTaskIdentifier)
                 }
                 self?.backgroundTaskIdentifier = nil
             }
+            return true
         #endif
     }
 
     /**
      Ends the background task if there is one.
+
+     - returns: A boolean value indicating whether a background task was ended or not.
      */
-    func endBackgroundTask() {
-        #if !os(OSX)
+    func endBackgroundTask() -> Bool {
+        #if os(OSX)
+            return false
+        #else
             guard let backgroundTaskIdentifier = backgroundTaskIdentifier else {
-                return
+                return false
             }
 
+            let application = UIApplication.sharedApplication()
             if backgroundTaskIdentifier != UIBackgroundTaskInvalid {
                 application.endBackgroundTask(backgroundTaskIdentifier)
             }
             self.backgroundTaskIdentifier = nil
+            return true
         #endif
     }
 }
