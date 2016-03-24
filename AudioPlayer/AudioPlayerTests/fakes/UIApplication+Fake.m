@@ -12,7 +12,7 @@
 @implementation UIApplication (Fake)
 
 + (void) load {
-/*    Method m1 = class_getInstanceMethod(UIApplication.class, @selector(beginBackgroundTaskWithExpirationHandler:));
+    Method m1 = class_getInstanceMethod(UIApplication.class, @selector(beginBackgroundTaskWithExpirationHandler:));
     Method m2 = class_getInstanceMethod(UIApplication.class, @selector(fake_beginBackgroundTaskWithExpirationHandler:));
     if (m1 && m2) {
         method_exchangeImplementations(m1, m2);
@@ -22,9 +22,7 @@
     Method m4 = class_getInstanceMethod(UIApplication.class, @selector(fake_endBackgroundTask:));
     if (m3 && m4) {
         method_exchangeImplementations(m3, m4);
-    }*/
-
-    NSLog(@"Load called");
+    }
 }
 
 - (void) setOnBegin:(UIBackgroundTaskIdentifier (^)(void (^ _Nonnull)()))onBegin {
@@ -45,10 +43,7 @@
 
 
 - (UIBackgroundTaskIdentifier) fake_beginBackgroundTaskWithExpirationHandler:(void (^)(void))handler {
-    NSLog(@"fake_beginBackgroundTaskWithExpirationHandler");
-    //TODO: uncomment
-    //return self.onBegin ? self.onBegin(handler) : UIBackgroundTaskInvalid;
-    return 999;
+    return self.onBegin ? self.onBegin(handler) : UIBackgroundTaskInvalid;
 }
 
 - (void) fake_endBackgroundTask:(UIBackgroundTaskIdentifier)identifier {
