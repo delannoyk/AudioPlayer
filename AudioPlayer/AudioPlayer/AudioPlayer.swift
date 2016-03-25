@@ -182,8 +182,6 @@ public class AudioPlayer: NSObject {
         retryTimer = nil
 
         stop()
-
-        backgroundHandler.endBackgroundTask()
     }
 
 

@@ -19,6 +19,11 @@ class BackgroundHandler: NSObject {
     /// The backround task identifier if a background task started. Nil if not.
     private var backgroundTaskIdentifier: Int?
 
+    /// Ends background task if any on deinitialization.
+    deinit {
+        endBackgroundTask()
+    }
+
     /**
      Starts a background task if there isn't already one.
 
