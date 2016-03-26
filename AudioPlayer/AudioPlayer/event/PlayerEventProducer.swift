@@ -26,9 +26,11 @@ private extension AVPlayer {
 // MARK: - Selector+PlayerEventProducer
 
 private extension Selector {
+    #if os(iOS) || os(tvOS)
     /// The selector to call when the audio session is interrupted.
     static let audioSessionInterrupted =
         #selector(PlayerEventProducer.audioSessionGotInterrupted(_:))
+    #endif
 
     /// The selector to call when the audio session route changes.
     static let audioRouteChanged = #selector(PlayerEventProducer.audioSessionRouteChanged(_:))
