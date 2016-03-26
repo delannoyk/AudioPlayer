@@ -75,17 +75,7 @@ public class AudioPlayer: NSObject {
                 player?.rate = 0
                 player = nil
 
-                let URLInfo: AudioItemURL = {
-                    switch (self.currentQuality ?? self.defaultQuality) {
-                    case .High:
-                        return currentItem.highestQualityURL
-                    case .Medium:
-                        return currentItem.mediumQualityURL
-                    default:
-                        return currentItem.lowestQualityURL
-                    }
-                }()
-
+                let URLInfo = currentItem.URLForQuality(currentQuality)
                 if reachability.isReachable() || URLInfo.URL.isOfflineURL {
                     state = .Buffering
                 } else {
