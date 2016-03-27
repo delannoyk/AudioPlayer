@@ -34,6 +34,9 @@ class NetworkEventProducer: NSObject, EventProducer {
     /// The reachability to work with.
     let reachability: Reachability
 
+    /// The date at which connection was lost.
+    private(set) var connectionLossDate: NSDate?
+
     /// The listener that will be alerted a new event occured.
     weak var eventListener: EventListener?
 
@@ -51,6 +54,10 @@ class NetworkEventProducer: NSObject, EventProducer {
     init(reachability: Reachability) {
         lastStatus = reachability.currentReachabilityStatus
         self.reachability = reachability
+        
+        if lastStatus == .NotReachable {
+            connectionLossDate = NSDate()
+        }
     }
 
     /**
@@ -107,9 +114,11 @@ class NetworkEventProducer: NSObject, EventProducer {
         let newStatus = reachability.currentReachabilityStatus
         if newStatus != lastStatus {
             if newStatus == .NotReachable {
+                connectionLossDate = NSDate()
                 eventListener?.onEvent(NetworkEvent.ConnectionLost, generetedBy: self)
             } else if lastStatus == .NotReachable {
                 eventListener?.onEvent(NetworkEvent.ConnectionRetrieved, generetedBy: self)
+                connectionLossDate = nil
             } else {
                 eventListener?.onEvent(NetworkEvent.NetworkChanged, generetedBy: self)
             }

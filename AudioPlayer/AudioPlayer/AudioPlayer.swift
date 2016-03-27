@@ -79,7 +79,6 @@ public class AudioPlayer: NSObject {
                 if reachability.isReachable() || URLInfo.URL.isOfflineURL {
                     state = .Buffering
                 } else {
-                    connectionLossDate = NSDate()
                     stateWhenConnectionLost = .Buffering
                     state = .WaitingForConnection
                     return
@@ -222,9 +221,6 @@ public class AudioPlayer: NSObject {
 
     /// The state of the player when the connection was lost
     private var stateWhenConnectionLost: AudioPlayerState?
-
-    /// The date of the connection loss
-    private var connectionLossDate: NSDate?
 
     /// Boolean value indicating whether the player should resume playing (after buffering)
     private var shouldResumePlaying: Bool {
@@ -661,7 +657,6 @@ extension AudioPlayer: EventListener {
 
             //In case we're not playing offline file
             if !(currentItem.soundURLs[currentQuality]?.isOfflineURL ?? false) {
-                connectionLossDate = NSDate()
                 stateWhenConnectionLost = state
 
                 if let currentItem = player?.currentItem where currentItem.playbackBufferEmpty {
@@ -677,7 +672,7 @@ extension AudioPlayer: EventListener {
         case .ConnectionRetrieved:
             //Early exit if connection wasn't lost during playing or `resumeAfterConnectionLoss`
             //isn't enabled.
-            guard let lossDate = connectionLossDate,
+            guard let lossDate = networkEventProducer.connectionLossDate,
                 stateWhenLost = stateWhenConnectionLost where resumeAfterConnectionLoss else {
                     return
             }
@@ -689,7 +684,6 @@ extension AudioPlayer: EventListener {
                 retryOrPlayNext()
             }
 
-            connectionLossDate = nil
             stateWhenConnectionLost = nil
 
         case .NetworkChanged:
