@@ -546,7 +546,6 @@ public class AudioPlayer: NSObject {
     }
     #endif
 
-
     // MARK: MPNowPlayingInfoCenter
 
     /**
@@ -554,44 +553,17 @@ public class AudioPlayer: NSObject {
     */
     private func updateNowPlayingInfoCenter() {
         #if os(iOS) || os(tvOS)
-            if let currentItem = currentItem {
-                var info = [String: AnyObject]()
-                if let title = currentItem.title {
-                    info[MPMediaItemPropertyTitle] = title
-                }
-                if let artist = currentItem.artist {
-                    info[MPMediaItemPropertyArtist] = artist
-                }
-                if let album = currentItem.album {
-                    info[MPMediaItemPropertyAlbumTitle] = album
-                }
-                if let trackCount = currentItem.trackCount {
-                    info[MPMediaItemPropertyAlbumTrackCount] = trackCount
-                }
-                if let trackNumber = currentItem.trackNumber {
-                    info[MPMediaItemPropertyAlbumTrackNumber] = trackNumber
-                }
-                #if os(iOS)
-                    if let artwork = currentItem.artworkImage {
-                        info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(image: artwork)
-                    }
-                #endif
-                if let duration = currentItemDuration {
-                    info[MPMediaItemPropertyPlaybackDuration] = duration
-                }
-                if let progression = currentItemProgression {
-                    info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = progression
-                }
-
-                info[MPNowPlayingInfoPropertyPlaybackRate] = player?.rate ?? 0
-
-                MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = info
+            if let item = currentItem {
+                MPNowPlayingInfoCenter.defaultCenter().updateWithItem(
+                    item,
+                    duration: currentItemDuration,
+                    progression: currentItemProgression,
+                    playbackRate: player?.rate ?? 0)
             } else {
                 MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = nil
             }
         #endif
     }
-
 
     // MARK: Retrying
 
