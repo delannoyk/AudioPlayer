@@ -6,6 +6,7 @@
 //  Copyright © 2016 Kevin Delannoy. All rights reserved.
 //
 
+import UIKit
 import AVFoundation
 import SystemConfiguration
 @testable import AudioPlayer
@@ -166,5 +167,18 @@ class FakeMetadataItem: AVMetadataItem {
 
     override var value: protocol<NSCopying, NSObjectProtocol>? {
         return _value
+    }
+}
+
+class FakeApplication: BackgroundTaskCreator {
+    var onBegin: ((() -> ())? -> UIBackgroundTaskIdentifier)?
+    var onEnd: (UIBackgroundTaskIdentifier -> ())?
+
+    func beginBackgroundTaskWithExpirationHandler(handler: (() -> Void)?) -> UIBackgroundTaskIdentifier {
+        return onBegin?(handler) ?? UIBackgroundTaskInvalid
+    }
+
+    func endBackgroundTask(identifier: UIBackgroundTaskIdentifier) {
+        onEnd?(identifier)
     }
 }

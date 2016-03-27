@@ -15,7 +15,6 @@
 		462FC8051C9D7C33005A674B /* AudioPlayerMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462FC8021C9D7C33005A674B /* AudioPlayerMode.swift */; };
 		4669307A1BAD30AB00C1E97C /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466930791BAD30AB00C1E97C /* Reachability.swift */; };
 		468E897C1CA1C8E0007F53AD /* BackgroundHandler_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468E897B1CA1C8E0007F53AD /* BackgroundHandler_Tests.swift */; };
-		468E89801CA1D952007F53AD /* UIApplication+Fake.m in Sources */ = {isa = PBXBuildFile; fileRef = 468E897F1CA1D952007F53AD /* UIApplication+Fake.m */; };
 		46AADEE71CA1BA5A00CF7A3D /* BackgroundHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46AADEE61CA1BA5A00CF7A3D /* BackgroundHandler.swift */; };
 		46AADEE81CA1BA5A00CF7A3D /* BackgroundHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46AADEE61CA1BA5A00CF7A3D /* BackgroundHandler.swift */; };
 		46AADEE91CA1BA5A00CF7A3D /* BackgroundHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46AADEE61CA1BA5A00CF7A3D /* BackgroundHandler.swift */; };
@@ -83,9 +82,6 @@
 		462FC8021C9D7C33005A674B /* AudioPlayerMode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioPlayerMode.swift; sourceTree = "<group>"; };
 		466930791BAD30AB00C1E97C /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Reachability.swift; path = AudioPlayer/Reachability.swift; sourceTree = SOURCE_ROOT; };
 		468E897B1CA1C8E0007F53AD /* BackgroundHandler_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackgroundHandler_Tests.swift; sourceTree = "<group>"; };
-		468E897D1CA1D952007F53AD /* AudioPlayerTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AudioPlayerTests-Bridging-Header.h"; sourceTree = "<group>"; };
-		468E897E1CA1D952007F53AD /* UIApplication+Fake.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIApplication+Fake.h"; sourceTree = "<group>"; };
-		468E897F1CA1D952007F53AD /* UIApplication+Fake.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIApplication+Fake.m"; sourceTree = "<group>"; };
 		46AADEE61CA1BA5A00CF7A3D /* BackgroundHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackgroundHandler.swift; sourceTree = "<group>"; };
 		46D3A2E01C8F480A00635FE4 /* EventProducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventProducer.swift; sourceTree = "<group>"; };
 		46D3A2E41C8F489700635FE4 /* PlayerEventProducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerEventProducer.swift; sourceTree = "<group>"; };
@@ -217,9 +213,6 @@
 			children = (
 				46DDB0A31C95E6DC007B60C6 /* image.png */,
 				46D3A2FC1C90922700635FE4 /* Fakes.swift */,
-				468E897E1CA1D952007F53AD /* UIApplication+Fake.h */,
-				468E897F1CA1D952007F53AD /* UIApplication+Fake.m */,
-				468E897D1CA1D952007F53AD /* AudioPlayerTests-Bridging-Header.h */,
 			);
 			path = fakes;
 			sourceTree = "<group>";
@@ -486,7 +479,6 @@
 				468E897C1CA1C8E0007F53AD /* BackgroundHandler_Tests.swift in Sources */,
 				46D3A2F91C90905C00635FE4 /* NetworkEventProducer_Tests.swift in Sources */,
 				46170A311C9B2DA0001F85F9 /* AudioPlayerState_Tests.swift in Sources */,
-				468E89801CA1D952007F53AD /* UIApplication+Fake.m in Sources */,
 				46E49EF41C94B27000490721 /* AudioItemQueue_Tests.swift in Sources */,
 				46D3A3271C94469E00635FE4 /* QualityAdjustmentEventProducer_Tests.swift in Sources */,
 				46F956091C97385400923EE1 /* AudioItemEventProducer_Tests.swift in Sources */,
@@ -688,7 +680,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "be.delannoyk.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "AudioPlayerTests/fakes/AudioPlayerTests-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -701,7 +692,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "be.delannoyk.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "AudioPlayerTests/fakes/AudioPlayerTests-Bridging-Header.h";
 			};
 			name = Release;
 		};

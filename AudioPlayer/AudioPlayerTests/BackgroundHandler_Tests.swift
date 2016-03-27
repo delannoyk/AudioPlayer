@@ -10,12 +10,13 @@ import XCTest
 @testable import AudioPlayer
 
 class BackgroundHandler_Tests: XCTestCase {
-    var application = UIApplication.sharedApplication()
+    var application = FakeApplication()
     var backgroundHandler: BackgroundHandler!
     
     override func setUp() {
         super.setUp()
         backgroundHandler = BackgroundHandler()
+        backgroundHandler.backgroundTaskCreator = application
     }
     
     override func tearDown() {
@@ -53,9 +54,7 @@ class BackgroundHandler_Tests: XCTestCase {
     }
 
     func testHandlerEndsTaskIfCalled() {
-        //FIXME: In order to have a valid UIApplication, this test needs to be ran in
-        // a host application. So this will come with an example app.
-        /*var handler: (() -> ())?
+        var handler: (() -> ())?
         application.onBegin = { h in
             handler = h
             return 1
@@ -63,6 +62,6 @@ class BackgroundHandler_Tests: XCTestCase {
         XCTAssert(backgroundHandler.beginBackgroundTask())
         XCTAssertNotNil(handler)
         handler?()
-        XCTAssertFalse(backgroundHandler.endBackgroundTask())*/
+        XCTAssertFalse(backgroundHandler.endBackgroundTask())
     }
 }
