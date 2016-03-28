@@ -150,6 +150,15 @@ public class AudioPlayer: NSObject {
         }
     }
 
+    /// A boolean value indicating whether there is a next item to play or not.
+    public var hasNext: Bool {
+        return queue?.hasNextItem ?? false
+    }
+
+    /// A boolean value indicating whether there is a previous item to play or not.
+    public var hasPrevious: Bool {
+        return queue?.hasPreviousItem ?? false
+    }
 
 
 
@@ -426,15 +435,6 @@ public class AudioPlayer: NSObject {
     }
 
     /**
-    Returns whether there is a next item in the queue or not.
-
-    - returns: A boolean value indicating whether there is a next item to play or not.
-    */
-    public func hasNext() -> Bool {
-        return queue?.hasNextItem ?? false
-    }
-
-    /**
     Plays previous item in the queue or rewind current item.
     */
     public func previous() {
@@ -610,7 +610,7 @@ public class AudioPlayer: NSObject {
         if mode.intersect(.Repeat) != [] {
             seekToTime(0)
             resume()
-        } else if hasNext() {
+        } else if hasNext {
             next()
         } else {
             stop()
