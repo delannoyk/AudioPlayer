@@ -139,6 +139,7 @@ class AudioItemQueue {
 
      - returns: The previous item in the queue.
      */
+    @warn_unused_result
     func previousItem() -> AudioItem? {
         //Early exit if queue is empty
         guard queue.count > 0 else {
