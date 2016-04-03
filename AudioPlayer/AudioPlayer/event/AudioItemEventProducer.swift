@@ -12,7 +12,7 @@ import Foundation
 
 extension AudioItem {
     /// The list of properties that is observed through KVO.
-    private static var KVOProperties: [String] {
+    private static var ap_KVOProperties: [String] {
         return ["artist", "title", "album", "trackCount", "trackNumber", "artworkImage"]
     }
 }
@@ -73,7 +73,7 @@ class AudioItemEventProducer: NSObject, EventProducer {
         }
 
         //Observing AudioItem's property
-        for keyPath in AudioItem.KVOProperties {
+        for keyPath in AudioItem.ap_KVOProperties {
             item.addObserver(self, forKeyPath: keyPath, options: .New, context: nil)
         }
 
@@ -89,7 +89,7 @@ class AudioItemEventProducer: NSObject, EventProducer {
         }
 
         //Unobserving AudioItem's property
-        for keyPath in AudioItem.KVOProperties {
+        for keyPath in AudioItem.ap_KVOProperties {
             item.removeObserver(self, forKeyPath: keyPath)
         }
 
