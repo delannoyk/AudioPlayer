@@ -12,7 +12,7 @@ import AVFoundation
 
 private extension AVPlayer {
     /// The list of properties that is observed through KVO.
-    static var KVOProperties: [String] {
+    static var ap_KVOProperties: [String] {
         return [
             "currentItem.playbackBufferEmpty",
             "currentItem.playbackLikelyToKeepUp",
@@ -156,7 +156,7 @@ class PlayerEventProducer: NSObject, EventProducer {
             name: AVPlayerItemDidPlayToEndTimeNotification, object: player)
 
         //Observing AVPlayer's property
-        for keyPath in AVPlayer.KVOProperties {
+        for keyPath in AVPlayer.ap_KVOProperties {
             player.addObserver(self, forKeyPath: keyPath, options: .New, context: nil)
         }
 
@@ -195,7 +195,7 @@ class PlayerEventProducer: NSObject, EventProducer {
         center.removeObserver(self, name: AVPlayerItemDidPlayToEndTimeNotification, object: player)
 
         //Unobserving AVPlayer's property
-        for keyPath in AVPlayer.KVOProperties {
+        for keyPath in AVPlayer.ap_KVOProperties {
             player.removeObserver(self, forKeyPath: keyPath)
         }
 
