@@ -16,7 +16,7 @@ private extension Array {
 
      - returns: A shuffled array.
      */
-    func shuffled() -> [Element] {
+    func ap_shuffled() -> [Element] {
         return sort { element1, element2 in
             random() % 2 == 0
         }
@@ -57,7 +57,7 @@ class AudioItemQueue {
     init(items: [AudioItem], mode: AudioPlayerMode) {
         self.items = items
         self.mode = mode
-        queue = mode.contains(.Shuffle) ? items.shuffled() : items
+        queue = mode.contains(.Shuffle) ? items.ap_shuffled() : items
         historic = []
     }
 
@@ -93,7 +93,7 @@ class AudioItemQueue {
         } else if mode.contains(.Shuffle) && !oldMode.contains(.Shuffle) {
             let alreadyPlayed = queue.prefixUpTo(nextPosition)
             let leftovers = queue.suffixFrom(nextPosition)
-            queue = Array(alreadyPlayed).shuffled() + Array(leftovers).shuffled()
+            queue = Array(alreadyPlayed).ap_shuffled() + Array(leftovers).ap_shuffled()
         }
     }
 
