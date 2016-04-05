@@ -223,37 +223,29 @@ class PlayerEventProducer: NSObject, EventProducer {
      */
     override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?,
         change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
-            if let keyPath = keyPath, player = object as? AVPlayer {
+            if let keyPath = keyPath, p = object as? AVPlayer, currentItem = p.currentItem {
                 switch keyPath {
                 case "currentItem.duration":
-                    if let currentItem = player.currentItem {
-                        let duration = currentItem.duration
-                        eventListener?.onEvent(PlayerEvent.LoadedDuration(duration),
-                            generetedBy: self)
+                    let duration = currentItem.duration
+                    eventListener?.onEvent(PlayerEvent.LoadedDuration(duration),
+                                           generetedBy: self)
 
-                        let metadata = currentItem.asset.commonMetadata
-                        eventListener?.onEvent(PlayerEvent.LoadedMetadata(metadata),
-                            generetedBy: self)
-                    }
+                    let metadata = currentItem.asset.commonMetadata
+                    eventListener?.onEvent(PlayerEvent.LoadedMetadata(metadata),
+                                           generetedBy: self)
 
-                case "currentItem.playbackBufferEmpty":
-                    if let empty = player.currentItem?.playbackBufferEmpty where empty {
-                        eventListener?.onEvent(PlayerEvent.StartedBuffering, generetedBy: self)
-                    }
+                case "currentItem.playbackBufferEmpty" where currentItem.playbackBufferEmpty:
+                    eventListener?.onEvent(PlayerEvent.StartedBuffering, generetedBy: self)
 
-                case "currentItem.playbackLikelyToKeepUp":
-                    if let keepUp = player.currentItem?.playbackLikelyToKeepUp where keepUp {
-                        eventListener?.onEvent(PlayerEvent.ReadyToPlay, generetedBy: self)
-                    }
+                case "currentItem.playbackLikelyToKeepUp" where currentItem.playbackLikelyToKeepUp:
+                    eventListener?.onEvent(PlayerEvent.ReadyToPlay, generetedBy: self)
 
-                case "currentItem.status":
-                    if let item = player.currentItem where item.status == .Failed {
-                        eventListener?.onEvent(PlayerEvent.EndedPlaying(item.error),
-                            generetedBy: self)
-                    }
+                case "currentItem.status" where currentItem.status == .Failed:
+                    eventListener?.onEvent(PlayerEvent.EndedPlaying(currentItem.error),
+                                           generetedBy: self)
 
                 case "currentItem.loadedTimeRanges":
-                    if let range = player.currentItem?.loadedTimeRanges.last?.CMTimeRangeValue {
+                    if let range = currentItem.loadedTimeRanges.last?.CMTimeRangeValue {
                         eventListener?.onEvent(PlayerEvent.LoadedMoreRange(range.start, range.end),
                             generetedBy: self)
                     }

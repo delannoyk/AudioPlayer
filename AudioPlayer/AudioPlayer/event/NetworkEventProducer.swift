@@ -54,7 +54,7 @@ class NetworkEventProducer: NSObject, EventProducer {
     init(reachability: Reachability) {
         lastStatus = reachability.currentReachabilityStatus
         self.reachability = reachability
-        
+
         if lastStatus == .NotReachable {
             connectionLossDate = NSDate()
         }
