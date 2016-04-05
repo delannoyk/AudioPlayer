@@ -128,9 +128,9 @@ public class AudioItem: NSObject {
 
     /**
      Returns an URL that best fits a given quality.
-     
+
      - parameter quality: The quality for the requested URL.
-     
+
      - returns: The URL that best fits the given quality.
      */
     func URLForQuality(quality: AudioQuality) -> AudioItemURL {
