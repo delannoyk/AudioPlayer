@@ -80,7 +80,7 @@
 		462679411AED567D003771C9 /* Info-iOS.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-iOS.plist"; sourceTree = "<group>"; };
 		462679481AED567D003771C9 /* AudioPlayerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AudioPlayerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4626794E1AED567D003771C9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		462679671AED5DDC003771C9 /* AudioPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AudioPlayer.swift; path = AudioPlayer/AudioPlayer.swift; sourceTree = SOURCE_ROOT; };
+		462679671AED5DDC003771C9 /* AudioPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AudioPlayer.swift; path = AudioPlayer/player/AudioPlayer.swift; sourceTree = SOURCE_ROOT; };
 		462FC8021C9D7C33005A674B /* AudioPlayerMode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioPlayerMode.swift; sourceTree = "<group>"; };
 		4631A0301CA7D6F300202AA3 /* MPNowPlayingInfoCenter+AudioItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MPNowPlayingInfoCenter+AudioItem.swift"; sourceTree = "<group>"; };
 		466930791BAD30AB00C1E97C /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Reachability.swift; path = AudioPlayer/Reachability.swift; sourceTree = SOURCE_ROOT; };
@@ -232,6 +232,7 @@
 		46D3A2FF1C90A5D600635FE4 /* player */ = {
 			isa = PBXGroup;
 			children = (
+				462679671AED5DDC003771C9 /* AudioPlayer.swift */,
 				46D3A3091C93389500635FE4 /* AudioPlayerState.swift */,
 				46D3A3001C90A93400635FE4 /* AudioPlayerDelegate.swift */,
 				462FC8021C9D7C33005A674B /* AudioPlayerMode.swift */,
@@ -264,7 +265,6 @@
 				46D3A2FF1C90A5D600635FE4 /* player */,
 				46D3A2FE1C90A5C600635FE4 /* item */,
 				46D3A2DB1C8F442200635FE4 /* event */,
-				462679671AED5DDC003771C9 /* AudioPlayer.swift */,
 				466930791BAD30AB00C1E97C /* Reachability.swift */,
 			);
 			path = AudioPlayer;
