@@ -60,6 +60,10 @@ class BackgroundHandler: NSObject {
     /// The backround task identifier if a background task started. Nil if not.
     private var taskIdentifier: Int?
 
+    /// The number of background request received. When this counter hits 0, the background
+    /// task, if any, will be terminated.
+    private var counter = 0
+
     /// Ends background task if any on deinitialization.
     deinit {
         endBackgroundTask()
@@ -74,6 +78,8 @@ class BackgroundHandler: NSObject {
         #if os(OSX)
             return false
         #else
+            counter += 1
+
             guard taskIdentifier == nil else {
                 return false
             }
@@ -100,6 +106,12 @@ class BackgroundHandler: NSObject {
             return false
         #else
             guard let taskIdentifier = taskIdentifier else {
+                return false
+            }
+
+            counter -= 1
+
+            guard counter == 0 else {
                 return false
             }
 
