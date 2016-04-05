@@ -76,6 +76,6 @@ public protocol AudioPlayerDelegate: NSObjectProtocol {
      - parameter range:       The time range that the audio player loaded.
      - parameter item:        Current item.
      */
-    func audioPlayer(audioPlayer: AudioPlayer, didLoadRange range: AudioPlayer.TimeRange,
+    func audioPlayer(audioPlayer: AudioPlayer, didLoadRange range: TimeRange,
         forItem item: AudioItem)
 }

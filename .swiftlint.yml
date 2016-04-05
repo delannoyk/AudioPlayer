@@ -1,0 +1,6 @@
+included:
+  - AudioPlayer/AudioPlayer
+exluded:
+  - AudioPlayer/AudioPlayerTests
+disabled_rules:
+  - variable_name
