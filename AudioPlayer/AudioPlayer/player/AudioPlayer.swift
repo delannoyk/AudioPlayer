@@ -57,6 +57,8 @@ public class AudioPlayer: NSObject {
             if #available(OSX 10.11, *) {
                 player?.allowsExternalPlayback = false
             }
+            player?.volume = volume
+            player?.rate = rate
 
             if let player = player {
                 playerEventProducer.player = player
@@ -80,12 +82,14 @@ public class AudioPlayer: NSObject {
     public internal(set) var currentItem: AudioItem? {
         didSet {
             if let currentItem = currentItem {
-                //TODO: begin a background task until it starts playing
-                startAudioSession()
-
+                //Stops the current player
                 player?.rate = 0
                 player = nil
 
+                //Ensures the audio session got started
+                startAudioSession()
+
+                //Sets new state
                 let URLInfo = currentItem.URLForQuality(currentQuality)
                 if reachability.isReachable() || URLInfo.URL.ap_isOfflineURL {
                     state = .Buffering
@@ -95,21 +99,19 @@ public class AudioPlayer: NSObject {
                     return
                 }
 
+                //Creates new player
                 player = AVPlayer(URL: URLInfo.URL)
-                player?.volume = volume
                 currentQuality = URLInfo.quality
 
-                player?.rate = rate
-
+                //Updates information on the lock screen
                 updateNowPlayingInfoCenter()
 
+                //Calls delegate
                 if oldValue != currentItem {
                     delegate?.audioPlayer(self, willStartPlayingItem: currentItem)
                 }
             } else {
-                if let _ = oldValue {
-                    stop()
-                }
+                stop()
             }
         }
     }
