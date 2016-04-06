@@ -63,10 +63,16 @@ extension AudioPlayer {
      Stops the player and clear the queue.
      */
     public func stop() {
-        player?.rate = 0
-        player = nil
-        currentItem = nil
-        queue = nil
+        if let _ = player {
+            player?.rate = 0
+            player = nil
+        }
+        if let _ = currentItem {
+            currentItem = nil
+        }
+        if let _ = queue {
+            queue = nil
+        }
 
         state = .Stopped
     }
