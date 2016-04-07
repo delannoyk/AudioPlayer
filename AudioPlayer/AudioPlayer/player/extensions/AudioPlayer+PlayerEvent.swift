@@ -105,7 +105,7 @@ extension AudioPlayer {
         case .SessionMessedUp:
             #if os(iOS) || os(tvOS)
                 //We reenable the audio session directly in case we're in background
-                startAudioSession()
+                setAudioSessionActive(true)
 
                 //Aaaaand we: restart playing/go to next
                 state = .Stopped
