@@ -210,6 +210,12 @@ public class AudioPlayer: NSObject {
             updateNowPlayingInfoCenter()
 
             if state != oldValue {
+                if state == .Buffering {
+                    backgroundHandler.beginBackgroundTask()
+                } else if oldValue == .Buffering {
+                    backgroundHandler.endBackgroundTask()
+                }
+
                 delegate?.audioPlayer(self, didChangeFromState: oldValue, toState: state)
             }
         }
