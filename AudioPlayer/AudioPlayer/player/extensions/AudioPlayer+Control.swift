@@ -74,6 +74,7 @@ extension AudioPlayer {
             queue = nil
         }
 
+        setAudioSessionActive(false)
         state = .Stopped
     }
 

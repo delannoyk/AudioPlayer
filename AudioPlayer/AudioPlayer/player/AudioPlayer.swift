@@ -87,7 +87,7 @@ public class AudioPlayer: NSObject {
                 player = nil
 
                 //Ensures the audio session got started
-                startAudioSession()
+                setAudioSessionActive(true)
 
                 //Sets new state
                 let URLInfo = currentItem.URLForQuality(currentQuality)
@@ -292,10 +292,10 @@ public class AudioPlayer: NSObject {
     /**
      Activates the `AVAudioSession` and sets the right category.
      */
-    func startAudioSession() {
+    func setAudioSessionActive(active: Bool) {
         #if os(iOS) || os(tvOS)
-            _ = try? AVAudioSession.sharedInstance().setActive(true)
             _ = try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+            _ = try? AVAudioSession.sharedInstance().setActive(active)
         #endif
     }
 
