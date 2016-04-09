@@ -21,7 +21,7 @@ extension CMTime {
     /// Returns the NSTimerInterval value of CMTime (only if it's a valid value).
     var ap_timeIntervalValue: NSTimeInterval? {
         let seconds = CMTimeGetSeconds(self)
-        if !isnan(seconds) {
+        if !seconds.isNaN {
             return NSTimeInterval(seconds)
         }
         return nil
