@@ -18,4 +18,5 @@ Pod::Spec.new do |s|
 
   s.osx.deployment_target = '10.10'
   s.osx.framework = 'Foundation', 'AVFoundation', 'SystemConfiguration'
+  s.osx.exclude_files = 'AudioPlayer/AudioPlayer/utils/MPNowPlayingInfoCenter+AudioItem.swift'
 end
