@@ -45,6 +45,9 @@ public class AudioPlayer: NSObject {
     /// The audio item event producer.
     var audioItemEventProducer = AudioItemEventProducer()
 
+    /// The retry event producer.
+    var retryEventProducer = RetryEventProducer()
+
 
     //MARK: Player
 
@@ -158,10 +161,24 @@ public class AudioPlayer: NSObject {
 
     /// The maximum number of interruption before putting the player to Stopped mode. Default
     /// value is 10.
-    public var maximumRetryCount = 10
+    public var maximumRetryCount: Int {
+        get {
+            return retryEventProducer.maximumRetryCount
+        }
+        set {
+            retryEventProducer.maximumRetryCount = newValue
+        }
+    }
 
     /// The delay to wait before cancelling last retry and retrying. Default value is 10 seconds.
-    public var retryTimeout = NSTimeInterval(10)
+    public var retryTimeout: NSTimeInterval {
+        get {
+            return retryEventProducer.retryTimeout
+        }
+        set {
+            retryEventProducer.retryTimeout = newValue
+        }
+    }
 
     /// Defines whether the player should resume after a system interruption or not. Default value
     /// is `true`.
@@ -263,9 +280,6 @@ public class AudioPlayer: NSObject {
      it was previously playing.
      */
     deinit {
-        retryTimer?.invalidate()
-        retryTimer = nil
-
         stop()
     }
 
@@ -300,24 +314,7 @@ public class AudioPlayer: NSObject {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
     // MARK: Public computed properties
-
-    /// The current number of retry we already tried
-    var retryCount = 0
-
-    /// The timer used to cancel a retry and make a new one
-    var retryTimer: NSTimer?
 
     /// Boolean value indicating whether the player should resume playing (after buffering)
     var shouldResumePlaying: Bool {
@@ -327,6 +324,7 @@ public class AudioPlayer: NSObject {
             (stateBeforeBuffering == nil || stateBeforeBuffering != .Paused)
     }
 
+
     // MARK: Retrying
 
     /**
@@ -334,22 +332,23 @@ public class AudioPlayer: NSObject {
      (or enabled). If not, it'll just play the next item in queue.
      */
     func retryOrPlayNext() {
-        if state == .Playing {
+        guard state != .Playing else {
             return
         }
 
-        if maximumRetryCount > 0 {
-            if retryCount < maximumRetryCount {
-                //We can retry
-                let cip = currentItemProgression
-                let ci = currentItem
+        guard maximumRetryCount > 0 && retryCount < maximumRetryCount else {
+            retryCount = 0
+            nextOrStop()
+            return
+        }
 
-                currentItem = ci
-                if let cip = cip {
-                    seekToTime(cip)
-                }
-
-                retryCount += 1
+        let cip = currentItemProgression
+        let ci = currentItem
+        currentItem = ci
+        if let cip = cip {
+            seekToTime(cip)
+        }
+        retryCount += 1
 
                 //We gonna cancel this current retry and create a new one if the player
                 //isn't playing after a certain delay
@@ -360,14 +359,6 @@ public class AudioPlayer: NSObject {
                 //    selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
                 NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
                 retryTimer = timer*/
-
-                return
-            } else {
-                retryCount = 0
-            }
-        }
-
-        nextOrStop()
     }
 }
 
