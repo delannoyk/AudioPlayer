@@ -338,7 +338,7 @@ public class AudioPlayer: NSObject {
 
         guard maximumRetryCount > 0 && retryCount < maximumRetryCount else {
             retryCount = 0
-            nextOrStop()
+            state = .Failed(.MaximumRetryCountHit)
             return
         }
 

@@ -9,6 +9,36 @@
 import Foundation
 
 /**
+ The possible errors an `AudioPlayer` can fail with.
+
+ - MaximumRetryCountHit: The player hit the maximum retry count.
+ - FoundationError:      The `AVPlayer` failed to play.
+ */
+public enum AudioPlayerError: ErrorType, Equatable {
+    case MaximumRetryCountHit
+    case FoundationError(NSError)
+}
+
+/**
+ Return true if `lhs` is equal to `rhs`.
+
+ - parameter lhs: The left value.
+ - parameter rhs: The right value.
+
+ - returns: true if `lhs` is equal to `rhs`.
+ */
+public func == (lhs: AudioPlayerError, rhs: AudioPlayerError) -> Bool {
+    switch (lhs, rhs) {
+    case (.MaximumRetryCountHit, .MaximumRetryCountHit):
+        return true
+    case (.FoundationError(let e1), .FoundationError(let e2)):
+        return e1 == e2
+    default:
+        return false
+    }
+}
+
+/**
  `AudioPlayerState` defines 4 state an `AudioPlayer` instance can be in.
 
  - `Buffering`:            The player is buffering data before playing them.
@@ -24,7 +54,7 @@ public enum AudioPlayerState: Equatable {
     case Paused
     case Stopped
     case WaitingForConnection
-    case Failed(NSError?)
+    case Failed(AudioPlayerError)
 }
 
 /**

@@ -11,8 +11,7 @@ extension AudioPlayer {
         switch event {
         case .EndedPlaying(let error):
             if let error = error {
-                state = .Failed(error)
-                nextOrStop()
+                state = .Failed(.FoundationError(error))
             } else {
                 nextOrStop()
             }
