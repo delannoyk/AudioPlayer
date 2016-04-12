@@ -346,7 +346,9 @@ public class AudioPlayer: NSObject {
         let ci = currentItem
         currentItem = ci
         if let cip = cip {
-            seekToTime(cip)
+            //We can't call self.seekToTime in here since the player is new
+            //and `cip` is probably not in the seekableTimeRanges.
+            player?.seekToTime(CMTime(seconds: cip, preferredTimescale: 1000000000))
         }
         retryCount += 1
 

@@ -41,7 +41,9 @@ extension AudioPlayer {
         qualityIsBeingChanged = true
         player?.replaceCurrentItemWithPlayerItem(item)
         if let cip = cip {
-            seekToTime(cip)
+            //We can't call self.seekToTime in here since the player is loading a new
+            //item and `cip` is probably not in the seekableTimeRanges.
+            player?.seekToTime(CMTime(timeInterval: cip))
         }
         qualityIsBeingChanged = false
 
