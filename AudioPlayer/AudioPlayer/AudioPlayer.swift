@@ -619,9 +619,12 @@ public class AudioPlayer: NSObject {
     */
     public func addItemsToQueue(items: [AudioItem]) {
         if currentItem != nil {
-            var idx = 0
-            enqueuedItems = (enqueuedItems ?? []) + items.map { (position: idx++, item: $0) }
-            adaptQueueToPlayerMode()
+            var idx = enqueuedItems?.count ?? 0
+            var toAdd = items.map { (position: idx++, item: $0) }
+            if mode.contains(.Shuffle) {
+                toAdd = toAdd.shuffled()
+            }
+            enqueuedItems = (enqueuedItems ?? []) + toAdd
         }
         else {
             playItems(items)
