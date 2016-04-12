@@ -1113,7 +1113,9 @@ public class AudioPlayer: NSObject {
 
                 currentItem = ci
                 if let cip = cip {
-                    seekToTime(cip)
+                    //We can't call self.seekToTime in here since the player is new
+                    //and `cip` is probably not in the seekableTimeRanges.
+                    player?.seekToTime(CMTime(seconds: cip, preferredTimescale: 1000000000))
                 }
 
                 retryCount++
@@ -1176,7 +1178,9 @@ public class AudioPlayer: NSObject {
                     qualityIsBeingChanged = true
                     player?.replaceCurrentItemWithPlayerItem(item)
                     if let cip = cip {
-                        seekToTime(cip)
+                        //We can't call self.seekToTime in here since the player is loading a new
+                        //item and `cip` is probably not in the seekableTimeRanges.
+                        player?.seekToTime(CMTime(seconds: cip, preferredTimescale: 1000000000))
                     }
                     qualityIsBeingChanged = false
 
@@ -1202,7 +1206,9 @@ public class AudioPlayer: NSObject {
                     qualityIsBeingChanged = true
                     player?.replaceCurrentItemWithPlayerItem(item)
                     if let cip = cip {
-                        seekToTime(cip)
+                        //We can't call self.seekToTime in here since the player is loading a new
+                        //item and `cip` is probably not in the seekableTimeRanges.
+                        player?.seekToTime(CMTime(seconds: cip, preferredTimescale: 1000000000))
                     }
                     qualityIsBeingChanged = false
 
