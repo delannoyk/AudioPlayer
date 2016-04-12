@@ -43,7 +43,7 @@ public enum AudioPlayerState {
     case Paused
     case Stopped
     case WaitingForConnection
-    case Failed(NSError?)
+    case Failed(AudioPlayerError)
 }
 
 extension AudioPlayerState: Equatable { }
@@ -60,8 +60,8 @@ public func ==(lhs: AudioPlayerState, rhs: AudioPlayerState) -> Bool {
         return true
     case (.WaitingForConnection, .WaitingForConnection):
         return true
-    case (.Failed(let e1), .Failed(let e2)):
-        return e1 == e2
+    case (.Failed, .Failed):
+        return true
     default:
         return false
     }
@@ -96,6 +96,14 @@ public struct AudioPlayerModeMask: OptionSetType {
     public static var RepeatAll: AudioPlayerModeMask {
         return self.init(rawValue: 0b100)
     }
+}
+
+
+// MARK: - AudioPlayerError
+
+public enum AudioPlayerError: ErrorType {
+    case MaximumRetryCountHit
+    case FoundationError(NSError?)
 }
 
 
@@ -933,8 +941,7 @@ public class AudioPlayer: NSObject {
 
                 case "currentItem.status":
                     if let item = player.currentItem where item.status == .Failed {
-                        state = .Failed(item.error)
-                        nextOrStop()
+                        state = .Failed(.FoundationError(item.error))
                     }
 
                 case "currentItem.loadedTimeRanges":
@@ -1126,7 +1133,7 @@ public class AudioPlayer: NSObject {
             }
         }
 
-        nextOrStop()
+        state = .Failed(.MaximumRetryCountHit)
     }
 
     private func nextOrStop() {
