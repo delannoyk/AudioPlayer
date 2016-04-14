@@ -1075,7 +1075,7 @@ public class AudioPlayer: NSObject {
     - parameter time: The current time.
     */
     private func currentProgressionUpdated(time: CMTime) {
-        if let currentItemProgression = currentItemProgression, currentItemDuration = currentItemDuration where currentItemDuration > 0 {
+        if let currentItemProgression = currentItemProgression, currentItemDuration = currentItemDuration, currentItem = player?.currentItem where currentItemDuration > 0 && currentItem.playbackLikelyToKeepUp {
             //This fixes the behavior where sometimes the `playbackLikelyToKeepUp`
             //isn't changed even though it's playing (happens mostly at the first play though).
             if state == .Buffering || state == .Paused {
