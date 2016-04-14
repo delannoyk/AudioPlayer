@@ -56,7 +56,8 @@ extension AudioPlayer {
 
         case .Progressed(let time):
             if let currentItemProgression = time.ap_timeIntervalValue,
-                currentItemDuration = currentItemDuration where currentItemDuration > 0 {
+                currentItemDuration = currentItemDuration, item = player?.currentItem
+                where currentItemDuration > 0 && item.playbackLikelyToKeepUp {
                 //This fixes the behavior where sometimes the `playbackLikelyToKeepUp` isn't
                 //changed even though it's playing (happens mostly at the first play though).
                 if state == .Buffering || state == .Paused {
