@@ -43,7 +43,7 @@ public enum AudioPlayerState {
     case Paused
     case Stopped
     case WaitingForConnection
-    case Failed(NSError?)
+    case Failed(AudioPlayerError)
 }
 
 extension AudioPlayerState: Equatable { }
@@ -60,8 +60,8 @@ public func ==(lhs: AudioPlayerState, rhs: AudioPlayerState) -> Bool {
         return true
     case (.WaitingForConnection, .WaitingForConnection):
         return true
-    case (.Failed(let e1), .Failed(let e2)):
-        return e1 == e2
+    case (.Failed, .Failed):
+        return true
     default:
         return false
     }
@@ -96,6 +96,14 @@ public struct AudioPlayerModeMask: OptionSetType {
     public static var RepeatAll: AudioPlayerModeMask {
         return self.init(rawValue: 0b100)
     }
+}
+
+
+// MARK: - AudioPlayerError
+
+public enum AudioPlayerError: ErrorType {
+    case MaximumRetryCountHit
+    case FoundationError(NSError?)
 }
 
 
@@ -435,11 +443,13 @@ public class AudioPlayer: NSObject {
 
                 if reachability.isReachable() || URLInfo.URL.isOfflineURL {
                     state = .Buffering
+                    beginBackgroundTask()
                 }
                 else {
                     connectionLossDate = NSDate()
                     stateWhenConnectionLost = .Buffering
                     state = .WaitingForConnection
+                    beginBackgroundTask()
                     return
                 }
 
@@ -644,9 +654,12 @@ public class AudioPlayer: NSObject {
     */
     public func addItemsToQueue(items: [AudioItem]) {
         if currentItem != nil {
-            var idx = 0
-            enqueuedItems = (enqueuedItems ?? []) + items.map { (position: idx++, item: $0) }
-            adaptQueueToPlayerMode()
+            var idx = enqueuedItems?.count ?? 0
+            var toAdd = items.map { (position: idx++, item: $0) }
+            if mode.contains(.Shuffle) {
+                toAdd = toAdd.shuffled()
+            }
+            enqueuedItems = (enqueuedItems ?? []) + toAdd
         }
         else {
             playItems(items)
@@ -967,8 +980,7 @@ public class AudioPlayer: NSObject {
 
                 case "currentItem.status":
                     if let item = player.currentItem where item.status == .Failed {
-                        state = .Failed(item.error)
-                        nextOrStop()
+                        state = .Failed(.FoundationError(item.error))
                     }
 
                 case "currentItem.loadedTimeRanges":
@@ -1099,7 +1111,7 @@ public class AudioPlayer: NSObject {
     - parameter time: The current time.
     */
     private func currentProgressionUpdated(time: CMTime) {
-        if let currentItemProgression = currentItemProgression, currentItemDuration = currentItemDuration where currentItemDuration > 0 {
+        if let currentItemProgression = currentItemProgression, currentItemDuration = currentItemDuration, currentItem = player?.currentItem where currentItemDuration > 0 && currentItem.playbackLikelyToKeepUp {
             //This fixes the behavior where sometimes the `playbackLikelyToKeepUp`
             //isn't changed even though it's playing (happens mostly at the first play though).
             if state == .Buffering || state == .Paused {
@@ -1140,7 +1152,9 @@ public class AudioPlayer: NSObject {
 
                 currentItem = ci
                 if let cip = cip {
-                    seekToTime(cip)
+                    //We can't call self.seekToTime in here since the player is new
+                    //and `cip` is probably not in the seekableTimeRanges.
+                    player?.seekToTime(CMTime(seconds: cip, preferredTimescale: 1000000000))
                 }
 
                 retryCount++
@@ -1160,7 +1174,7 @@ public class AudioPlayer: NSObject {
             }
         }
 
-        nextOrStop()
+        state = .Failed(.MaximumRetryCountHit)
     }
 
     private func nextOrStop() {
@@ -1203,7 +1217,9 @@ public class AudioPlayer: NSObject {
                     qualityIsBeingChanged = true
                     player?.replaceCurrentItemWithPlayerItem(item)
                     if let cip = cip {
-                        seekToTime(cip)
+                        //We can't call self.seekToTime in here since the player is loading a new
+                        //item and `cip` is probably not in the seekableTimeRanges.
+                        player?.seekToTime(CMTime(seconds: cip, preferredTimescale: 1000000000))
                     }
                     qualityIsBeingChanged = false
 
@@ -1229,7 +1245,9 @@ public class AudioPlayer: NSObject {
                     qualityIsBeingChanged = true
                     player?.replaceCurrentItemWithPlayerItem(item)
                     if let cip = cip {
-                        seekToTime(cip)
+                        //We can't call self.seekToTime in here since the player is loading a new
+                        //item and `cip` is probably not in the seekableTimeRanges.
+                        player?.seekToTime(CMTime(seconds: cip, preferredTimescale: 1000000000))
                     }
                     qualityIsBeingChanged = false
 
