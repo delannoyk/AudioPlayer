@@ -423,11 +423,13 @@ public class AudioPlayer: NSObject {
 
                 if reachability.isReachable() || URLInfo.URL.isOfflineURL {
                     state = .Buffering
+                    beginBackgroundTask()
                 }
                 else {
                     connectionLossDate = NSDate()
                     stateWhenConnectionLost = .Buffering
                     state = .WaitingForConnection
+                    beginBackgroundTask()
                     return
                 }
 
