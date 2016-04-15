@@ -12,33 +12,33 @@ import XCTest
 class AudioPlayerState_Tests: XCTestCase {
     func testEquatable() {
         let buffering = AudioPlayerState.Buffering
-        let failedNoError = AudioPlayerState.Failed(nil)
-        let failedWithError = AudioPlayerState.Failed(NSError(domain: "", code: -1, userInfo: nil))
+        let failedMaximumRetryCountHit = AudioPlayerState.Failed(.MaximumRetryCountHit)
+        let failedWithError = AudioPlayerState.Failed(.FoundationError(NSError(domain: "", code: -1, userInfo: nil)))
         let paused = AudioPlayerState.Paused
         let playing = AudioPlayerState.Playing
         let stopped = AudioPlayerState.Stopped
         let waitingForConnection = AudioPlayerState.WaitingForConnection
 
         XCTAssertEqual(buffering, buffering)
-        XCTAssertEqual(failedNoError, failedNoError)
+        XCTAssertEqual(failedMaximumRetryCountHit, failedMaximumRetryCountHit)
         XCTAssertEqual(failedWithError, failedWithError)
         XCTAssertEqual(paused, paused)
         XCTAssertEqual(playing, playing)
         XCTAssertEqual(stopped, stopped)
         XCTAssertEqual(waitingForConnection, waitingForConnection)
 
-        XCTAssertNotEqual(buffering, failedNoError)
+        XCTAssertNotEqual(buffering, failedMaximumRetryCountHit)
         XCTAssertNotEqual(buffering, failedWithError)
         XCTAssertNotEqual(buffering, paused)
         XCTAssertNotEqual(buffering, playing)
         XCTAssertNotEqual(buffering, stopped)
         XCTAssertNotEqual(buffering, waitingForConnection)
 
-        XCTAssertNotEqual(failedNoError, failedWithError)
-        XCTAssertNotEqual(failedNoError, paused)
-        XCTAssertNotEqual(failedNoError, playing)
-        XCTAssertNotEqual(failedNoError, stopped)
-        XCTAssertNotEqual(failedNoError, waitingForConnection)
+        XCTAssertNotEqual(failedMaximumRetryCountHit, failedWithError)
+        XCTAssertNotEqual(failedMaximumRetryCountHit, paused)
+        XCTAssertNotEqual(failedMaximumRetryCountHit, playing)
+        XCTAssertNotEqual(failedMaximumRetryCountHit, stopped)
+        XCTAssertNotEqual(failedMaximumRetryCountHit, waitingForConnection)
 
         XCTAssertNotEqual(failedWithError, paused)
         XCTAssertNotEqual(failedWithError, playing)
