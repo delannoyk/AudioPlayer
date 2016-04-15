@@ -87,12 +87,8 @@ extension AudioPlayer {
                 state = .Paused
             }
 
-            retryCount = 0
-
-            //We cancel the retry we might have asked for
-            retryTimer?.invalidate()
-            retryTimer = nil
-
+            //TODO: where to start?
+            retryEventProducer.stopProducingEvents()
             backgroundHandler.endBackgroundTask()
 
         case .RouteChanged:

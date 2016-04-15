@@ -336,12 +336,6 @@ public class AudioPlayer: NSObject {
             return
         }
 
-        guard maximumRetryCount > 0 && retryCount < maximumRetryCount else {
-            retryCount = 0
-            state = .Failed(.MaximumRetryCountHit)
-            return
-        }
-
         let cip = currentItemProgression
         let ci = currentItem
         currentItem = ci
@@ -350,17 +344,6 @@ public class AudioPlayer: NSObject {
             //and `cip` is probably not in the seekableTimeRanges.
             player?.seekToTime(CMTime(seconds: cip, preferredTimescale: 1000000000))
         }
-        retryCount += 1
-
-                //We gonna cancel this current retry and create a new one if the player
-                //isn't playing after a certain delay
-                /*let target = ClosureContainer() { [weak self] sender in
-                    self?.retryOrPlayNext()
-                }
-                let timer = NSTimer(timeInterval: retryTimeout, target: target,
-                //    selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
-                NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
-                retryTimer = timer*/
     }
 }
 
