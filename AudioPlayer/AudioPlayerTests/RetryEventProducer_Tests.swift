@@ -18,7 +18,6 @@ class RetryEventProducer_Tests: XCTestCase {
         listener = FakeEventListener()
         producer = RetryEventProducer()
         producer.eventListener = listener
-        producer.startProducingEvents()
     }
 
     override func tearDown() {
@@ -26,5 +25,34 @@ class RetryEventProducer_Tests: XCTestCase {
         producer.stopProducingEvents()
         producer = nil
         super.tearDown()
+    }
+
+    func testEventListenerGetsCalledUntilMaximumRetryCountHit() {
+        var receivedRetry = 1
+        let maximumRetryCount = 3
+
+        let expectation = expectationWithDescription("Waiting for `onEvent` to get called")
+        listener.eventClosure = { event, producer in
+            if let event = event as? RetryEventProducer.RetryEvent {
+                if event == .RetryAvailable {
+                    receivedRetry += 1
+                } else if event == .RetryFailed && receivedRetry == maximumRetryCount - 1 {
+                    expectation.fulfill()
+                } else {
+                    XCTFail()
+                    expectation.fulfill()
+                }
+            }
+        }
+
+        producer.retryTimeout = 1
+        producer.maximumRetryCount = maximumRetryCount
+        producer.startProducingEvents()
+
+        waitForExpectationsWithTimeout(5) { e in
+            if let _ = e {
+                XCTFail()
+            }
+        }
     }
 }

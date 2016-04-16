@@ -67,8 +67,7 @@ class RetryEventProducer: NSObject, EventProducer {
         retryCount = 0
 
         //Creates a new timer for next retry
-        timer = NSTimer.scheduledTimerWithTimeInterval(
-            retryTimeout, target: self, selector: .timerTicked, userInfo: nil, repeats: false)
+        restartTimer()
 
         //Saving that we're currently listening
         listening = true
@@ -90,6 +89,15 @@ class RetryEventProducer: NSObject, EventProducer {
     }
 
     /**
+     Stops the current timer if any and restart a new one.
+     */
+    private func restartTimer() {
+        timer?.invalidate()
+        timer = NSTimer.scheduledTimerWithTimeInterval(
+            retryTimeout, target: self, selector: .timerTicked, userInfo: nil, repeats: false)
+    }
+
+    /**
      The retry timer ticked.
      */
     @objc private func timerTicked(_: AnyObject) {
@@ -97,6 +105,8 @@ class RetryEventProducer: NSObject, EventProducer {
 
         if retryCount < maximumRetryCount {
             eventListener?.onEvent(RetryEvent.RetryAvailable, generetedBy: self)
+
+            restartTimer()
         } else {
             eventListener?.onEvent(RetryEvent.RetryFailed, generetedBy: self)
         }
