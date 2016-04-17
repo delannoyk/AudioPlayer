@@ -658,6 +658,16 @@ public class AudioPlayer: NSObject {
     public func resume() {
         player?.rate = rate
         state = .Playing
+
+        //We gonna cancel this current retry and create a new one if the player isn't playing after a certain delay
+        retryTimer?.invalidate()
+
+        let target = ClosureContainer() { [weak self] sender in
+            self?.retryOrPlayNext()
+        }
+        let timer = NSTimer(timeInterval: retryTimeout, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
+        NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
+        retryTimer = timer
     }
 
     /**
