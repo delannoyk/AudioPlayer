@@ -96,9 +96,11 @@ public class AudioPlayer: NSObject {
                 let URLInfo = currentItem.URLForQuality(currentQuality)
                 if reachability.isReachable() || URLInfo.URL.ap_isOfflineURL {
                     state = .Buffering
+                    backgroundHandler.beginBackgroundTask()
                 } else {
                     stateWhenConnectionLost = .Buffering
                     state = .WaitingForConnection
+                    backgroundHandler.beginBackgroundTask()
                     return
                 }
 
