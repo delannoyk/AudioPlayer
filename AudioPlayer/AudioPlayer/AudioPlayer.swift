@@ -656,18 +656,26 @@ public class AudioPlayer: NSObject {
     Resume the player.
     */
     public func resume() {
+        //We ensure the rate is correctly set
         player?.rate = rate
-        state = .Playing
 
-        //We gonna cancel this current retry and create a new one if the player isn't playing after a certain delay
-        retryTimer?.invalidate()
-
-        let target = ClosureContainer() { [weak self] sender in
-            self?.retryOrPlayNext()
+        //We don't wan't to change the state to Playing in case it's Buffering. That
+        //would be a lie.
+        if state != .Playing && state != .Buffering {
+            state = .Playing
         }
-        let timer = NSTimer(timeInterval: retryTimeout, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
-        NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
-        retryTimer = timer
+
+        //In case we don't have a retry timer, let's start one.
+        //This ensures that the player will eventually restart at some point if the connection
+        //was droped by `AVPlayer` (refer to https://github.com/delannoyk/AudioPlayer/issues/21 )
+        if retryTimer == nil {
+            let target = ClosureContainer() { [weak self] sender in
+                self?.retryOrPlayNext()
+            }
+            let timer = NSTimer(timeInterval: retryTimeout, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
+            NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
+            retryTimer = timer
+        }
     }
 
     /**
