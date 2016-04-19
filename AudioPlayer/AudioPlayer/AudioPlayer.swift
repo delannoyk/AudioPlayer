@@ -1131,40 +1131,39 @@ public class AudioPlayer: NSObject {
     */
     private func retryOrPlayNext() {
         if state == .Playing {
+            retryTimer?.invalidate()
+            retryTimer = nil
             return
         }
 
-        if maximumRetryCount > 0 {
-            if retryCount < maximumRetryCount {
-                //We can retry
-                let cip = currentItemProgression
-                let ci = currentItem
+        if maximumRetryCount > 0 && retryCount < maximumRetryCount {
+            //We can retry
+            let cip = currentItemProgression
+            let ci = currentItem
 
-                currentItem = ci
-                if let cip = cip {
-                    //We can't call self.seekToTime in here since the player is new
-                    //and `cip` is probably not in the seekableTimeRanges.
-                    player?.seekToTime(CMTime(seconds: cip, preferredTimescale: 1000000000))
-                }
-
-                retryCount++
-
-                //We gonna cancel this current retry and create a new one if the player isn't playing after a certain delay
-                let target = ClosureContainer() { [weak self] sender in
-                    self?.retryOrPlayNext()
-                }
-                let timer = NSTimer(timeInterval: retryTimeout, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
-                NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
-                retryTimer = timer
-
-                return
+            currentItem = ci
+            if let cip = cip {
+                //We can't call self.seekToTime in here since the player is new
+                //and `cip` is probably not in the seekableTimeRanges.
+                player?.seekToTime(CMTime(seconds: cip, preferredTimescale: 1000000000))
             }
-            else {
-                retryCount = 0
+
+            retryCount++
+
+            //We gonna cancel this current retry and create a new one if the player isn't playing after a certain delay
+            let target = ClosureContainer() { [weak self] sender in
+                self?.retryOrPlayNext()
             }
+            let timer = NSTimer(timeInterval: retryTimeout, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
+            NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
+            retryTimer = timer
         }
-
-        state = .Failed(.MaximumRetryCountHit)
+        else {
+            retryTimer?.invalidate()
+            retryTimer = nil
+            retryCount = 0
+            state = .Failed(.MaximumRetryCountHit)
+        }
     }
 
     private func nextOrStop() {
