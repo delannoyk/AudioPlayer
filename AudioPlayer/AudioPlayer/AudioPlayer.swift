@@ -1147,6 +1147,10 @@ public class AudioPlayer: NSObject {
         if mode.intersect(.Repeat) != [] {
             seekToTime(0)
             resume()
+            
+            if let currentItem = self.currentItem {
+                delegate?.audioPlayer(self, willStartPlayingItem: currentItem)
+            }
         }
         else if hasNext() {
             next()
