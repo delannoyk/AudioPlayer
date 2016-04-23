@@ -685,6 +685,9 @@ public class AudioPlayer: NSObject {
         //We ensure the player actually pauses
         player?.rate = 0
         state = .Paused
+        
+        retryTimer?.invalidate()
+        retryTimer = nil
 
         //Let's begin a background task for the player to keep buffering if the app is in
         //background. This will mimic the default behavior of `AVPlayer` when pausing while the
@@ -700,6 +703,9 @@ public class AudioPlayer: NSObject {
         player?.rate = 0
 
         state = .Stopped
+        
+        retryTimer?.invalidate()
+        retryTimer = nil
 
         enqueuedItems = nil
         currentItem = nil
