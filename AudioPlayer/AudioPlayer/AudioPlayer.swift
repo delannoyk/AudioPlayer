@@ -719,7 +719,6 @@ public class AudioPlayer: NSObject {
         if let currentItemIndexInQueue = currentItemIndexInQueue where hasNext() {
             //The background task will end when the player will have enough data to play
             beginBackgroundTask()
-            //pause()
 
             let newIndex = currentItemIndexInQueue + 1
             if newIndex < enqueuedItems?.count {
@@ -963,6 +962,7 @@ public class AudioPlayer: NSObject {
                         }
                         else {
                             state = .Paused
+                            player.rate = 0
                         }
 
                         retryCount = 0
@@ -1118,6 +1118,7 @@ public class AudioPlayer: NSObject {
                 }
                 else {
                     state = .Paused
+                    player?.rate = 0
                 }
                 endBackgroundTask()
             }
