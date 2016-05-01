@@ -762,12 +762,12 @@ public class AudioPlayer: NSObject {
                     // time is larger than possibly, so just move forward as far as possible
                     seekToSeekableRangeEnd(1)
                 }
-                
-                updateNowPlayingInfoCenter()
             }
         } else {
             player?.seekToTime(time, toleranceBefore: toleranceBefore, toleranceAfter: toleranceAfter)
         }
+        
+        updateNowPlayingInfoCenter()
     }
     
     /**
