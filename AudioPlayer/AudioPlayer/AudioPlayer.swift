@@ -742,31 +742,31 @@ public class AudioPlayer: NSObject {
 
     - parameter time: The time to seek to.
     */
-    public func seekToTime(time: NSTimeInterval, toleranceBefore: CMTime = kCMTimePositiveInfinity, toleranceAfter: CMTime = kCMTimePositiveInfinity) {
+    public func seekToTime(time: NSTimeInterval, toleranceBefore: CMTime = kCMTimePositiveInfinity, toleranceAfter: CMTime = kCMTimePositiveInfinity, respectingSeekableTimeRanges: Bool = true) {
         let time = CMTime(seconds: time, preferredTimescale: 1000000000)
-        // if we specify non-default zero tolerance, skip the range checks: will take longer to play, but necessary for when seek needs to be precise 
-        if toleranceBefore == kCMTimeZero && toleranceAfter == kCMTimeZero {
-            player?.seekToTime(time, toleranceBefore: toleranceBefore, toleranceAfter: toleranceAfter)
-            return
-        }
         
-        let seekableRange = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
-        if let seekableStart = seekableRange?.start, let seekableEnd = seekableRange?.end {
-            // check if time is in seekable range
-            if time >= seekableStart && time <= seekableEnd {
-                // time is in seekable range
-                player?.seekToTime(time, toleranceBefore: toleranceBefore, toleranceAfter: toleranceAfter)
+        // if we specify non-default zero tolerance, skip the range checks: will take longer to play, but necessary for when seek needs to be precise
+        if respectingSeekableTimeRanges {
+            let seekableRange = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
+            if let seekableStart = seekableRange?.start, let seekableEnd = seekableRange?.end {
+                // check if time is in seekable range
+                if time >= seekableStart && time <= seekableEnd {
+                    // time is in seekable range
+                    player?.seekToTime(time, toleranceBefore: toleranceBefore, toleranceAfter: toleranceAfter)
+                }
+                else if time < seekableStart {
+                    // time is before seekable start, so just move to the most early position as possible
+                    seekToSeekableRangeStart(1)
+                }
+                else if time > seekableEnd {
+                    // time is larger than possibly, so just move forward as far as possible
+                    seekToSeekableRangeEnd(1)
+                }
+                
+                updateNowPlayingInfoCenter()
             }
-            else if time < seekableStart {
-                // time is before seekable start, so just move to the most early position as possible
-                seekToSeekableRangeStart(1)
-            }
-            else if time > seekableEnd {
-                // time is larger than possibly, so just move forward as far as possible
-                seekToSeekableRangeEnd(1)
-            }
-            
-            updateNowPlayingInfoCenter()
+        } else {
+            player?.seekToTime(time, toleranceBefore: toleranceBefore, toleranceAfter: toleranceAfter)
         }
     }
     
