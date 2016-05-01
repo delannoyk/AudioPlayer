@@ -656,16 +656,43 @@ public class AudioPlayer: NSObject {
     Resume the player.
     */
     public func resume() {
+        //We ensure the rate is correctly set
         player?.rate = rate
-        state = .Playing
+
+        //We don't wan't to change the state to Playing in case it's Buffering. That
+        //would be a lie.
+        if state != .Playing && state != .Buffering {
+            state = .Playing
+        }
+
+        //In case we don't have a retry timer, let's start one.
+        //This ensures that the player will eventually restart at some point if the connection
+        //was droped by `AVPlayer` (refer to https://github.com/delannoyk/AudioPlayer/issues/21 )
+        if retryTimer == nil {
+            let target = ClosureContainer() { [weak self] sender in
+                self?.retryOrPlayNext()
+            }
+            let timer = NSTimer(timeInterval: retryTimeout, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
+            NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
+            retryTimer = timer
+        }
     }
 
     /**
     Pauses the player.
     */
     public func pause() {
+        //We ensure the player actually pauses
         player?.rate = 0
         state = .Paused
+        
+        retryTimer?.invalidate()
+        retryTimer = nil
+
+        //Let's begin a background task for the player to keep buffering if the app is in
+        //background. This will mimic the default behavior of `AVPlayer` when pausing while the
+        //app is in foreground.
+        beginBackgroundTask()
     }
 
     /**
@@ -676,6 +703,9 @@ public class AudioPlayer: NSObject {
         player?.rate = 0
 
         state = .Stopped
+        
+        retryTimer?.invalidate()
+        retryTimer = nil
 
         enqueuedItems = nil
         currentItem = nil
@@ -689,7 +719,6 @@ public class AudioPlayer: NSObject {
         if let currentItemIndexInQueue = currentItemIndexInQueue where hasNext() {
             //The background task will end when the player will have enough data to play
             beginBackgroundTask()
-            //pause()
 
             let newIndex = currentItemIndexInQueue + 1
             if newIndex < enqueuedItems?.count {
@@ -939,6 +968,7 @@ public class AudioPlayer: NSObject {
                         }
                         else {
                             state = .Paused
+                            player.rate = 0
                         }
 
                         retryCount = 0
@@ -1094,6 +1124,7 @@ public class AudioPlayer: NSObject {
                 }
                 else {
                     state = .Paused
+                    player?.rate = 0
                 }
                 endBackgroundTask()
             }
@@ -1113,40 +1144,39 @@ public class AudioPlayer: NSObject {
     */
     private func retryOrPlayNext() {
         if state == .Playing {
+            retryTimer?.invalidate()
+            retryTimer = nil
             return
         }
 
-        if maximumRetryCount > 0 {
-            if retryCount < maximumRetryCount {
-                //We can retry
-                let cip = currentItemProgression
-                let ci = currentItem
+        if maximumRetryCount > 0 && retryCount < maximumRetryCount {
+            //We can retry
+            let cip = currentItemProgression
+            let ci = currentItem
 
-                currentItem = ci
-                if let cip = cip {
-                    //We can't call self.seekToTime in here since the player is new
-                    //and `cip` is probably not in the seekableTimeRanges.
-                    player?.seekToTime(CMTime(seconds: cip, preferredTimescale: 1000000000))
-                }
-
-                retryCount++
-
-                //We gonna cancel this current retry and create a new one if the player isn't playing after a certain delay
-                let target = ClosureContainer() { [weak self] sender in
-                    self?.retryOrPlayNext()
-                }
-                let timer = NSTimer(timeInterval: retryTimeout, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
-                NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
-                retryTimer = timer
-
-                return
+            currentItem = ci
+            if let cip = cip {
+                //We can't call self.seekToTime in here since the player is new
+                //and `cip` is probably not in the seekableTimeRanges.
+                player?.seekToTime(CMTime(seconds: cip, preferredTimescale: 1000000000))
             }
-            else {
-                retryCount = 0
+
+            retryCount++
+
+            //We gonna cancel this current retry and create a new one if the player isn't playing after a certain delay
+            let target = ClosureContainer() { [weak self] sender in
+                self?.retryOrPlayNext()
             }
+            let timer = NSTimer(timeInterval: retryTimeout, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
+            NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
+            retryTimer = timer
         }
-
-        state = .Failed(.MaximumRetryCountHit)
+        else {
+            retryTimer?.invalidate()
+            retryTimer = nil
+            retryCount = 0
+            state = .Failed(.MaximumRetryCountHit)
+        }
     }
 
     private func nextOrStop() {
