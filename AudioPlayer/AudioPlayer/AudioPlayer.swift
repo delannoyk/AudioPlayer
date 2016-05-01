@@ -742,11 +742,11 @@ public class AudioPlayer: NSObject {
 
     - parameter time: The time to seek to.
     */
-    public func seekToTime(time: NSTimeInterval, toleranceBefore: CMTime = kCMTimePositiveInfinity, toleranceAfter: CMTime = kCMTimePositiveInfinity, respectingSeekableTimeRanges: Bool = true) {
+    public func seekToTime(time: NSTimeInterval, toleranceBefore: CMTime = kCMTimePositiveInfinity, toleranceAfter: CMTime = kCMTimePositiveInfinity, adaptingTimeToSeekableTimeRanges adaptTime: Bool = true) {
         let time = CMTime(seconds: time, preferredTimescale: 1000000000)
         
         // if we specify non-default zero tolerance, skip the range checks: will take longer to play, but necessary for when seek needs to be precise
-        if respectingSeekableTimeRanges {
+        if adaptTime {
             let seekableRange = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
             if let seekableStart = seekableRange?.start, let seekableEnd = seekableRange?.end {
                 // check if time is in seekable range
