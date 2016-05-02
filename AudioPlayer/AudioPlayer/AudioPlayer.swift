@@ -951,7 +951,9 @@ public class AudioPlayer: NSObject {
 
                     stateBeforeBuffering = state
                     if reachability.isReachable() || (currentItem?.soundURLs[currentQuality ?? defaultQuality]?.isOfflineURL ?? false) {
-                        state = .Buffering
+                        if state != .Paused { // Fixes issue https://github.com/delannoyk/AudioPlayer/issues/44
+                            state = .Buffering
+                        }
                     }
                     else {
                         state = .WaitingForConnection
