@@ -410,6 +410,9 @@ public class AudioPlayer: NSObject {
                 player?.rate = 0
                 player = nil
 
+                stateBeforeBuffering = nil
+                stateWhenConnectionLost = nil
+
                 let URLInfo: AudioItemURL = {
                     switch (self.currentQuality ?? self.defaultQuality) {
                     case .High:
@@ -746,6 +749,8 @@ public class AudioPlayer: NSObject {
         let time = CMTime(seconds: time, preferredTimescale: 1000000000)
         let seekableRange = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
         if let seekableStart = seekableRange?.start, let seekableEnd = seekableRange?.end {
+            stateBeforeBuffering = nil
+            stateWhenConnectionLost = nil
             // check if time is in seekable range
             if time >= seekableStart && time <= seekableEnd {
                 // time is in seekable range
@@ -771,6 +776,8 @@ public class AudioPlayer: NSObject {
      */
     public func seekToSeekableRangeEnd(padding: NSTimeInterval) {
         if let range = currentItemSeekableRange {
+            stateBeforeBuffering = nil
+            stateWhenConnectionLost = nil
             let position = max(range.earliest, range.latest - padding)
 
             let time = CMTime(seconds: position, preferredTimescale: 1000000000)
@@ -782,11 +789,13 @@ public class AudioPlayer: NSObject {
 
     /**
      Seeks backwards as far as possible.
-     
+
      - parameter padding: The padding to apply if any.
      */
     public func seekToSeekableRangeStart(padding: NSTimeInterval) {
         if let range = currentItemSeekableRange {
+            stateBeforeBuffering = nil
+            stateWhenConnectionLost = nil
             let position = min(range.latest, range.earliest + padding)
 
             let time = CMTime(seconds: position, preferredTimescale: 1000000000)
