@@ -632,7 +632,33 @@ public class AudioPlayer: NSObject {
             playItems(items)
         }
     }
-
+    /* Add item to the top of the queue ; If the queue is empty and player isn't
+    playing, the behaviour will be similar to `playItems(items: items)`. */
+    public func addItemToQueueFirst(item: AudioItem) {
+        addItemsToQueueFirst([item])
+   }
+   /* Add multiple items to the top of the queue; If the queue is empty and player isn't
+    playing, the behaviour will be similar to `playItems(items: items)`. */
+  public func addItemsToQueueFirst(items: [AudioItem]) {
+    if currentItem != nil {
+      
+      var idx = enqueuedItems?.count ?? 0
+      var toAdd = items.map { (position: idx++, item: $0) }
+      if mode.contains(.Shuffle) {
+        toAdd = toAdd.shuffled()
+      }
+     
+      var currentEnqueuedItems = (enqueuedItems ?? []);
+      
+      var next = currentEnqueuedItems[(currentItemIndexInQueue!+1)..<(currentEnqueuedItems.count)];
+     
+      enqueuedItems = ((currentEnqueuedItems[0...(currentItemIndexInQueue!)]) + toAdd) + next;
+      
+    }
+    else {
+      playItems(items)
+    }
+  }
     /**
      Removes an item at a specific index in the queue.
 
