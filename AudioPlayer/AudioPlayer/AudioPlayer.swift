@@ -648,6 +648,9 @@ public class AudioPlayer: NSObject {
         if let enqueuedItems = enqueuedItems {
             if index >= 0 && index < enqueuedItems.count {
                 self.enqueuedItems?.removeAtIndex(index)
+                if index < currentItemIndexInQueue {
+                    currentItemIndexInQueue = currentItemIndexInQueue! - 1
+                }
             }
         }
     }
