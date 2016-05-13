@@ -38,11 +38,13 @@ quality.
 public struct AudioItemURL {
     public let quality: AudioQuality
     public let URL: NSURL
+    public let headers: [String : AnyObject]?
 
-    public init?(quality: AudioQuality, URL: NSURL?) {
+    public init?(quality: AudioQuality, URL: NSURL?, headers: [String : AnyObject]? = nil) {
         if let URL = URL {
             self.quality = quality
             self.URL = URL
+            self.headers = headers
         }
         else {
             return nil

@@ -20,7 +20,7 @@ private class ClosureContainer: NSObject {
         self.closure = closure
     }
 
-    @objc func callSelectorOnTarget(sender: AnyObject) {
+    dynamic func callSelectorOnTarget(sender: AnyObject) {
         closure(sender: sender)
     }
 }
@@ -296,7 +296,7 @@ public class AudioPlayer: NSObject {
                 let target = ClosureContainer() { [weak self] sender in
                     self?.adjustQualityIfNecessary()
                 }
-                let timer = NSTimer(timeInterval: adjustQualityTimeInternal, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
+                let timer = self.createNewTimerWithTarget(target, timeInterVal: adjustQualityTimeInternal)
                 NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
                 qualityAdjustmentTimer = timer
 
@@ -433,7 +433,7 @@ public class AudioPlayer: NSObject {
                     return
                 }
 
-                player = AVPlayer(URL: URLInfo.URL)
+                player = self.createAVPlayer(URLInfo)
                 player?.volume = volume
                 currentQuality = URLInfo.quality
 
@@ -451,6 +451,19 @@ public class AudioPlayer: NSObject {
                 }
             }
         }
+    }
+    
+    private func createAVPlayer(URLInfo: AudioItemURL) -> AVPlayer {
+       return AVPlayer(playerItem: self.createAVPlayerItem(URLInfo))
+    }
+    
+    private func createAVPlayerItem(URLInfo: AudioItemURL) -> AVPlayerItem {
+        guard let headers = URLInfo.headers else {
+            return AVPlayerItem(URL: URLInfo.URL)
+        }
+        
+        let asset = AVURLAsset.init(URL: URLInfo.URL, options: ["AVURLAssetHTTPHeaderFieldsKey" : headers])
+        return AVPlayerItem(asset: asset)
     }
 
     /// The current item duration or nil if no item or unknown duration.
@@ -672,7 +685,7 @@ public class AudioPlayer: NSObject {
             let target = ClosureContainer() { [weak self] sender in
                 self?.retryOrPlayNext()
             }
-            let timer = NSTimer(timeInterval: retryTimeout, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
+            let timer = self.createNewTimerWithTarget(target, timeInterVal: retryTimeout)
             NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
             retryTimer = timer
         }
@@ -1167,7 +1180,7 @@ public class AudioPlayer: NSObject {
             let target = ClosureContainer() { [weak self] sender in
                 self?.retryOrPlayNext()
             }
-            let timer = NSTimer(timeInterval: retryTimeout, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
+            let timer = self.createNewTimerWithTarget(target, timeInterVal: retryTimeout)
             NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
             retryTimer = timer
         }
@@ -1198,78 +1211,61 @@ public class AudioPlayer: NSObject {
 
 
     // MARK: Quality adjustment
+    
+    private func urlInfoAudioQualityDecrease(isDecreasing: Bool, quality: AudioQuality) -> AudioItemURL? {
+        switch quality {
+        case .High:
+            return isDecreasing ? self.currentItem?.mediumQualityURL : nil
+        case .Medium:
+            return isDecreasing ? self.currentItem?.lowestQualityURL : self.currentItem?.highestQualityURL
+        case .Low:
+            return isDecreasing ? nil : self.currentItem?.mediumQualityURL
+        }
+    }
+    
+    private func updateAudioQuality(currentQuality: AudioQuality) {
+        
+        let isAudioQualityDecrease = interruptionCount >= adjustQualityAfterInterruptionCount
+        let URLInfo = self.urlInfoAudioQualityDecrease(isAudioQualityDecrease, quality: currentQuality)
+        
+        if let URLInfo = URLInfo where URLInfo.quality != currentQuality {
+            let cip = currentItemProgression
+            let item = self.createAVPlayerItem(URLInfo)
+            qualityIsBeingChanged = true
+            player?.replaceCurrentItemWithPlayerItem(item)
+            if let cip = cip {
+                //We can't call self.seekToTime in here since the player is loading a new
+                //item and `cip` is probably not in the seekableTimeRanges.
+                player?.seekToTime(CMTime(seconds: cip, preferredTimescale: 1000000000))
+            }
+            qualityIsBeingChanged = false
+            
+            self.currentQuality = URLInfo.quality
+        }
+    }
+    
 
     /**
     Adjusts quality if necessary based on interruption count.
     */
     private func adjustQualityIfNecessary() {
         if let currentQuality = currentQuality where adjustQualityAutomatically {
-            if interruptionCount >= adjustQualityAfterInterruptionCount {
-                //Decreasing audio quality
-                let URLInfo: AudioItemURL? = {
-                    if currentQuality == .High {
-                        return self.currentItem?.mediumQualityURL
-                    }
-                    if currentQuality == .Medium {
-                        return self.currentItem?.lowestQualityURL
-                    }
-                    return nil
-                    }()
-
-                if let URLInfo = URLInfo where URLInfo.quality != currentQuality {
-                    let cip = currentItemProgression
-                    let item = AVPlayerItem(URL: URLInfo.URL)
-
-                    qualityIsBeingChanged = true
-                    player?.replaceCurrentItemWithPlayerItem(item)
-                    if let cip = cip {
-                        //We can't call self.seekToTime in here since the player is loading a new
-                        //item and `cip` is probably not in the seekableTimeRanges.
-                        player?.seekToTime(CMTime(seconds: cip, preferredTimescale: 1000000000))
-                    }
-                    qualityIsBeingChanged = false
-
-                    self.currentQuality = URLInfo.quality
-                }
-            }
-            else if interruptionCount == 0 {
-                //Increasing audio quality
-                let URLInfo: AudioItemURL? = {
-                    if currentQuality == .Low {
-                        return self.currentItem?.mediumQualityURL
-                    }
-                    if currentQuality == .Medium {
-                        return self.currentItem?.highestQualityURL
-                    }
-                    return nil
-                    }()
-
-                if let URLInfo = URLInfo where URLInfo.quality != currentQuality {
-                    let cip = currentItemProgression
-                    let item = AVPlayerItem(URL: URLInfo.URL)
-
-                    qualityIsBeingChanged = true
-                    player?.replaceCurrentItemWithPlayerItem(item)
-                    if let cip = cip {
-                        //We can't call self.seekToTime in here since the player is loading a new
-                        //item and `cip` is probably not in the seekableTimeRanges.
-                        player?.seekToTime(CMTime(seconds: cip, preferredTimescale: 1000000000))
-                    }
-                    qualityIsBeingChanged = false
-
-                    self.currentQuality = URLInfo.quality
-                }
-            }
-
+            self.updateAudioQuality(currentQuality)
             interruptionCount = 0
-
+            
             let target = ClosureContainer() { [weak self] sender in
                 self?.adjustQualityIfNecessary()
             }
-            let timer = NSTimer(timeInterval: adjustQualityTimeInternal, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
+
+            let timer = self.createNewTimerWithTarget(target, timeInterVal: adjustQualityTimeInternal)
             NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
             qualityAdjustmentTimer = timer
         }
+    }
+    
+    private func createNewTimerWithTarget(target: AnyObject, timeInterVal: NSTimeInterval) -> NSTimer {
+        return NSTimer(
+            timeInterval: timeInterVal, target: target, selector: #selector(ClosureContainer.callSelectorOnTarget(_:)), userInfo: nil, repeats: false)
     }
 
 
