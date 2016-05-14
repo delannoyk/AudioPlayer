@@ -81,9 +81,11 @@ extension AudioPlayer {
     /**
      Seeks to a specific time.
 
-     - parameter time:            The time to seek to.
-     - parameter toleranceBefore: The tolerance allowed before time.
-     - parameter toleranceAfter:  The tolerance allowed after time.
+     - parameter time:                              The time to seek to.
+     - parameter byAdaptingTimeToFitSeekableRanges: A boolean value indicating whether the time
+        should be adapted to current seekable ranges in order to be bufferless.
+     - parameter toleranceBefore:                   The tolerance allowed before time.
+     - parameter toleranceAfter:                    The tolerance allowed after time.
      */
     public func seekToTime(time: NSTimeInterval,
                            byAdaptingTimeToFitSeekableRanges: Bool = false,
