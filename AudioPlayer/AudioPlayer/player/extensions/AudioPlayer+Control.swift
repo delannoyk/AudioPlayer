@@ -17,15 +17,30 @@ extension AudioPlayer {
      */
     public func resume() {
         player?.rate = rate
-        state = .Playing
+
+        //We don't wan't to change the state to Playing in case it's Buffering. That
+        //would be a lie.
+        if state != .Playing && state != .Buffering {
+            state = .Playing
+        }
+
+        retryEventProducer.startProducingEvents()
     }
 
     /**
      Pauses the player.
      */
     public func pause() {
+        //We ensure the player actually pauses
         player?.rate = 0
         state = .Paused
+
+        retryEventProducer.stopProducingEvents()
+
+        //Let's begin a background task for the player to keep buffering if the app is in
+        //background. This will mimic the default behavior of `AVPlayer` when pausing while the
+        //app is in foreground.
+        backgroundHandler.beginBackgroundTask()
     }
 
     /**
@@ -63,6 +78,8 @@ extension AudioPlayer {
      Stops the player and clear the queue.
      */
     public func stop() {
+        retryEventProducer.stopProducingEvents()
+
         if let _ = player {
             player?.rate = 0
             player = nil

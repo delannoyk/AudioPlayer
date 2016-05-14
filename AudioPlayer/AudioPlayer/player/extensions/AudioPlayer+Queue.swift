@@ -12,6 +12,14 @@ extension AudioPlayer {
         return queue?.queue
     }
 
+    /// The current item index in queue.
+    public var currentItemIndexInQueue: Int? {
+        if let currentItem = currentItem {
+            return queue?.items.indexOf(currentItem)
+        }
+        return nil
+    }
+
     /// A boolean value indicating whether there is a next item to play or not.
     public var hasNext: Bool {
         return queue?.hasNextItem ?? false

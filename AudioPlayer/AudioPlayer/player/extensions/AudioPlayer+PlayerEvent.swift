@@ -66,6 +66,7 @@ extension AudioPlayer {
                         state = .Playing
                         player?.rate = rate
                     } else {
+                        player?.rate = 0
                         state = .Paused
                     }
                     backgroundHandler.endBackgroundTask()
@@ -84,6 +85,7 @@ extension AudioPlayer {
                 state = .Playing
                 player?.rate = rate
             } else {
+                player?.rate = 0
                 state = .Paused
             }
 

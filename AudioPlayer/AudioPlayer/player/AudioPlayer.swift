@@ -335,6 +335,7 @@ public class AudioPlayer: NSObject {
      */
     func retryOrPlayNext() {
         guard state != .Playing else {
+            retryEventProducer.stopProducingEvents()
             return
         }
 
