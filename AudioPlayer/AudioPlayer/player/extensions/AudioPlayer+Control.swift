@@ -86,6 +86,7 @@ extension AudioPlayer {
      - parameter toleranceAfter:  The tolerance allowed after time.
      */
     public func seekToTime(time: NSTimeInterval,
+                           byAdaptingTimeToFitSeekableRanges: Bool = false,
                            toleranceBefore: CMTime = kCMTimePositiveInfinity,
                            toleranceAfter: CMTime = kCMTimePositiveInfinity) {
         guard let earliest = currentItemSeekableRange?.earliest,
@@ -99,7 +100,7 @@ extension AudioPlayer {
                 return
         }
 
-        if time >= earliest && time <= latest {
+        if !byAdaptingTimeToFitSeekableRanges || time >= earliest && time <= latest {
             //Time is in seekable range, there's no problem here.
             player?.seekToTime(CMTime(timeInterval: time),
                                toleranceBefore: toleranceBefore,
