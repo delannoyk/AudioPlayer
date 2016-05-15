@@ -12,6 +12,6 @@ extension NSURL {
     /// A boolean value indicating whether a resource should be considered available
     /// when internet connection is down or not.
     var ap_isOfflineURL: Bool {
-        return fileURL || scheme == "ipod-library" || host == "localhost"
+        return fileURL || scheme == "ipod-library" || host == "localhost" || host == "127.0.0.1"
     }
 }
