@@ -36,7 +36,7 @@ class RetryEventProducer_Tests: XCTestCase {
             if let event = event as? RetryEventProducer.RetryEvent {
                 if event == .RetryAvailable {
                     receivedRetry += 1
-                } else if event == .RetryFailed && receivedRetry == maximumRetryCount - 1 {
+                } else if event == .RetryFailed && receivedRetry == maximumRetryCount {
                     expectation.fulfill()
                 } else {
                     XCTFail()
