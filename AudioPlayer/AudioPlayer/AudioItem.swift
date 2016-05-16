@@ -38,9 +38,9 @@ quality.
 public struct AudioItemURL {
     public let quality: AudioQuality
     public let URL: NSURL
-    public let headers: [String : AnyObject]?
+    public let headers: [NSObject : AnyObject]?
 
-    public init?(quality: AudioQuality, URL: NSURL?, headers: [String : AnyObject]? = nil) {
+    public init?(quality: AudioQuality, URL: NSURL?, headers: [NSObject : AnyObject]? = nil) {
         if let URL = URL {
             self.quality = quality
             self.URL = URL
@@ -63,7 +63,7 @@ URLs can be remote or local.
 public class AudioItem: NSObject {
     /// Returns the available qualities
     public let soundURLs: [AudioQuality: NSURL]
-    public private (set) var headers: [String: AnyObject]?
+    public private (set) var headers: [NSObject: AnyObject]?
 
     // MARK: Initialization
 
@@ -76,7 +76,7 @@ public class AudioItem: NSObject {
 
     - returns: An initialized `AudioItem` if there is at least a non-null URL.
     */
-    public convenience init?(highQualitySoundURL: NSURL? = nil, mediumQualitySoundURL: NSURL? = nil, lowQualitySoundURL: NSURL? = nil, headers: [String: AnyObject]? = nil) {
+    public convenience init?(highQualitySoundURL: NSURL? = nil, mediumQualitySoundURL: NSURL? = nil, lowQualitySoundURL: NSURL? = nil, headers: [NSObject: AnyObject]? = nil) {
         var URLs = [AudioQuality: NSURL]()
         if let highURL = highQualitySoundURL {
             URLs[.High] = highURL
@@ -97,7 +97,7 @@ public class AudioItem: NSObject {
 
     - returns: An initialized `AudioItem` if there is at least an URL in the `soundURLs` dictionary.
     */
-    public init?(soundURLs: [AudioQuality: NSURL], headers: [String: AnyObject]? = nil) {
+    public init?(soundURLs: [AudioQuality: NSURL], headers: [NSObject: AnyObject]? = nil) {
         self.soundURLs = soundURLs
         self.headers = headers
         super.init()
