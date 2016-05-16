@@ -242,7 +242,7 @@ public class AudioPlayer: NSObject {
     public override init() {
         super.init()
 
-        observe(ReachabilityChangedNotification, selector: "reachabilityStatusChanged:", object: reachability)
+        observe(ReachabilityChangedNotification, selector: #selector(reachabilityStatusChanged(_:)), object: reachability)
         reachability.startNotifier()
     }
 
@@ -309,12 +309,12 @@ public class AudioPlayer: NSObject {
                 }
 
                 #if os(iOS) || os(tvOS)
-                    observe(AVAudioSessionInterruptionNotification, selector: "audioSessionGotInterrupted:")
-                    observe(AVAudioSessionRouteChangeNotification, selector: "audioSessionRouteChanged:")
-                    observe(AVAudioSessionMediaServicesWereLostNotification, selector: "audioSessionMessedUp:")
-                    observe(AVAudioSessionMediaServicesWereResetNotification, selector: "audioSessionMessedUp:")
+                    observe(AVAudioSessionInterruptionNotification, selector: #selector(audioSessionGotInterrupted(_:)))
+                    observe(AVAudioSessionRouteChangeNotification, selector: #selector(audioSessionRouteChanged(_:)))
+                    observe(AVAudioSessionMediaServicesWereLostNotification, selector: #selector(audioSessionMessedUp(_:)))
+                    observe(AVAudioSessionMediaServicesWereResetNotification, selector: #selector(audioSessionMessedUp(_:)))
                 #endif
-                observe(AVPlayerItemDidPlayToEndTimeNotification, selector: "playerItemDidEnd:")
+                observe(AVPlayerItemDidPlayToEndTimeNotification, selector: #selector(playerItemDidEnd(_:)))
             }
         }
     }
@@ -596,8 +596,7 @@ public class AudioPlayer: NSObject {
     */
     public func playItems(items: [AudioItem], startAtIndex index: Int = 0) {
         if items.count > 0 {
-            var idx = 0
-            enqueuedItems = items.map { (position: idx++, item: $0) }
+            enqueuedItems = items.enumerate().map {(position:$0.index + 1, item: $0.element)}
             adaptQueueToPlayerMode()
 
             let startIndex: Int = {
@@ -634,8 +633,8 @@ public class AudioPlayer: NSObject {
     */
     public func addItemsToQueue(items: [AudioItem]) {
         if currentItem != nil {
-            var idx = enqueuedItems?.count ?? 0
-            var toAdd = items.map { (position: idx++, item: $0) }
+            let idx = enqueuedItems?.count ?? 0
+            var toAdd = items.enumerate().map {(position:($0.index + idx + 1), item:$0.element)}
             if mode.contains(.Shuffle) {
                 toAdd = toAdd.shuffled()
             }
@@ -959,7 +958,7 @@ public class AudioPlayer: NSObject {
                 case "currentItem.playbackBufferEmpty":
                     //The buffer is empty and player is loading
                     if state == .Playing && !qualityIsBeingChanged {
-                        interruptionCount++
+                        interruptionCount += 1
                     }
 
                     stateBeforeBuffering = state
@@ -1072,7 +1071,7 @@ public class AudioPlayer: NSObject {
 
         //Aaaaand we: restart playing/go to next
         state = .Stopped
-        interruptionCount++
+        interruptionCount += 1
         retryOrPlayNext()
     }
     #endif
@@ -1110,7 +1109,7 @@ public class AudioPlayer: NSObject {
                 stateWhenConnectionLost = state
                 if let currentItem = player?.currentItem where currentItem.playbackBufferEmpty {
                     if state == .Playing && !qualityIsBeingChanged {
-                        interruptionCount++
+                        interruptionCount += 1
                     }
                     state = .WaitingForConnection
                     beginBackgroundTask()
@@ -1174,7 +1173,7 @@ public class AudioPlayer: NSObject {
                 player?.seekToTime(CMTime(seconds: cip, preferredTimescale: 1000000000))
             }
 
-            retryCount++
+            retryCount += 1
 
             //We gonna cancel this current retry and create a new one if the player isn't playing after a certain delay
             let target = ClosureContainer() { [weak self] sender in
