@@ -62,7 +62,8 @@ public class AudioItem: NSObject {
     /// Returns the available qualities
     public let soundURLs: [AudioQuality: NSURL]
 
-    /// Returns true if the item as a local path url
+    /// Returns true if the item is a local path url
+    /// NOTE: we assume that any URL comming from a local item will be a local path URL
     public let isLocal: Bool
     
     // MARK: Initialization
