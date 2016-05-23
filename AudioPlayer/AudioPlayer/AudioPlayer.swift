@@ -511,6 +511,9 @@ public class AudioPlayer: NSObject {
     /// NOTE: we assume that any URL comming from a local item will be a local path URL
     public var playQueuedRemoteItemsWithWiFiOnly = false
 
+    /// Stops the player and cleans the queue after playing the last track on queue. Default value is true
+    public var stopPlayerAtEndOfQueue = true
+    
     /// The maximum number of interruption before putting the player to Stopped mode. Default value is 10.
     public var maximumRetryCount = 10
 
@@ -821,7 +824,6 @@ public class AudioPlayer: NSObject {
     public func hasPrevious() -> Bool {
         if let enqueuedItems = enqueuedItems, currentItemIndexInQueue = currentItemIndexInQueue {
             var newIndex = currentItemIndexInQueue - 1
-            print("newindex: \(newIndex)")
             if newIndex >= 0 {
                 if mode.intersect(.RepeatAll) != [] ||      /// repeat?
                     !playQueuedRemoteItemsWithWiFiOnly ||   /// local only?
@@ -1265,8 +1267,12 @@ public class AudioPlayer: NSObject {
         else if hasNext() {
             next()
         }
-        else {
+        else if stopPlayerAtEndOfQueue {
             stop()
+        }
+        else {
+            pause()
+            seekToTime(0)
         }
     }
 
