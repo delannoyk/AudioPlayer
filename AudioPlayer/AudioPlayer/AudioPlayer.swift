@@ -165,7 +165,7 @@ This protocol contains helpful methods to alert you of specific events.
 If you want to be notified about those events, you will have to set a delegate
 to your `audioPlayer` instance.
 */
-public protocol AudioPlayerDelegate: NSObjectProtocol {
+public protocol AudioPlayerDelegate: class {
     /**
      This method is called when the audio player changes its state.
      A fresh created audioPlayer starts in `.Stopped` mode.
