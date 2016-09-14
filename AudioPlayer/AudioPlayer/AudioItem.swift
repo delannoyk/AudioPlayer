@@ -62,7 +62,10 @@ public class AudioItem: NSObject {
     /// Returns the available qualities
     public let soundURLs: [AudioQuality: NSURL]
 
-
+    /// Returns true if the item is a local path url
+    /// NOTE: we assume that any URL comming from a local item will be a local path URL
+    public let isLocal: Bool
+    
     // MARK: Initialization
 
     /**
@@ -76,16 +79,21 @@ public class AudioItem: NSObject {
     */
     public convenience init?(highQualitySoundURL: NSURL? = nil, mediumQualitySoundURL: NSURL? = nil, lowQualitySoundURL: NSURL? = nil) {
         var URLs = [AudioQuality: NSURL]()
+        var local = false
+        
         if let highURL = highQualitySoundURL {
+            local = highURL.absoluteString!.hasPrefix("file://")
             URLs[.High] = highURL
         }
         if let mediumURL = mediumQualitySoundURL {
+            local = mediumURL.absoluteString!.hasPrefix("file://")
             URLs[.Medium] = mediumURL
         }
         if let lowURL = lowQualitySoundURL {
+            local = lowURL.absoluteString!.hasPrefix("file://")
             URLs[.Low] = lowURL
         }
-        self.init(soundURLs: URLs)
+        self.init(soundURLs: URLs, isLocal:local)
     }
 
     /**
@@ -95,8 +103,9 @@ public class AudioItem: NSObject {
 
     - returns: An initialized `AudioItem` if there is at least an URL in the `soundURLs` dictionary.
     */
-    public init?(soundURLs: [AudioQuality: NSURL]) {
+    public init?(soundURLs: [AudioQuality: NSURL], isLocal:Bool) {
         self.soundURLs = soundURLs
+        self.isLocal = isLocal
         super.init()
 
         if soundURLs.count == 0 {

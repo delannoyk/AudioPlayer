@@ -140,7 +140,7 @@ private extension NSObject {
 private extension Array {
     func shuffled() -> [Element] {
         return sort { e1, e2 in
-            random() % 2 == 0
+            arc4random() % 2 == 0
         }
     }
 }
@@ -262,7 +262,7 @@ public class AudioPlayer: NSObject {
     public override init() {
         super.init()
 
-        observe(ReachabilityChangedNotification, selector: "reachabilityStatusChanged:", object: reachability)
+        observe(ReachabilityChangedNotification, selector: #selector(AudioPlayer.reachabilityStatusChanged(_:)), object: reachability)
         reachability.startNotifier()
     }
 
@@ -316,7 +316,7 @@ public class AudioPlayer: NSObject {
                 let target = ClosureContainer() { [weak self] sender in
                     self?.adjustQualityIfNecessary()
                 }
-                let timer = NSTimer(timeInterval: adjustQualityTimeInternal, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
+                let timer = NSTimer(timeInterval: adjustQualityTimeInternal, target: target, selector: #selector(ClosureContainer.callSelectorOnTarget(_:)), userInfo: nil, repeats: false)
                 NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
                 qualityAdjustmentTimer = timer
 
@@ -329,12 +329,12 @@ public class AudioPlayer: NSObject {
                 }
 
                 #if os(iOS) || os(tvOS)
-                    observe(AVAudioSessionInterruptionNotification, selector: "audioSessionGotInterrupted:")
-                    observe(AVAudioSessionRouteChangeNotification, selector: "audioSessionRouteChanged:")
-                    observe(AVAudioSessionMediaServicesWereLostNotification, selector: "audioSessionMessedUp:")
-                    observe(AVAudioSessionMediaServicesWereResetNotification, selector: "audioSessionMessedUp:")
+                    observe(AVAudioSessionInterruptionNotification, selector: #selector(AudioPlayer.audioSessionGotInterrupted(_:)))
+                    observe(AVAudioSessionRouteChangeNotification, selector: #selector(AudioPlayer.audioSessionRouteChanged(_:)))
+                    observe(AVAudioSessionMediaServicesWereLostNotification, selector: #selector(AudioPlayer.audioSessionMessedUp(_:)))
+                    observe(AVAudioSessionMediaServicesWereResetNotification, selector: #selector(AudioPlayer.audioSessionMessedUp(_:)))
                 #endif
-                observe(AVPlayerItemDidPlayToEndTimeNotification, selector: "playerItemDidEnd:")
+                observe(AVPlayerItemDidPlayToEndTimeNotification, selector: #selector(AudioPlayer.playerItemDidEnd(_:)))
             }
         }
     }
@@ -526,7 +526,14 @@ public class AudioPlayer: NSObject {
 
 
     /// MARK: Public properties
+    
+    /// Reproduce remote items on queue only if there is WiFi connection. Default value is false
+    /// NOTE: we assume that any URL comming from a local item will be a local path URL
+    public var playQueuedRemoteItemsWithWiFiOnly = false
 
+    /// Stops the player and cleans the queue after playing the last track on queue. Default value is true
+    public var stopPlayerAtEndOfQueue = true
+    
     /// The maximum number of interruption before putting the player to Stopped mode. Default value is 10.
     public var maximumRetryCount = 10
 
@@ -695,7 +702,7 @@ public class AudioPlayer: NSObject {
             let target = ClosureContainer() { [weak self] sender in
                 self?.retryOrPlayNext()
             }
-            let timer = NSTimer(timeInterval: retryTimeout, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
+            let timer = NSTimer(timeInterval: retryTimeout, target: target, selector: #selector(ClosureContainer.callSelectorOnTarget(_:)), userInfo: nil, repeats: false)
             NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
             retryTimer = timer
         }
@@ -742,11 +749,25 @@ public class AudioPlayer: NSObject {
         if let currentItemIndexInQueue = currentItemIndexInQueue where hasNext() {
             //The background task will end when the player will have enough data to play
             beginBackgroundTask()
-
-            let newIndex = currentItemIndexInQueue + 1
+            
+            var newIndex = currentItemIndexInQueue + 1
             if newIndex < enqueuedItems?.count {
-                self.currentItemIndexInQueue = newIndex
-                currentItem = enqueuedItems?[newIndex].item
+                if mode.intersect(.RepeatAll) != [] ||      /// repeat?
+                    !playQueuedRemoteItemsWithWiFiOnly ||   /// local only?
+                    reachability.isReachableViaWiFi() {     /// wifi connected?
+                    self.currentItemIndexInQueue = newIndex
+                    currentItem = enqueuedItems?[newIndex].item
+                    return
+                }
+                
+                repeat {
+                    if enqueuedItems![newIndex].item.isLocal {
+                        self.currentItemIndexInQueue = newIndex
+                        currentItem = enqueuedItems?[newIndex].item
+                        return
+                    }
+                    newIndex += 1
+                } while newIndex < enqueuedItems?.count
             }
             else if mode.intersect(.RepeatAll) != [] {
                 self.currentItemIndexInQueue = 0
@@ -762,8 +783,20 @@ public class AudioPlayer: NSObject {
     */
     public func hasNext() -> Bool {
         if let enqueuedItems = enqueuedItems, currentItemIndexInQueue = currentItemIndexInQueue {
-            if currentItemIndexInQueue + 1 < enqueuedItems.count || mode.intersect(.RepeatAll) != [] {
-                return true
+            var newIndex = currentItemIndexInQueue + 1
+            if newIndex < enqueuedItems.count {
+                if mode.intersect(.RepeatAll) != [] ||      /// repeat?
+                    !playQueuedRemoteItemsWithWiFiOnly ||   /// local only?
+                    reachability.isReachableViaWiFi() {     /// wifi connected?
+                    return true
+                }
+            
+                repeat {
+                    if enqueuedItems[newIndex].item.isLocal {
+                        return true
+                    }
+                    newIndex += 1
+                } while newIndex < enqueuedItems.count
             }
         }
         return false
@@ -774,10 +807,24 @@ public class AudioPlayer: NSObject {
     */
     public func previous() {
         if let currentItemIndexInQueue = currentItemIndexInQueue, enqueuedItems = enqueuedItems {
-            let newIndex = currentItemIndexInQueue - 1
+            var newIndex = currentItemIndexInQueue - 1
             if newIndex >= 0 {
-                self.currentItemIndexInQueue = newIndex
-                currentItem = enqueuedItems[newIndex].item
+                if mode.intersect(.RepeatAll) != [] ||      /// repeat?
+                    !playQueuedRemoteItemsWithWiFiOnly ||   /// local only?
+                    reachability.isReachableViaWiFi() {     /// wifi connected?
+                    self.currentItemIndexInQueue = newIndex
+                    currentItem = enqueuedItems[newIndex].item
+                    return
+                }
+                
+                repeat {
+                    if enqueuedItems[newIndex].item.isLocal {
+                        self.currentItemIndexInQueue = newIndex
+                        currentItem = enqueuedItems[newIndex].item
+                        return
+                    }
+                    newIndex -= 1
+                } while newIndex >= 0
             }
             else if mode.intersect(.RepeatAll) != [] {
                 self.currentItemIndexInQueue = enqueuedItems.count - 1
@@ -787,6 +834,32 @@ public class AudioPlayer: NSObject {
                 seekToTime(0)
             }
         }
+    }
+    
+    /**
+     Returns whether there is a previous item in the queue or not.
+     
+     - returns: A boolean value indicating whether there is a previous item to play or not.
+     */
+    public func hasPrevious() -> Bool {
+        if let enqueuedItems = enqueuedItems, currentItemIndexInQueue = currentItemIndexInQueue {
+            var newIndex = currentItemIndexInQueue - 1
+            if newIndex >= 0 {
+                if mode.intersect(.RepeatAll) != [] ||      /// repeat?
+                    !playQueuedRemoteItemsWithWiFiOnly ||   /// local only?
+                    reachability.isReachableViaWiFi() {     /// wifi connected?
+                    return true
+                }
+            
+                repeat {
+                    if enqueuedItems[newIndex].item.isLocal {
+                        return true
+                    }
+                    newIndex -= 1
+                } while newIndex >= 0
+            }
+        }
+        return false
     }
 
     /**
@@ -969,7 +1042,7 @@ public class AudioPlayer: NSObject {
                 case "currentItem.playbackBufferEmpty":
                     //The buffer is empty and player is loading
                     if state == .Playing && !qualityIsBeingChanged {
-                        interruptionCount++
+                        interruptionCount += 1
                     }
 
                     stateBeforeBuffering = state
@@ -1082,7 +1155,7 @@ public class AudioPlayer: NSObject {
 
         //Aaaaand we: restart playing/go to next
         state = .Stopped
-        interruptionCount++
+        interruptionCount += 1
         retryOrPlayNext()
     }
     #endif
@@ -1120,7 +1193,7 @@ public class AudioPlayer: NSObject {
                 stateWhenConnectionLost = state
                 if let currentItem = player?.currentItem where currentItem.playbackBufferEmpty {
                     if state == .Playing && !qualityIsBeingChanged {
-                        interruptionCount++
+                        interruptionCount += 1
                     }
                     state = .WaitingForConnection
                     beginBackgroundTask()
@@ -1184,13 +1257,13 @@ public class AudioPlayer: NSObject {
                 player?.seekToTime(CMTime(seconds: cip, preferredTimescale: 1000000000))
             }
 
-            retryCount++
+            retryCount += 1
 
             //We gonna cancel this current retry and create a new one if the player isn't playing after a certain delay
             let target = ClosureContainer() { [weak self] sender in
                 self?.retryOrPlayNext()
             }
-            let timer = NSTimer(timeInterval: retryTimeout, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
+            let timer = NSTimer(timeInterval: retryTimeout, target: target, selector: #selector(ClosureContainer.callSelectorOnTarget(_:)), userInfo: nil, repeats: false)
             NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
             retryTimer = timer
         }
@@ -1214,8 +1287,12 @@ public class AudioPlayer: NSObject {
         else if hasNext() {
             next()
         }
-        else {
+        else if stopPlayerAtEndOfQueue {
             stop()
+        }
+        else {
+            pause()
+            seekToTime(0)
         }
     }
 
@@ -1289,7 +1366,7 @@ public class AudioPlayer: NSObject {
             let target = ClosureContainer() { [weak self] sender in
                 self?.adjustQualityIfNecessary()
             }
-            let timer = NSTimer(timeInterval: adjustQualityTimeInternal, target: target, selector: "callSelectorOnTarget:", userInfo: nil, repeats: false)
+            let timer = NSTimer(timeInterval: adjustQualityTimeInternal, target: target, selector: #selector(ClosureContainer.callSelectorOnTarget(_:)), userInfo: nil, repeats: false)
             NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
             qualityAdjustmentTimer = timer
         }
