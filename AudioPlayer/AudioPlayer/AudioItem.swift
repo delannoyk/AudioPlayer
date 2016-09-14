@@ -82,15 +82,15 @@ public class AudioItem: NSObject {
         var local = false
         
         if let highURL = highQualitySoundURL {
-            local = highURL.absoluteString.hasPrefix("file://")
+            local = highURL.absoluteString!.hasPrefix("file://")
             URLs[.High] = highURL
         }
         if let mediumURL = mediumQualitySoundURL {
-            local = mediumURL.absoluteString.hasPrefix("file://")
+            local = mediumURL.absoluteString!.hasPrefix("file://")
             URLs[.Medium] = mediumURL
         }
         if let lowURL = lowQualitySoundURL {
-            local = lowURL.absoluteString.hasPrefix("file://")
+            local = lowURL.absoluteString!.hasPrefix("file://")
             URLs[.Low] = lowURL
         }
         self.init(soundURLs: URLs, isLocal:local)
