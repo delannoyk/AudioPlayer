@@ -17,8 +17,8 @@ private extension Array {
      - returns: A shuffled array.
      */
     func ap_shuffled() -> [Element] {
-        return sort { element1, element2 in
-            random() % 2 == 0
+        return sorted { element1, element2 in
+            arc4random() % 2 == 0
         }
     }
 }
@@ -44,7 +44,7 @@ class AudioItemQueue {
     /// The player mode. It will affect the queue.
     var mode: AudioPlayerMode {
         didSet {
-            adaptQueue(oldValue)
+            adaptQueue(oldMode: oldValue)
         }
     }
 
@@ -57,7 +57,7 @@ class AudioItemQueue {
     init(items: [AudioItem], mode: AudioPlayerMode) {
         self.items = items
         self.mode = mode
-        queue = mode.contains(.Shuffle) ? items.ap_shuffled() : items
+        queue = mode.contains(.shuffle) ? items.ap_shuffled() : items
         historic = []
     }
 
@@ -81,18 +81,18 @@ class AudioItemQueue {
             return
         }
 
-        if oldMode.contains(.Repeat) && !mode.contains(.Repeat) &&
+        if oldMode.contains(.repeat) && !mode.contains(.repeat) &&
             historic.last == queue[nextPosition] {
                 nextPosition += 1
         }
-        if oldMode.contains(.Shuffle) && !mode.contains(.Shuffle) {
+        if oldMode.contains(.shuffle) && !mode.contains(.shuffle) {
             queue = items
-            if let last = historic.last, index = queue.indexOf(last) {
+            if let last = historic.last, let index = queue.index(of: last) {
                 nextPosition = index + 1
             }
-        } else if mode.contains(.Shuffle) && !oldMode.contains(.Shuffle) {
-            let alreadyPlayed = queue.prefixUpTo(nextPosition)
-            let leftovers = queue.suffixFrom(nextPosition)
+        } else if mode.contains(.shuffle) && !oldMode.contains(.shuffle) {
+            let alreadyPlayed = queue.prefix(upTo: nextPosition)
+            let leftovers = queue.suffix(from: nextPosition)
             queue = Array(alreadyPlayed).ap_shuffled() + Array(leftovers).ap_shuffled()
         }
     }
@@ -102,7 +102,6 @@ class AudioItemQueue {
 
      - returns: The next item in the queue.
      */
-    @warn_unused_result
     func nextItem() -> AudioItem? {
         //Early exit if queue is empty
         guard queue.count > 0 else {
@@ -111,14 +110,14 @@ class AudioItemQueue {
 
         if nextPosition < queue.count {
             let item = queue[nextPosition]
-            if !mode.contains(.Repeat) {
+            if !mode.contains(.repeat) {
                 nextPosition += 1
             }
             historic.append(item)
             return item
         }
 
-        if mode.contains(.RepeatAll) {
+        if mode.contains(.repeatAll) {
             nextPosition = 0
             return nextItem()
         }
@@ -128,7 +127,7 @@ class AudioItemQueue {
     /// A boolean value indicating whether the queue has a next item to play or not.
     var hasNextItem: Bool {
         if queue.count > 0 &&
-            (queue.count > nextPosition || mode.contains(.Repeat) || mode.contains(.RepeatAll)) {
+            (queue.count > nextPosition || mode.contains(.repeat) || mode.contains(.repeatAll)) {
                 return true
         }
         return false
@@ -139,14 +138,13 @@ class AudioItemQueue {
 
      - returns: The previous item in the queue.
      */
-    @warn_unused_result
     func previousItem() -> AudioItem? {
         //Early exit if queue is empty
         guard queue.count > 0 else {
             return nil
         }
 
-        let previousPosition = mode.contains(.Repeat) ? nextPosition : nextPosition - 1
+        let previousPosition = mode.contains(.repeat) ? nextPosition : nextPosition - 1
         if previousPosition >= 0 {
             let item = queue[previousPosition]
             nextPosition = previousPosition
@@ -154,7 +152,7 @@ class AudioItemQueue {
             return item
         }
 
-        if mode.contains(.RepeatAll) {
+        if mode.contains(.repeatAll) {
             nextPosition = queue.count
             return previousItem()
         }
@@ -164,7 +162,7 @@ class AudioItemQueue {
     /// A boolean value indicating whether the queue has a previous item to play or not.
     var hasPreviousItem: Bool {
         if queue.count > 0 &&
-            (nextPosition > 0 || mode.contains(.Repeat) || mode.contains(.RepeatAll)) {
+            (nextPosition > 0 || mode.contains(.repeat) || mode.contains(.repeatAll)) {
                 return true
         }
         return false
@@ -173,11 +171,11 @@ class AudioItemQueue {
     /**
      Adds a list of items to the queue.
 
-     - parameter newItems: The items to add to the queue.
+     - parameter items: The items to add to the queue.
      */
-    func addItems(newItems: [AudioItem]) {
-        items.appendContentsOf(newItems)
-        queue.appendContentsOf(newItems)
+    func add(items: [AudioItem]) {
+        self.items.append(contentsOf: items)
+        self.queue.append(contentsOf: items)
     }
 
     /**
@@ -185,13 +183,10 @@ class AudioItemQueue {
 
      - parameter index: The index of the item to remove.
      */
-    func removeItemAtIndex(index: Int) {
-        assert(index >= 0, "cannot remove an item at negative index")
-        assert(index < queue.count, "cannot remove an item at an index > queue.count")
-
-        let item = queue.removeAtIndex(index)
-        if let index = items.indexOf(item) {
-            items.removeAtIndex(index)
+    func remove(at index: Int) {
+        let item = queue.remove(at: index)
+        if let index = items.index(of: item) {
+            items.remove(at: index)
         }
     }
 }

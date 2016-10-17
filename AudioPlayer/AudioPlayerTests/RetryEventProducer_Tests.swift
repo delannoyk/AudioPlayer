@@ -31,16 +31,16 @@ class RetryEventProducer_Tests: XCTestCase {
         var receivedRetry = 1
         let maximumRetryCount = 3
 
-        let expectation = expectationWithDescription("Waiting for `onEvent` to get called")
+        let r = expectation(description: "Waiting for `onEvent` to get called")
         listener.eventClosure = { event, producer in
             if let event = event as? RetryEventProducer.RetryEvent {
-                if event == .RetryAvailable {
+                if event == .retryAvailable {
                     receivedRetry += 1
-                } else if event == .RetryFailed && receivedRetry == maximumRetryCount {
-                    expectation.fulfill()
+                } else if event == .retryFailed && receivedRetry == maximumRetryCount {
+                    r.fulfill()
                 } else {
                     XCTFail()
-                    expectation.fulfill()
+                    r.fulfill()
                 }
             }
         }
@@ -49,7 +49,7 @@ class RetryEventProducer_Tests: XCTestCase {
         producer.maximumRetryCount = maximumRetryCount
         producer.startProducingEvents()
 
-        waitForExpectationsWithTimeout(5) { e in
+        waitForExpectations(timeout: 5) { e in
             if let _ = e {
                 XCTFail()
             }

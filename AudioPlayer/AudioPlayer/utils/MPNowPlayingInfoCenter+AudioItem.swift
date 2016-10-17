@@ -9,11 +9,8 @@
 import MediaPlayer
 
 extension MPNowPlayingInfoCenter {
-    func ap_updateWithItem(item: AudioItem,
-                           duration: NSTimeInterval?,
-                           progression: NSTimeInterval?,
-                           playbackRate: Float) {
-        var info = [String: AnyObject]()
+    func ap_update(with item: AudioItem, duration: TimeInterval?, progression: TimeInterval?, playbackRate: Float) {
+        var info = [String: Any]()
         if let title = item.title {
             info[MPMediaItemPropertyTitle] = title
         }

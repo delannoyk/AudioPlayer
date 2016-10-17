@@ -20,8 +20,8 @@ extension AudioPlayer {
 
         //We don't wan't to change the state to Playing in case it's Buffering. That
         //would be a lie.
-        if state != .Playing && state != .Buffering {
-            state = .Playing
+        if !state.isPlaying && !state.isBuffering {
+            state = .playing
         }
 
         retryEventProducer.startProducingEvents()
@@ -33,7 +33,7 @@ extension AudioPlayer {
     public func pause() {
         //We ensure the player actually pauses
         player?.rate = 0
-        state = .Paused
+        state = .paused
 
         retryEventProducer.stopProducingEvents()
 
@@ -50,7 +50,7 @@ extension AudioPlayer {
         if hasPrevious {
             currentItem = queue?.previousItem()
         } else {
-            seekToTime(0)
+            seek(to: 0)
         }
     }
 
@@ -91,8 +91,8 @@ extension AudioPlayer {
             queue = nil
         }
 
-        setAudioSessionActive(false)
-        state = .Stopped
+        setAudioSession(active: false)
+        state = .stopped
     }
 
     /**
@@ -104,33 +104,35 @@ extension AudioPlayer {
      - parameter toleranceBefore:                   The tolerance allowed before time.
      - parameter toleranceAfter:                    The tolerance allowed after time.
      */
-    public func seekToTime(time: NSTimeInterval,
-                           byAdaptingTimeToFitSeekableRanges: Bool = false,
-                           toleranceBefore: CMTime = kCMTimePositiveInfinity,
-                           toleranceAfter: CMTime = kCMTimePositiveInfinity) {
+    public func seek(to time: TimeInterval,
+                     byAdaptingTimeToFitSeekableRanges: Bool = false,
+                     toleranceBefore: CMTime = kCMTimePositiveInfinity,
+                     toleranceAfter: CMTime = kCMTimePositiveInfinity) {
         guard let earliest = currentItemSeekableRange?.earliest,
-            latest = currentItemSeekableRange?.latest else {
+            let latest = currentItemSeekableRange?.latest else {
                 //In case we don't have a valid `seekableRange`, although this *shouldn't* happen
-                //let's just call `AVPlayer.seekToTime` with given values.
-                player?.seekToTime(CMTime(timeInterval: time),
-                                   toleranceBefore: toleranceBefore,
-                                   toleranceAfter: toleranceAfter)
+                //let's just call `AVPlayer.seek(to:)` with given values.
+                player?.seek(
+                    to: CMTime(timeInterval: time),
+                    toleranceBefore: toleranceBefore,
+                    toleranceAfter: toleranceAfter)
                 updateNowPlayingInfoCenter()
                 return
         }
 
-        if !byAdaptingTimeToFitSeekableRanges || time >= earliest && time <= latest {
+        if !byAdaptingTimeToFitSeekableRanges || (time >= earliest && time <= latest) {
             //Time is in seekable range, there's no problem here.
-            player?.seekToTime(CMTime(timeInterval: time),
-                               toleranceBefore: toleranceBefore,
-                               toleranceAfter: toleranceAfter)
+            player?.seek(
+                to: CMTime(timeInterval: time),
+                toleranceBefore: toleranceBefore,
+                toleranceAfter: toleranceAfter)
             updateNowPlayingInfoCenter()
         } else if time < earliest {
             //Time is before seekable start, so just move to the most early position as possible.
-            seekToSeekableRangeStart(1)
+            seekToSeekableRangeStart(padding: 1)
         } else if time > latest {
             //Time is larger than possibly, so just move forward as far as possible.
-            seekToSeekableRangeEnd(1)
+            seekToSeekableRangeEnd(padding: 1)
         }
     }
 
@@ -139,10 +141,10 @@ extension AudioPlayer {
 
      - parameter padding: The padding to apply if any.
      */
-    public func seekToSeekableRangeStart(padding: NSTimeInterval) {
+    public func seekToSeekableRangeStart(padding: TimeInterval) {
         if let range = currentItemSeekableRange {
             let position = min(range.latest, range.earliest + padding)
-            player?.seekToTime(CMTime(timeInterval: position))
+            player?.seek(to: CMTime(timeInterval: position))
             updateNowPlayingInfoCenter()
         }
     }
@@ -152,10 +154,10 @@ extension AudioPlayer {
 
      - parameter padding: The padding to apply if any.
      */
-    public func seekToSeekableRangeEnd(padding: NSTimeInterval) {
+    public func seekToSeekableRangeEnd(padding: TimeInterval) {
         if let range = currentItemSeekableRange {
             let position = max(range.earliest, range.latest - padding)
-            player?.seekToTime(CMTime(timeInterval: position))
+            player?.seek(to: CMTime(timeInterval: position))
             updateNowPlayingInfoCenter()
         }
     }
@@ -167,28 +169,28 @@ extension AudioPlayer {
      - parameter event: The event received.
      */
     public func remoteControlReceivedWithEvent(event: UIEvent) {
-        if event.type == .RemoteControl {
+        if event.type == .remoteControl {
             switch event.subtype {
-            case .RemoteControlBeginSeekingBackward:
+            case .remoteControlBeginSeekingBackward:
                 rate = -(rate * rateMultiplerOnSeeking)
-            case .RemoteControlBeginSeekingForward:
+            case .remoteControlBeginSeekingForward:
                 rate = rate * rateMultiplerOnSeeking
-            case .RemoteControlEndSeekingBackward:
+            case .remoteControlEndSeekingBackward:
                 rate = -(rate / rateMultiplerOnSeeking)
-            case .RemoteControlEndSeekingForward:
+            case .remoteControlEndSeekingForward:
                 rate = rate / rateMultiplerOnSeeking
-            case .RemoteControlNextTrack:
+            case .remoteControlNextTrack:
                 next()
-            case .RemoteControlPause:
+            case .remoteControlPause:
                 pause()
-            case .RemoteControlPlay:
+            case .remoteControlPlay:
                 resume()
-            case .RemoteControlPreviousTrack:
+            case .remoteControlPreviousTrack:
                 previous()
-            case .RemoteControlStop:
+            case .remoteControlStop:
                 stop()
-            case .RemoteControlTogglePlayPause:
-                if state == .Playing {
+            case .remoteControlTogglePlayPause:
+                if case .playing = state {
                     pause()
                 } else {
                     resume()

@@ -17,7 +17,7 @@ class NetworkEventProducer_Tests: XCTestCase {
     override func setUp() {
         super.setUp()
         listener = FakeEventListener()
-        reachability = FakeReachability.reachabilityForInternetConnection()
+        reachability = FakeReachability()
         producer = NetworkEventProducer(reachability: reachability)
         producer.eventListener = listener
         producer.startProducingEvents()
@@ -32,16 +32,16 @@ class NetworkEventProducer_Tests: XCTestCase {
     }
 
     func testEventListenerGetsCalledWhenChangingReachabilityStatus() {
-        let expectation = expectationWithDescription("Waiting for `onEvent` to get called")
+        let e = expectation(description: "Waiting for `onEvent` to get called")
         listener.eventClosure = { event, producer in
             XCTAssertEqual(event as? NetworkEventProducer.NetworkEvent,
-                NetworkEventProducer.NetworkEvent.ConnectionRetrieved)
-            expectation.fulfill()
+                NetworkEventProducer.NetworkEvent.connectionRetrieved)
+            e.fulfill()
         }
 
-        reachability.reachabilityStatus = .ReachableViaWiFi
+        reachability.reachabilityStatus = .reachableViaWiFi
 
-        waitForExpectationsWithTimeout(1) { e in
+        waitForExpectations(timeout: 1) { e in
             if let _ = e {
                 XCTFail()
             }
@@ -54,13 +54,13 @@ class NetworkEventProducer_Tests: XCTestCase {
         }
         reachability.reachabilityStatus = reachability.currentReachabilityStatus
 
-        let expectation = expectationWithDescription("Waiting for `onEvent` to get called")
-        let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(0.2 * Double(NSEC_PER_SEC)))
-        dispatch_after(delayTime, dispatch_get_main_queue()) {
-            expectation.fulfill()
+        let e = expectation(description: "Waiting for `onEvent` to get called")
+        let delay = DispatchTime(uptimeNanoseconds: UInt64(0.2 * Double(NSEC_PER_SEC)))
+        DispatchQueue.main.asyncAfter(deadline: delay) {
+            e.fulfill()
         }
 
-        waitForExpectationsWithTimeout(1) { e in
+        waitForExpectations(timeout: 1) { e in
             if let _ = e {
                 XCTFail()
             }
@@ -68,18 +68,18 @@ class NetworkEventProducer_Tests: XCTestCase {
     }
 
     func testConnectionLostEvent() {
-        reachability.reachabilityStatus = .ReachableViaWiFi
+        reachability.reachabilityStatus = .reachableViaWiFi
 
-        let expectation = expectationWithDescription("Waiting for `onEvent` to get called")
+        let e = expectation(description: "Waiting for `onEvent` to get called")
         listener.eventClosure = { event, producer in
             XCTAssertEqual(event as? NetworkEventProducer.NetworkEvent,
-                NetworkEventProducer.NetworkEvent.ConnectionLost)
-            expectation.fulfill()
+                NetworkEventProducer.NetworkEvent.connectionLost)
+            e.fulfill()
         }
 
-        reachability.reachabilityStatus = .NotReachable
+        reachability.reachabilityStatus = .notReachable
 
-        waitForExpectationsWithTimeout(1) { e in
+        waitForExpectations(timeout: 1) { e in
             if let _ = e {
                 XCTFail()
             }
@@ -87,18 +87,18 @@ class NetworkEventProducer_Tests: XCTestCase {
     }
 
     func testConnectionChangedEvent() {
-        reachability.reachabilityStatus = .ReachableViaWiFi
+        reachability.reachabilityStatus = .reachableViaWiFi
 
-        let expectation = expectationWithDescription("Waiting for `onEvent` to get called")
+        let e = expectation(description: "Waiting for `onEvent` to get called")
         listener.eventClosure = { event, producer in
             XCTAssertEqual(event as? NetworkEventProducer.NetworkEvent,
-                NetworkEventProducer.NetworkEvent.NetworkChanged)
-            expectation.fulfill()
+                NetworkEventProducer.NetworkEvent.networkChanged)
+            e.fulfill()
         }
 
-        reachability.reachabilityStatus = .ReachableViaWWAN
+        reachability.reachabilityStatus = .reachableViaWWAN
 
-        waitForExpectationsWithTimeout(1) { e in
+        waitForExpectations(timeout: 1) { e in
             if let _ = e {
                 XCTFail()
             }

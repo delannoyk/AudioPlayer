@@ -23,7 +23,7 @@ protocol EventListener: class {
      - parameter event:         The event that occured.
      - parameter eventProducer: The producer at the root of the event.
      */
-    func onEvent(event: Event, generetedBy eventProducer: EventProducer)
+    func onEvent(_ event: Event, generetedBy eventProducer: EventProducer)
 }
 
 /**

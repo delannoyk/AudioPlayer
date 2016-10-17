@@ -1,5 +1,5 @@
 //
-//  CMTime+NSTimeIntervalValue.swift
+//  CMTime+TimeIntervalValue.swift
 //  AudioPlayer
 //
 //  Created by Kevin DELANNOY on 11/03/16.
@@ -14,15 +14,15 @@ extension CMTime {
 
      - parameter timeInterval: The time in seconds.
      */
-    init(timeInterval: NSTimeInterval) {
+    init(timeInterval: TimeInterval) {
         self.init(seconds: timeInterval, preferredTimescale: 1000000000)
     }
 
-    /// Returns the NSTimerInterval value of CMTime (only if it's a valid value).
-    var ap_timeIntervalValue: NSTimeInterval? {
+    /// Returns the TimerInterval value of CMTime (only if it's a valid value).
+    var ap_timeIntervalValue: TimeInterval? {
         let seconds = CMTimeGetSeconds(self)
         if !seconds.isNaN {
-            return NSTimeInterval(seconds)
+            return TimeInterval(seconds)
         }
         return nil
     }

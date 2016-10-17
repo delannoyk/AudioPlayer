@@ -9,41 +9,41 @@
 import AVFoundation
 
 extension AudioPlayer {
-    func handleQualityEvent(event: QualityAdjustmentEventProducer.QualityAdjustmentEvent) {
+    func handleQualityEvent(from producer: EventProducer, with event: QualityAdjustmentEventProducer.QualityAdjustmentEvent) {
         //Early exit if user doesn't want to adjust quality
         guard adjustQualityAutomatically else {
             return
         }
 
         switch event {
-        case .GoDown:
+        case .goDown:
             guard let quality = AudioQuality(rawValue: currentQuality.rawValue - 1) else {
                 return
             }
-            handleQualityChange(quality)
+            changeQuality(to: quality)
 
-        case .GoUp:
+        case .goUp:
             guard let quality = AudioQuality(rawValue: currentQuality.rawValue + 1) else {
                 return
             }
-            handleQualityChange(quality)
+            changeQuality(to: quality)
         }
     }
 
-    private func handleQualityChange(newQuality: AudioQuality) {
-        guard let URL = currentItem?.soundURLs[newQuality] else {
+    private func changeQuality(to newQuality: AudioQuality) {
+        guard let url = currentItem?.soundURLs[newQuality] else {
             return
         }
 
         let cip = currentItemProgression
-        let item = AVPlayerItem(URL: URL)
+        let item = AVPlayerItem(url: url)
 
         qualityIsBeingChanged = true
-        player?.replaceCurrentItemWithPlayerItem(item)
+        player?.replaceCurrentItem(with: item)
         if let cip = cip {
-            //We can't call self.seekToTime in here since the player is loading a new
+            //We can't call self.seek(to:) in here since the player is loading a new
             //item and `cip` is probably not in the seekableTimeRanges.
-            player?.seekToTime(CMTime(timeInterval: cip))
+            player?.seek(to: CMTime(timeInterval: cip))
         }
         qualityIsBeingChanged = false
 

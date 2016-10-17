@@ -22,7 +22,7 @@
 		462FC8051C9D7C33005A674B /* AudioPlayerMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462FC8021C9D7C33005A674B /* AudioPlayerMode.swift */; };
 		4631A0311CA7D6F300202AA3 /* MPNowPlayingInfoCenter+AudioItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4631A0301CA7D6F300202AA3 /* MPNowPlayingInfoCenter+AudioItem.swift */; };
 		4631A0321CA7D6F300202AA3 /* MPNowPlayingInfoCenter+AudioItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4631A0301CA7D6F300202AA3 /* MPNowPlayingInfoCenter+AudioItem.swift */; };
-		466549711CE8A0C6000EE23C /* NSURL+Offline_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466549701CE8A0C6000EE23C /* NSURL+Offline_Tests.swift */; };
+		466549711CE8A0C6000EE23C /* URL+Offline_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466549701CE8A0C6000EE23C /* URL+Offline_Tests.swift */; };
 		4669307A1BAD30AB00C1E97C /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466930791BAD30AB00C1E97C /* Reachability.swift */; };
 		467D61171CB110BD00D50807 /* AudioPlayer+PlayerEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467D61161CB110BD00D50807 /* AudioPlayer+PlayerEvent.swift */; };
 		467D61181CB110BD00D50807 /* AudioPlayer+PlayerEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467D61161CB110BD00D50807 /* AudioPlayer+PlayerEvent.swift */; };
@@ -36,9 +36,9 @@
 		467D61231CB111E800D50807 /* AudioPlayer+AudioItemEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467D61221CB111E800D50807 /* AudioPlayer+AudioItemEvent.swift */; };
 		467D61241CB111E800D50807 /* AudioPlayer+AudioItemEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467D61221CB111E800D50807 /* AudioPlayer+AudioItemEvent.swift */; };
 		467D61251CB111E800D50807 /* AudioPlayer+AudioItemEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467D61221CB111E800D50807 /* AudioPlayer+AudioItemEvent.swift */; };
-		467D61271CB1145000D50807 /* NSURL+Offline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467D61261CB1145000D50807 /* NSURL+Offline.swift */; };
-		467D61281CB1145000D50807 /* NSURL+Offline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467D61261CB1145000D50807 /* NSURL+Offline.swift */; };
-		467D61291CB1145000D50807 /* NSURL+Offline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467D61261CB1145000D50807 /* NSURL+Offline.swift */; };
+		467D61271CB1145000D50807 /* URL+Offline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467D61261CB1145000D50807 /* URL+Offline.swift */; };
+		467D61281CB1145000D50807 /* URL+Offline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467D61261CB1145000D50807 /* URL+Offline.swift */; };
+		467D61291CB1145000D50807 /* URL+Offline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467D61261CB1145000D50807 /* URL+Offline.swift */; };
 		468E897C1CA1C8E0007F53AD /* BackgroundHandler_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468E897B1CA1C8E0007F53AD /* BackgroundHandler_Tests.swift */; };
 		46AADEE71CA1BA5A00CF7A3D /* BackgroundHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46AADEE61CA1BA5A00CF7A3D /* BackgroundHandler.swift */; };
 		46AADEE81CA1BA5A00CF7A3D /* BackgroundHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46AADEE61CA1BA5A00CF7A3D /* BackgroundHandler.swift */; };
@@ -59,9 +59,9 @@
 		46D3A3031C90A93900635FE4 /* AudioPlayerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D3A3001C90A93400635FE4 /* AudioPlayerDelegate.swift */; };
 		46D3A3041C90A93A00635FE4 /* AudioPlayerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D3A3001C90A93400635FE4 /* AudioPlayerDelegate.swift */; };
 		46D3A30A1C93389500635FE4 /* AudioPlayerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D3A3091C93389500635FE4 /* AudioPlayerState.swift */; };
-		46D3A30D1C933A7F00635FE4 /* CMTime+NSTimeIntervalValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D3A30C1C933A7F00635FE4 /* CMTime+NSTimeIntervalValue.swift */; };
-		46D3A30E1C933A8200635FE4 /* CMTime+NSTimeIntervalValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D3A30C1C933A7F00635FE4 /* CMTime+NSTimeIntervalValue.swift */; };
-		46D3A30F1C933A8200635FE4 /* CMTime+NSTimeIntervalValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D3A30C1C933A7F00635FE4 /* CMTime+NSTimeIntervalValue.swift */; };
+		46D3A30D1C933A7F00635FE4 /* CMTime+TimeIntervalValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D3A30C1C933A7F00635FE4 /* CMTime+TimeIntervalValue.swift */; };
+		46D3A30E1C933A8200635FE4 /* CMTime+TimeIntervalValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D3A30C1C933A7F00635FE4 /* CMTime+TimeIntervalValue.swift */; };
+		46D3A30F1C933A8200635FE4 /* CMTime+TimeIntervalValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D3A30C1C933A7F00635FE4 /* CMTime+TimeIntervalValue.swift */; };
 		46D3A3101C933A8500635FE4 /* AudioPlayerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D3A3091C93389500635FE4 /* AudioPlayerState.swift */; };
 		46D3A3111C933A8600635FE4 /* AudioPlayerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D3A3091C93389500635FE4 /* AudioPlayerState.swift */; };
 		46D3A3131C93405400635FE4 /* QualityAdjustmentEventProducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D3A3121C93405400635FE4 /* QualityAdjustmentEventProducer.swift */; };
@@ -118,13 +118,13 @@
 		462679671AED5DDC003771C9 /* AudioPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AudioPlayer.swift; path = AudioPlayer/player/AudioPlayer.swift; sourceTree = SOURCE_ROOT; };
 		462FC8021C9D7C33005A674B /* AudioPlayerMode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioPlayerMode.swift; sourceTree = "<group>"; };
 		4631A0301CA7D6F300202AA3 /* MPNowPlayingInfoCenter+AudioItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MPNowPlayingInfoCenter+AudioItem.swift"; sourceTree = "<group>"; };
-		466549701CE8A0C6000EE23C /* NSURL+Offline_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSURL+Offline_Tests.swift"; sourceTree = "<group>"; };
+		466549701CE8A0C6000EE23C /* URL+Offline_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "URL+Offline_Tests.swift"; sourceTree = "<group>"; };
 		466930791BAD30AB00C1E97C /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Reachability.swift; path = AudioPlayer/Reachability.swift; sourceTree = SOURCE_ROOT; };
 		467D61161CB110BD00D50807 /* AudioPlayer+PlayerEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AudioPlayer+PlayerEvent.swift"; sourceTree = "<group>"; };
 		467D611A1CB1113500D50807 /* AudioPlayer+NetworkEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AudioPlayer+NetworkEvent.swift"; sourceTree = "<group>"; };
 		467D611E1CB1119600D50807 /* AudioPlayer+QualityAdjustmentEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AudioPlayer+QualityAdjustmentEvent.swift"; sourceTree = "<group>"; };
 		467D61221CB111E800D50807 /* AudioPlayer+AudioItemEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AudioPlayer+AudioItemEvent.swift"; sourceTree = "<group>"; };
-		467D61261CB1145000D50807 /* NSURL+Offline.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSURL+Offline.swift"; sourceTree = "<group>"; };
+		467D61261CB1145000D50807 /* URL+Offline.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "URL+Offline.swift"; sourceTree = "<group>"; };
 		468E897B1CA1C8E0007F53AD /* BackgroundHandler_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackgroundHandler_Tests.swift; sourceTree = "<group>"; };
 		46AADEE61CA1BA5A00CF7A3D /* BackgroundHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackgroundHandler.swift; sourceTree = "<group>"; };
 		46D3A2E01C8F480A00635FE4 /* EventProducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventProducer.swift; sourceTree = "<group>"; };
@@ -135,7 +135,7 @@
 		46D3A2FC1C90922700635FE4 /* Fakes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Fakes.swift; sourceTree = "<group>"; };
 		46D3A3001C90A93400635FE4 /* AudioPlayerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioPlayerDelegate.swift; sourceTree = "<group>"; };
 		46D3A3091C93389500635FE4 /* AudioPlayerState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioPlayerState.swift; sourceTree = "<group>"; };
-		46D3A30C1C933A7F00635FE4 /* CMTime+NSTimeIntervalValue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CMTime+NSTimeIntervalValue.swift"; sourceTree = "<group>"; };
+		46D3A30C1C933A7F00635FE4 /* CMTime+TimeIntervalValue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CMTime+TimeIntervalValue.swift"; sourceTree = "<group>"; };
 		46D3A3121C93405400635FE4 /* QualityAdjustmentEventProducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QualityAdjustmentEventProducer.swift; sourceTree = "<group>"; };
 		46D3A31A1C9340D000635FE4 /* AudioItemQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioItemQueue.swift; sourceTree = "<group>"; };
 		46D3A3221C943ECC00635FE4 /* AudioItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioItem.swift; sourceTree = "<group>"; };
@@ -231,7 +231,7 @@
 				46DDB0A11C95E03D007B60C6 /* AudioItem_Tests.swift */,
 				46170A301C9B2DA0001F85F9 /* AudioPlayerState_Tests.swift */,
 				468E897B1CA1C8E0007F53AD /* BackgroundHandler_Tests.swift */,
-				466549701CE8A0C6000EE23C /* NSURL+Offline_Tests.swift */,
+				466549701CE8A0C6000EE23C /* URL+Offline_Tests.swift */,
 				4626794D1AED567D003771C9 /* supporting_files */,
 			);
 			path = AudioPlayerTests;
@@ -292,8 +292,8 @@
 			isa = PBXGroup;
 			children = (
 				46AADEE61CA1BA5A00CF7A3D /* BackgroundHandler.swift */,
-				467D61261CB1145000D50807 /* NSURL+Offline.swift */,
-				46D3A30C1C933A7F00635FE4 /* CMTime+NSTimeIntervalValue.swift */,
+				467D61261CB1145000D50807 /* URL+Offline.swift */,
+				46D3A30C1C933A7F00635FE4 /* CMTime+TimeIntervalValue.swift */,
 				4631A0301CA7D6F300202AA3 /* MPNowPlayingInfoCenter+AudioItem.swift */,
 			);
 			path = utils;
@@ -450,11 +450,12 @@
 			attributes = {
 				LastSwiftMigration = 0700;
 				LastSwiftUpdateCheck = 0730;
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = "Kevin Delannoy";
 				TargetAttributes = {
 					4626793C1AED567D003771C9 = {
 						CreatedOnToolsVersion = 6.3.1;
+						LastSwiftMigration = 0800;
 					};
 					462679471AED567D003771C9 = {
 						CreatedOnToolsVersion = 6.3.1;
@@ -549,10 +550,10 @@
 				462679681AED5DDC003771C9 /* AudioPlayer.swift in Sources */,
 				467D61231CB111E800D50807 /* AudioPlayer+AudioItemEvent.swift in Sources */,
 				46D3A2E91C8F4A7B00635FE4 /* NetworkEventProducer.swift in Sources */,
-				467D61271CB1145000D50807 /* NSURL+Offline.swift in Sources */,
+				467D61271CB1145000D50807 /* URL+Offline.swift in Sources */,
 				46D3A3131C93405400635FE4 /* QualityAdjustmentEventProducer.swift in Sources */,
 				46DDB09E1C959D3C007B60C6 /* AudioItemEventProducer.swift in Sources */,
-				46D3A30D1C933A7F00635FE4 /* CMTime+NSTimeIntervalValue.swift in Sources */,
+				46D3A30D1C933A7F00635FE4 /* CMTime+TimeIntervalValue.swift in Sources */,
 				46D3A31B1C9340D000635FE4 /* AudioItemQueue.swift in Sources */,
 				467D611B1CB1113500D50807 /* AudioPlayer+NetworkEvent.swift in Sources */,
 				4631A0311CA7D6F300202AA3 /* MPNowPlayingInfoCenter+AudioItem.swift in Sources */,
@@ -573,7 +574,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				466549711CE8A0C6000EE23C /* NSURL+Offline_Tests.swift in Sources */,
+				466549711CE8A0C6000EE23C /* URL+Offline_Tests.swift in Sources */,
 				468E897C1CA1C8E0007F53AD /* BackgroundHandler_Tests.swift in Sources */,
 				460FA1E31CC1805A00156DFC /* RetryEventProducer_Tests.swift in Sources */,
 				46D3A2F91C90905C00635FE4 /* NetworkEventProducer_Tests.swift in Sources */,
@@ -612,8 +613,8 @@
 				46AADEE91CA1BA5A00CF7A3D /* BackgroundHandler.swift in Sources */,
 				46D3A3251C943ECC00635FE4 /* AudioItem.swift in Sources */,
 				467D61251CB111E800D50807 /* AudioPlayer+AudioItemEvent.swift in Sources */,
-				46D3A30F1C933A8200635FE4 /* CMTime+NSTimeIntervalValue.swift in Sources */,
-				467D61291CB1145000D50807 /* NSURL+Offline.swift in Sources */,
+				46D3A30F1C933A8200635FE4 /* CMTime+TimeIntervalValue.swift in Sources */,
+				467D61291CB1145000D50807 /* URL+Offline.swift in Sources */,
 				46DAE4BD1C40275F00572EB2 /* Reachability.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -630,7 +631,7 @@
 				46D3A2EA1C8F4A7B00635FE4 /* NetworkEventProducer.swift in Sources */,
 				467D61241CB111E800D50807 /* AudioPlayer+AudioItemEvent.swift in Sources */,
 				46D3A3141C93405400635FE4 /* QualityAdjustmentEventProducer.swift in Sources */,
-				467D61281CB1145000D50807 /* NSURL+Offline.swift in Sources */,
+				467D61281CB1145000D50807 /* URL+Offline.swift in Sources */,
 				653E188C1C3541B8003C0CAB /* AudioPlayer.swift in Sources */,
 				46DDB09F1C959D3C007B60C6 /* AudioItemEventProducer.swift in Sources */,
 				46D3A3031C90A93900635FE4 /* AudioPlayerDelegate.swift in Sources */,
@@ -640,7 +641,7 @@
 				46DE85131CAB0A3200F00287 /* AudioPlayer+CurrentItem.swift in Sources */,
 				46AADEE81CA1BA5A00CF7A3D /* BackgroundHandler.swift in Sources */,
 				46D3A3241C943ECC00635FE4 /* AudioItem.swift in Sources */,
-				46D3A30E1C933A8200635FE4 /* CMTime+NSTimeIntervalValue.swift in Sources */,
+				46D3A30E1C933A8200635FE4 /* CMTime+TimeIntervalValue.swift in Sources */,
 				467D61181CB110BD00D50807 /* AudioPlayer+PlayerEvent.swift in Sources */,
 				653E188D1C3541BB003C0CAB /* Reachability.swift in Sources */,
 				467D61201CB1119600D50807 /* AudioPlayer+QualityAdjustmentEvent.swift in Sources */,
@@ -674,8 +675,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -723,8 +726,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -744,6 +749,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -755,6 +761,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -767,6 +774,7 @@
 				PRODUCT_NAME = AudioPlayer;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -774,6 +782,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -785,6 +794,7 @@
 				PRODUCT_MODULE_NAME = AudioPlayer;
 				PRODUCT_NAME = AudioPlayer;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -801,6 +811,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "be.delannoyk.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -812,13 +823,14 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "be.delannoyk.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
 		46DAE4B81C4026E200572EB2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEFINES_MODULE = YES;
@@ -834,13 +846,14 @@
 				PRODUCT_NAME = AudioPlayer;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
 		46DAE4B91C4026E200572EB2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -855,12 +868,14 @@
 				PRODUCT_NAME = AudioPlayer;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
 		653E18851C353DD0003C0CAB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -873,6 +888,7 @@
 				PRODUCT_NAME = AudioPlayer;
 				SDKROOT = appletvos;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 9.0;
 			};
@@ -881,6 +897,7 @@
 		653E18861C353DD0003C0CAB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -892,6 +909,7 @@
 				PRODUCT_NAME = AudioPlayer;
 				SDKROOT = appletvos;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 9.0;
 			};

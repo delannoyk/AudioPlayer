@@ -29,17 +29,17 @@ private extension Selector {
     #if os(iOS) || os(tvOS)
     /// The selector to call when the audio session is interrupted.
     static let audioSessionInterrupted =
-        #selector(PlayerEventProducer.audioSessionGotInterrupted(_:))
+        #selector(PlayerEventProducer.audioSessionGotInterrupted(note:))
     #endif
 
     /// The selector to call when the audio session route changes.
-    static let audioRouteChanged = #selector(PlayerEventProducer.audioSessionRouteChanged(_:))
+    static let audioRouteChanged = #selector(PlayerEventProducer.audioSessionRouteChanged(note:))
 
     /// The selector to call when the audio session get messed up.
-    static let audioSessionMessedUp = #selector(PlayerEventProducer.audioSessionMessedUp(_:))
+    static let audioSessionMessedUp = #selector(PlayerEventProducer.audioSessionMessedUp(note:))
 
     /// The selector to call when an audio item ends playing.
-    static let itemDidEnd = #selector(PlayerEventProducer.playerItemDidEnd(_:))
+    static let itemDidEnd = #selector(PlayerEventProducer.playerItemDidEnd(note:))
 }
 
 // MARK: - PlayerEventProducer
@@ -51,61 +51,31 @@ class PlayerEventProducer: NSObject, EventProducer {
     /**
        A `PlayerEvent` is an event a player generates over time.
 
-       - StartedBuffering:  The player started buffering the audio file.
-       - ReadyToPlay:       The player is ready to play. It buffered enough data.
-       - LoadedMoreRange:   The player loaded more range of time.
-       - LoadedMetadata:    The player loaded metadata.
-       - LoadedDuration:    The player has found audio item duration.
-       - Progressed:        The player progressed in its playing.
-       - EndedPlaying:      The player ended playing the current item because it went through the
+       - startedBuffering:  The player started buffering the audio file.
+       - readyToPlay:       The player is ready to play. It buffered enough data.
+       - loadedMoreRange:   The player loaded more range of time.
+       - loadedMetadata:    The player loaded metadata.
+       - loadedDuration:    The player has found audio item duration.
+       - progressed:        The player progressed in its playing.
+       - endedPlaying:      The player ended playing the current item because it went through the
             file or because of an error.
-       - InterruptionBegan: The player got interrupted (phone call, Siri, ...).
-       - InterruptionEnded: The interruption ended.
-       - RouteChanged:      The player's route changed.
-       - SessionMessedUp:   The audio session is messed up.
+       - interruptionBegan: The player got interrupted (phone call, Siri, ...).
+       - interruptionEnded: The interruption ended.
+       - routeChanged:      The player's route changed.
+       - sessionMessedUp:   The audio session is messed up.
      */
-    enum PlayerEvent: Event, Equatable {
-        case StartedBuffering
-        case ReadyToPlay
-        case LoadedMoreRange(CMTime, CMTime)
-        case LoadedMetadata([AVMetadataItem])
-        case LoadedDuration(CMTime)
-        case Progressed(CMTime)
-        case EndedPlaying(NSError?)
-        case InterruptionBegan
-        case InterruptionEnded
-        case RouteChanged
-        case SessionMessedUp
-
-        private var hash: UInt {
-            switch self {
-            case .StartedBuffering:
-                return 0
-            case .ReadyToPlay:
-                return 1
-            case .LoadedMoreRange:
-                return 2
-            case .LoadedMetadata:
-                return 3
-            case .LoadedDuration:
-                return 4
-            case .Progressed:
-                return 5
-            case .EndedPlaying(let err):
-                if let _ = err {
-                    return 6
-                }
-                return 7
-            case .InterruptionBegan:
-                return 8
-            case .InterruptionEnded:
-                return 9
-            case .RouteChanged:
-                return 10
-            case .SessionMessedUp:
-                return 11
-            }
-        }
+    enum PlayerEvent: Event {
+        case startedBuffering
+        case readyToPlay
+        case loadedMoreRange(CMTime, CMTime)
+        case loadedMetadata([AVMetadataItem])
+        case loadedDuration(CMTime)
+        case progressed(CMTime)
+        case endedPlaying(Error?)
+        case interruptionBegan
+        case interruptionEnded
+        case routeChanged
+        case sessionMessedUp
     }
 
     /// The player to produce events with.
@@ -120,7 +90,7 @@ class PlayerEventProducer: NSObject, EventProducer {
     weak var eventListener: EventListener?
 
     /// The time observer for the player.
-    private var timeObserver: AnyObject?
+    private var timeObserver: Any?
 
     /// A boolean value indicating whether we're currently listening to events on the player.
     private var listening = false
@@ -136,36 +106,35 @@ class PlayerEventProducer: NSObject, EventProducer {
      Starts listening to the player events.
      */
     func startProducingEvents() {
-        guard let player = player where !listening else {
+        guard let player = player, !listening else {
             return
         }
 
         //Observing notifications sent through `NSNotificationCenter`
-        let center = NSNotificationCenter.defaultCenter()
+        let center = NotificationCenter.default
         #if os(iOS) || os(tvOS)
             center.addObserver(self, selector: .audioSessionInterrupted,
-                name: AVAudioSessionInterruptionNotification, object: player)
+                name: .AVAudioSessionInterruption, object: player)
             center.addObserver(self, selector: .audioRouteChanged,
-                name: AVAudioSessionRouteChangeNotification, object: player)
+                name: .AVAudioSessionRouteChange, object: player)
             center.addObserver(self, selector: .audioSessionMessedUp,
-                name: AVAudioSessionMediaServicesWereLostNotification, object: player)
+                name: .AVAudioSessionMediaServicesWereLost, object: player)
             center.addObserver(self, selector: .audioSessionMessedUp,
-                name: AVAudioSessionMediaServicesWereResetNotification, object: player)
+                name: .AVAudioSessionMediaServicesWereReset, object: player)
         #endif
         center.addObserver(self, selector: .itemDidEnd,
-            name: AVPlayerItemDidPlayToEndTimeNotification, object: player)
+            name: .AVPlayerItemDidPlayToEndTime, object: player)
 
         //Observing AVPlayer's property
         for keyPath in AVPlayer.ap_KVOProperties {
-            player.addObserver(self, forKeyPath: keyPath, options: .New, context: nil)
+            player.addObserver(self, forKeyPath: keyPath, options: .new, context: nil)
         }
 
         //Observing timing event
-        timeObserver = player.addPeriodicTimeObserverForInterval(CMTimeMake(1, 2),
-            queue: dispatch_get_main_queue()) { [weak self] time in
-                if let strongSelf = self {
-                    self?.eventListener?.onEvent(PlayerEvent.Progressed(time),
-                        generetedBy: strongSelf)
+        timeObserver = player.addPeriodicTimeObserver(forInterval: CMTimeMake(1, 2),
+            queue: DispatchQueue.main) { [weak self] time in
+                if let `self` = self {
+                    self.eventListener?.onEvent(PlayerEvent.progressed(time), generetedBy: self)
                 }
         }
 
@@ -176,23 +145,23 @@ class PlayerEventProducer: NSObject, EventProducer {
      Stops listening to the player events.
      */
     func stopProducingEvents() {
-        guard let player = player where listening else {
+        guard let player = player, listening else {
             return
         }
 
         //Unobserving notifications sent through `NSNotificationCenter`
-        let center = NSNotificationCenter.defaultCenter()
+        let center = NotificationCenter.default
         #if os(iOS) || os(tvOS)
             center.removeObserver(self,
-                name: AVAudioSessionInterruptionNotification, object: player)
+                name: .AVAudioSessionInterruption, object: player)
             center.removeObserver(self,
-                name: AVAudioSessionRouteChangeNotification, object: player)
+                name: .AVAudioSessionRouteChange, object: player)
             center.removeObserver(self,
-                name: AVAudioSessionMediaServicesWereLostNotification, object: player)
+                name: .AVAudioSessionMediaServicesWereLost, object: player)
             center.removeObserver(self,
-                name: AVAudioSessionMediaServicesWereResetNotification, object: player)
+                name: .AVAudioSessionMediaServicesWereReset, object: player)
         #endif
-        center.removeObserver(self, name: AVPlayerItemDidPlayToEndTimeNotification, object: player)
+        center.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: player)
 
         //Unobserving AVPlayer's property
         for keyPath in AVPlayer.ap_KVOProperties {
@@ -221,32 +190,32 @@ class PlayerEventProducer: NSObject, EventProducer {
      - parameter context: The value that was provided when the receiver was registered to receive
         key-value observation notifications.
      */
-    override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?,
-        change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
-            if let keyPath = keyPath, p = object as? AVPlayer, currentItem = p.currentItem {
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?,
+        change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+            if let keyPath = keyPath, let p = object as? AVPlayer, let currentItem = p.currentItem {
                 switch keyPath {
                 case "currentItem.duration":
                     let duration = currentItem.duration
-                    eventListener?.onEvent(PlayerEvent.LoadedDuration(duration),
+                    eventListener?.onEvent(PlayerEvent.loadedDuration(duration),
                                            generetedBy: self)
 
                     let metadata = currentItem.asset.commonMetadata
-                    eventListener?.onEvent(PlayerEvent.LoadedMetadata(metadata),
+                    eventListener?.onEvent(PlayerEvent.loadedMetadata(metadata),
                                            generetedBy: self)
 
-                case "currentItem.playbackBufferEmpty" where currentItem.playbackBufferEmpty:
-                    eventListener?.onEvent(PlayerEvent.StartedBuffering, generetedBy: self)
+                case "currentItem.playbackBufferEmpty" where currentItem.isPlaybackBufferEmpty:
+                    eventListener?.onEvent(PlayerEvent.startedBuffering, generetedBy: self)
 
-                case "currentItem.playbackLikelyToKeepUp" where currentItem.playbackLikelyToKeepUp:
-                    eventListener?.onEvent(PlayerEvent.ReadyToPlay, generetedBy: self)
+                case "currentItem.playbackLikelyToKeepUp" where currentItem.isPlaybackLikelyToKeepUp:
+                    eventListener?.onEvent(PlayerEvent.readyToPlay, generetedBy: self)
 
-                case "currentItem.status" where currentItem.status == .Failed:
-                    eventListener?.onEvent(PlayerEvent.EndedPlaying(currentItem.error),
+                case "currentItem.status" where currentItem.status == .failed:
+                    eventListener?.onEvent(PlayerEvent.endedPlaying(currentItem.error),
                                            generetedBy: self)
 
                 case "currentItem.loadedTimeRanges":
-                    if let range = currentItem.loadedTimeRanges.last?.CMTimeRangeValue {
-                        eventListener?.onEvent(PlayerEvent.LoadedMoreRange(range.start, range.end),
+                    if let range = currentItem.loadedTimeRanges.last?.timeRangeValue {
+                        eventListener?.onEvent(PlayerEvent.loadedMoreRange(range.start, range.end),
                             generetedBy: self)
                     }
 
@@ -264,17 +233,17 @@ class PlayerEventProducer: NSObject, EventProducer {
 
      - parameter note: The notification information.
      */
-    @objc private func audioSessionGotInterrupted(note: NSNotification) {
+    @objc fileprivate func audioSessionGotInterrupted(note: NSNotification) {
         if let userInfo = note.userInfo,
-            typeInt = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
-            type = AVAudioSessionInterruptionType(rawValue: typeInt) {
-                if type == .Began {
-                    eventListener?.onEvent(PlayerEvent.InterruptionBegan, generetedBy: self)
+            let typeInt = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
+            let type = AVAudioSessionInterruptionType(rawValue: typeInt) {
+                if type == .began {
+                    eventListener?.onEvent(PlayerEvent.interruptionBegan, generetedBy: self)
                 } else {
                     if let optionInt = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
                         let options = AVAudioSessionInterruptionOptions(rawValue: optionInt)
-                        if options.contains(.ShouldResume) {
-                            eventListener?.onEvent(PlayerEvent.InterruptionEnded, generetedBy: self)
+                        if options.contains(.shouldResume) {
+                            eventListener?.onEvent(PlayerEvent.interruptionEnded, generetedBy: self)
                         }
                     }
                 }
@@ -288,8 +257,8 @@ class PlayerEventProducer: NSObject, EventProducer {
 
      - parameter note: The notification information.
      */
-    @objc private func audioSessionRouteChanged(note: NSNotification) {
-        eventListener?.onEvent(PlayerEvent.RouteChanged, generetedBy: self)
+    @objc fileprivate func audioSessionRouteChanged(note: NSNotification) {
+        eventListener?.onEvent(PlayerEvent.routeChanged, generetedBy: self)
     }
 
     /**
@@ -298,8 +267,8 @@ class PlayerEventProducer: NSObject, EventProducer {
 
      - parameter note: The notification information.
      */
-    @objc private func audioSessionMessedUp(note: NSNotification) {
-        eventListener?.onEvent(PlayerEvent.SessionMessedUp, generetedBy: self)
+    @objc fileprivate func audioSessionMessedUp(note: NSNotification) {
+        eventListener?.onEvent(PlayerEvent.sessionMessedUp, generetedBy: self)
     }
 
     /**
@@ -307,11 +276,7 @@ class PlayerEventProducer: NSObject, EventProducer {
 
      - parameter note: The notification information.
      */
-    @objc private func playerItemDidEnd(note: NSNotification) {
-        eventListener?.onEvent(PlayerEvent.EndedPlaying(nil), generetedBy: self)
+    @objc fileprivate func playerItemDidEnd(note: NSNotification) {
+        eventListener?.onEvent(PlayerEvent.endedPlaying(nil), generetedBy: self)
     }
-}
-
-func == (lhs: PlayerEventProducer.PlayerEvent, rhs: PlayerEventProducer.PlayerEvent) -> Bool {
-    return lhs.hash == rhs.hash
 }

@@ -12,7 +12,7 @@ import Foundation
  Represents the mode in which the player should play. Modes can be used as masks
  so that you can play in `.Shuffle` mode and still `.RepeatAll`.
  */
-public struct AudioPlayerMode: OptionSetType {
+public struct AudioPlayerMode: OptionSet {
     /// The raw value describing the mode.
     public let rawValue: UInt
 
@@ -26,14 +26,14 @@ public struct AudioPlayerMode: OptionSetType {
     }
 
     /// In this mode, player's queue will be played as given.
-    public static var Normal = AudioPlayerMode(rawValue: 0)
+    public static let normal = AudioPlayerMode(rawValue: 0)
 
     /// In this mode, player's queue is shuffled randomly.
-    public static var Shuffle = AudioPlayerMode(rawValue: 0b001)
+    public static let shuffle = AudioPlayerMode(rawValue: 0b001)
 
     /// In this mode, the player will continuously play the same item over and over.
-    public static var Repeat = AudioPlayerMode(rawValue: 0b010)
+    public static let `repeat` = AudioPlayerMode(rawValue: 0b010)
 
     /// In this mode, the player will continuously play the same queue over and over.
-    public static var RepeatAll = AudioPlayerMode(rawValue: 0b100)
+    public static let repeatAll = AudioPlayerMode(rawValue: 0b100)
 }

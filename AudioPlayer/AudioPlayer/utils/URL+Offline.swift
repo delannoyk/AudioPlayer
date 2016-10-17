@@ -1,5 +1,5 @@
 //
-//  NSURL+Offline.swift
+//  URL+Offline.swift
 //  AudioPlayer
 //
 //  Created by Kevin DELANNOY on 03/04/16.
@@ -8,10 +8,10 @@
 
 import Foundation
 
-extension NSURL {
+extension URL {
     /// A boolean value indicating whether a resource should be considered available
     /// when internet connection is down or not.
     var ap_isOfflineURL: Bool {
-        return fileURL || scheme == "ipod-library" || host == "localhost" || host == "127.0.0.1"
+        return isFileURL || scheme == "ipod-library" || host == "localhost" || host == "127.0.0.1"
     }
 }

@@ -29,7 +29,7 @@
 
          - returns: A unique identifier for the new background task.
          */
-        func beginBackgroundTaskWithExpirationHandler(handler: (() -> Void)?)
+        func beginBackgroundTask(expirationHandler handler: (() -> Void)?)
             -> UIBackgroundTaskIdentifier
 
         /**
@@ -42,7 +42,7 @@
          - parameter: An identifier returned by the `beginBackgroundTaskWithExpirationHandler:`
             method.
          */
-        func endBackgroundTask(identifier: UIBackgroundTaskIdentifier)
+        func endBackgroundTask(_ identifier: UIBackgroundTaskIdentifier)
     }
 
     extension UIApplication: BackgroundTaskCreator {}
@@ -54,7 +54,7 @@
 class BackgroundHandler: NSObject {
     #if !os(OSX)
     /// The background task creator
-    var backgroundTaskCreator: BackgroundTaskCreator = UIApplication.sharedApplication()
+    var backgroundTaskCreator: BackgroundTaskCreator = UIApplication.shared
     #endif
 
     /// The backround task identifier if a background task started. Nil if not.
@@ -74,6 +74,7 @@ class BackgroundHandler: NSObject {
 
      - returns: A boolean value indicating whether a background task was created or not.
      */
+    @discardableResult
     func beginBackgroundTask() -> Bool {
         #if os(OSX)
             return false
@@ -84,9 +85,7 @@ class BackgroundHandler: NSObject {
                 return false
             }
 
-            taskIdentifier = backgroundTaskCreator.beginBackgroundTaskWithExpirationHandler {
-                [weak self] in
-
+            taskIdentifier = backgroundTaskCreator.beginBackgroundTask { [weak self] in
                 if let taskIdentifier = self?.taskIdentifier {
                     self?.backgroundTaskCreator.endBackgroundTask(taskIdentifier)
                 }
@@ -101,6 +100,7 @@ class BackgroundHandler: NSObject {
 
      - returns: A boolean value indicating whether a background task was ended or not.
      */
+    @discardableResult
     func endBackgroundTask() -> Bool {
         #if os(OSX)
             return false

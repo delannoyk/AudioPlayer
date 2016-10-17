@@ -8,23 +8,23 @@
 
 import Foundation
 
-public typealias TimeRange = (earliest: NSTimeInterval, latest: NSTimeInterval)
+public typealias TimeRange = (earliest: TimeInterval, latest: TimeInterval)
 
 extension AudioPlayer {
     /// The current item progression or nil if no item.
-    public var currentItemProgression: NSTimeInterval? {
+    public var currentItemProgression: TimeInterval? {
         return player?.currentItem?.currentTime().ap_timeIntervalValue
     }
 
     /// The current item duration or nil if no item or unknown duration.
-    public var currentItemDuration: NSTimeInterval? {
+    public var currentItemDuration: TimeInterval? {
         return player?.currentItem?.duration.ap_timeIntervalValue
     }
 
     /// The current seekable range.
     public var currentItemSeekableRange: TimeRange? {
-        let range = player?.currentItem?.seekableTimeRanges.last?.CMTimeRangeValue
-        if let start = range?.start.ap_timeIntervalValue, end = range?.end.ap_timeIntervalValue {
+        let range = player?.currentItem?.seekableTimeRanges.last?.timeRangeValue
+        if let start = range?.start.ap_timeIntervalValue, let end = range?.end.ap_timeIntervalValue {
             return (start, end)
         }
         if let currentItemProgression = currentItemProgression {
@@ -38,8 +38,8 @@ extension AudioPlayer {
 
     /// The current loaded range.
     public var currentItemLoadedRange: TimeRange? {
-        let range = player?.currentItem?.loadedTimeRanges.last?.CMTimeRangeValue
-        if let start = range?.start.ap_timeIntervalValue, end = range?.end.ap_timeIntervalValue {
+        let range = player?.currentItem?.loadedTimeRanges.last?.timeRangeValue
+        if let start = range?.start.ap_timeIntervalValue, let end = range?.end.ap_timeIntervalValue {
             return (start, end)
         }
         return nil

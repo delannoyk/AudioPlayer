@@ -11,13 +11,13 @@ import XCTest
 
 class AudioPlayerState_Tests: XCTestCase {
     func testEquatable() {
-        let buffering = AudioPlayerState.Buffering
-        let failedMaximumRetryCountHit = AudioPlayerState.Failed(.MaximumRetryCountHit)
-        let failedWithError = AudioPlayerState.Failed(.FoundationError(NSError(domain: "", code: -1, userInfo: nil)))
-        let paused = AudioPlayerState.Paused
-        let playing = AudioPlayerState.Playing
-        let stopped = AudioPlayerState.Stopped
-        let waitingForConnection = AudioPlayerState.WaitingForConnection
+        let buffering = AudioPlayerState.buffering
+        let failedMaximumRetryCountHit = AudioPlayerState.failed(.maximumRetryCountHit)
+        let failedWithError = AudioPlayerState.failed(.foundationError(NSError(domain: "", code: -1, userInfo: nil)))
+        let paused = AudioPlayerState.paused
+        let playing = AudioPlayerState.playing
+        let stopped = AudioPlayerState.stopped
+        let waitingForConnection = AudioPlayerState.waitingForConnection
 
         XCTAssertEqual(buffering, buffering)
         XCTAssertEqual(failedMaximumRetryCountHit, failedMaximumRetryCountHit)

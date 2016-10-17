@@ -9,13 +9,13 @@
 import Foundation
 
 extension AudioPlayer {
-    func handleRetryEvent(producer: EventProducer, event: RetryEventProducer.RetryEvent) {
+    func handleRetryEvent(from producer: EventProducer, with event: RetryEventProducer.RetryEvent) {
         switch event {
-        case .RetryAvailable:
+        case .retryAvailable:
             retryOrPlayNext()
 
-        case .RetryFailed:
-            state = .Failed(.MaximumRetryCountHit)
+        case .retryFailed:
+            state = .failed(.maximumRetryCountHit)
             producer.stopProducingEvents()
         }
     }

@@ -14,72 +14,98 @@ import Foundation
  - MaximumRetryCountHit: The player hit the maximum retry count.
  - FoundationError:      The `AVPlayer` failed to play.
  */
-public enum AudioPlayerError: ErrorType, Equatable {
-    case MaximumRetryCountHit
-    case FoundationError(NSError)
-}
-
-/**
- Return true if `lhs` is equal to `rhs`.
-
- - parameter lhs: The left value.
- - parameter rhs: The right value.
-
- - returns: true if `lhs` is equal to `rhs`.
- */
-public func == (lhs: AudioPlayerError, rhs: AudioPlayerError) -> Bool {
-    switch (lhs, rhs) {
-    case (.MaximumRetryCountHit, .MaximumRetryCountHit):
-        return true
-    case (.FoundationError(let e1), .FoundationError(let e2)):
-        return e1 == e2
-    default:
-        return false
-    }
+public enum AudioPlayerError: Error {
+    case maximumRetryCountHit
+    case foundationError(Error)
 }
 
 /**
  `AudioPlayerState` defines 4 state an `AudioPlayer` instance can be in.
 
- - `Buffering`:            The player is buffering data before playing them.
- - `Playing`:              The player is playing.
- - `Paused`:               The player is paused.
- - `Stopped`:              The player is stopped.
- - `WaitingForConnection`: The player is waiting for internet connection.
- - `Failed`:               An error occured. It contains AVPlayer's error if any.
+ - `buffering`:            The player is buffering data before playing them.
+ - `playing`:              The player is playing.
+ - `paused`:               The player is paused.
+ - `stopped`:              The player is stopped.
+ - `waitingForConnection`: The player is waiting for internet connection.
+ - `failed`:               An error occured. It contains AVPlayer's error if any.
 */
-public enum AudioPlayerState: Equatable {
-    case Buffering
-    case Playing
-    case Paused
-    case Stopped
-    case WaitingForConnection
-    case Failed(AudioPlayerError)
-}
+public enum AudioPlayerState {
+    case buffering
+    case playing
+    case paused
+    case stopped
+    case waitingForConnection
+    case failed(AudioPlayerError)
 
-/**
- Return true if `lhs` is equal to `rhs`.
-
- - parameter lhs: The left value.
- - parameter rhs: The right value.
-
- - returns: true if `lhs` is equal to `rhs`.
- */
-public func == (lhs: AudioPlayerState, rhs: AudioPlayerState) -> Bool {
-    switch (lhs, rhs) {
-    case (.Buffering, .Buffering):
-        return true
-    case (.Playing, .Playing):
-        return true
-    case (.Paused, .Paused):
-        return true
-    case (.Stopped, .Stopped):
-        return true
-    case (.WaitingForConnection, .WaitingForConnection):
-        return true
-    case (.Failed(let e1), .Failed(let e2)):
-        return e1 == e2
-    default:
+    var isBuffering: Bool {
+        if case .buffering = self {
+            return true
+        }
         return false
     }
+
+    var isPlaying: Bool {
+        if case .playing = self {
+            return true
+        }
+        return false
+    }
+
+    var isPaused: Bool {
+        if case .paused = self {
+            return true
+        }
+        return false
+    }
+
+    var isStopped: Bool {
+        if case .stopped = self {
+            return true
+        }
+        return false
+    }
+
+    var isWaitingForConnection: Bool {
+        if case .waitingForConnection = self {
+            return true
+        }
+        return false
+    }
+
+    var isFailed: Bool {
+        if case .failed = self {
+            return true
+        }
+        return false
+    }
+
+    var error: AudioPlayerError? {
+        if case .failed(let error) = self {
+            return error
+        }
+        return nil
+    }
+}
+
+//MARK: - Equatable
+
+extension AudioPlayerState: Equatable {}
+
+public func == (lhs: AudioPlayerState, rhs: AudioPlayerState) -> Bool {
+    if (lhs.isBuffering && rhs.isBuffering) || (lhs.isPlaying && rhs.isPlaying) ||
+        (lhs.isPaused && rhs.isPaused) || (lhs.isStopped && rhs.isStopped) ||
+        (lhs.isWaitingForConnection && rhs.isWaitingForConnection) {
+        return true
+    }
+    if let e1 = lhs.error, let e2 = rhs.error {
+        switch (e1, e2) {
+        case (.maximumRetryCountHit, .maximumRetryCountHit):
+            return true
+        case (.foundationError, .foundationError):
+            return true
+        default:
+            return false
+        }
+    }
+    return false
 }

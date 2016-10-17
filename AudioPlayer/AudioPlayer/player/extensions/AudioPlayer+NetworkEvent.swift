@@ -7,11 +7,11 @@
 //
 
 extension AudioPlayer {
-    func handleNetworkEvent(event: NetworkEventProducer.NetworkEvent) {
+    func handleNetworkEvent(from producer: EventProducer, with event: NetworkEventProducer.NetworkEvent) {
         switch event {
-        case .ConnectionLost:
+        case .connectionLost:
             //Early exit if state prevents us to handle connection loss
-            guard let currentItem = currentItem where state != .WaitingForConnection else {
+            guard let currentItem = currentItem, !state.isWaitingForConnection else {
                 return
             }
 
@@ -19,26 +19,26 @@ extension AudioPlayer {
             if !(currentItem.soundURLs[currentQuality]?.ap_isOfflineURL ?? false) {
                 stateWhenConnectionLost = state
 
-                if let currentItem = player?.currentItem where currentItem.playbackBufferEmpty {
-                    if state == .Playing {
+                if let currentItem = player?.currentItem, currentItem.isPlaybackBufferEmpty {
+                    if case .playing = state {
                         qualityAdjustmentEventProducer.interruptionCount += 1
                     }
 
-                    state = .WaitingForConnection
+                    state = .waitingForConnection
                     backgroundHandler.beginBackgroundTask()
                 }
             }
 
-        case .ConnectionRetrieved:
+        case .connectionRetrieved:
             //Early exit if connection wasn't lost during playing or `resumeAfterConnectionLoss`
             //isn't enabled.
             guard let lossDate = networkEventProducer.connectionLossDate,
-                stateWhenLost = stateWhenConnectionLost where resumeAfterConnectionLoss else {
+                let stateWhenLost = stateWhenConnectionLost, resumeAfterConnectionLoss else {
                     return
             }
 
             let isAllowedToRestart = lossDate.timeIntervalSinceNow < maximumConnectionLossTime
-            let wasPlayingBeforeLoss = stateWhenLost != .Stopped
+            let wasPlayingBeforeLoss = !stateWhenLost.isStopped
 
             if isAllowedToRestart && wasPlayingBeforeLoss {
                 retryOrPlayNext()
@@ -46,7 +46,7 @@ extension AudioPlayer {
 
             stateWhenConnectionLost = nil
 
-        case .NetworkChanged:
+        case .networkChanged:
             break
         }
     }

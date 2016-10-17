@@ -7,7 +7,7 @@
 //
 
 extension AudioPlayer {
-    func handleAudioItemEvent(event: AudioItemEventProducer.AudioItemEvent) {
+    func handleAudioItemEvent(from producer: EventProducer, with event: AudioItemEventProducer.AudioItemEvent) {
         updateNowPlayingInfoCenter()
     }
 }

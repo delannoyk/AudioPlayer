@@ -26,8 +26,7 @@ public class AudioPlayer: NSObject {
     let backgroundHandler = BackgroundHandler()
 
     /// Reachability for network connection.
-    let reachability = Reachability.reachabilityForInternetConnection()
-
+    let reachability = Reachability()
 
     // MARK: Event producers
 
@@ -47,7 +46,6 @@ public class AudioPlayer: NSObject {
 
     /// The retry event producer.
     var retryEventProducer = RetryEventProducer()
-
 
     //MARK: Player
 
@@ -90,37 +88,36 @@ public class AudioPlayer: NSObject {
                 player = nil
 
                 //Ensures the audio session got started
-                setAudioSessionActive(true)
+                setAudioSession(active: true)
 
                 //Sets new state
-                let URLInfo = currentItem.URLForQuality(currentQuality)
-                if reachability.isReachable() || URLInfo.URL.ap_isOfflineURL {
-                    state = .Buffering
+                let info = currentItem.url(for: currentQuality)
+                if reachability.isReachable() || info.url.ap_isOfflineURL {
+                    state = .buffering
                     backgroundHandler.beginBackgroundTask()
                 } else {
-                    stateWhenConnectionLost = .Buffering
-                    state = .WaitingForConnection
+                    stateWhenConnectionLost = .buffering
+                    state = .waitingForConnection
                     backgroundHandler.beginBackgroundTask()
                     return
                 }
 
                 //Creates new player
-                player = AVPlayer(URL: URLInfo.URL)
-                currentQuality = URLInfo.quality
+                player = AVPlayer(url: info.url)
+                currentQuality = info.quality
 
                 //Updates information on the lock screen
                 updateNowPlayingInfoCenter()
 
                 //Calls delegate
                 if oldValue != currentItem {
-                    delegate?.audioPlayer(self, willStartPlayingItem: currentItem)
+                    delegate?.audioPlayer(self, willStartPlaying: currentItem)
                 }
             } else {
                 stop()
             }
         }
     }
-
 
     // MARK: Public properties
 
@@ -129,19 +126,19 @@ public class AudioPlayer: NSObject {
 
     /// Defines the maximum to wait after a connection loss before putting the player to Stopped
     /// mode and cancelling the resume. Default value is 60 seconds.
-    public var maximumConnectionLossTime = NSTimeInterval(60)
+    public var maximumConnectionLossTime = TimeInterval(60)
 
     /// Defines whether the player should automatically adjust sound quality based on the number of
     /// interruption before a delay and the maximum number of interruption whithin this delay.
     /// Default value is `true`.
     public var adjustQualityAutomatically = true
 
-    /// Defines the default quality used to play. Default value is `.Medium`
-    public var defaultQuality = AudioQuality.Medium
+    /// Defines the default quality used to play. Default value is `.medium`
+    public var defaultQuality = AudioQuality.medium
 
     /// Defines the delay within which the player wait for an interruption before upgrading the
     /// quality. Default value is 10minutes.
-    public var adjustQualityTimeInternal: NSTimeInterval {
+    public var adjustQualityTimeInternal: TimeInterval {
         get {
             return qualityAdjustmentEventProducer.adjustQualityTimeInternal
         }
@@ -173,7 +170,7 @@ public class AudioPlayer: NSObject {
     }
 
     /// The delay to wait before cancelling last retry and retrying. Default value is 10 seconds.
-    public var retryTimeout: NSTimeInterval {
+    public var retryTimeout: TimeInterval {
         get {
             return retryEventProducer.retryTimeout
         }
@@ -191,7 +188,7 @@ public class AudioPlayer: NSObject {
     public var resumeAfterConnectionLoss = true
 
     /// Defines the mode of the player. Default is `.Normal`.
-    public var mode = AudioPlayerMode.Normal {
+    public var mode = AudioPlayerMode.normal {
         didSet {
             queue?.mode = mode
         }
@@ -207,7 +204,7 @@ public class AudioPlayer: NSObject {
     /// Defines the rate of the player. Default value is 1.
     public var rate = Float(1) {
         didSet {
-            if state == .Playing {
+            if case .playing = state {
                 player?.rate = rate
                 updateNowPlayingInfoCenter()
             }
@@ -220,29 +217,27 @@ public class AudioPlayer: NSObject {
     public var rateMultiplerOnSeeking = Float(2)
     #endif
 
-
     // MARK: Readonly properties
 
     /// The current state of the player.
-    public internal(set) var state = AudioPlayerState.Stopped {
+    public internal(set) var state = AudioPlayerState.stopped {
         didSet {
             updateNowPlayingInfoCenter()
 
             if state != oldValue {
-                if state == .Buffering {
+                if case .buffering = state {
                     backgroundHandler.beginBackgroundTask()
-                } else if oldValue == .Buffering {
+                } else if case .buffering = oldValue {
                     backgroundHandler.endBackgroundTask()
                 }
 
-                delegate?.audioPlayer(self, didChangeFromState: oldValue, toState: state)
+                delegate?.audioPlayer(self, didChangeStateFrom: oldValue, to: state)
             }
         }
     }
 
     /// The current quality being played.
     public internal(set) var currentQuality: AudioQuality
-
 
     // MARK: Private properties
 
@@ -260,7 +255,6 @@ public class AudioPlayer: NSObject {
 
     /// The state of the player when the connection was lost
     var stateWhenConnectionLost: AudioPlayerState?
-
 
     // MARK: Initialization
 
@@ -285,7 +279,6 @@ public class AudioPlayer: NSObject {
         stop()
     }
 
-
     // MARK: Utility methods
 
     /**
@@ -294,13 +287,13 @@ public class AudioPlayer: NSObject {
     func updateNowPlayingInfoCenter() {
         #if os(iOS) || os(tvOS)
             if let item = currentItem {
-                MPNowPlayingInfoCenter.defaultCenter().ap_updateWithItem(
-                    item,
+                MPNowPlayingInfoCenter.default().ap_update(
+                    with: item,
                     duration: currentItemDuration,
                     progression: currentItemProgression,
                     playbackRate: player?.rate ?? 0)
             } else {
-                MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = nil
+                MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
             }
         #endif
     }
@@ -308,24 +301,22 @@ public class AudioPlayer: NSObject {
     /**
      Activates the `AVAudioSession` and sets the right category.
      */
-    func setAudioSessionActive(active: Bool) {
+    func setAudioSession(active: Bool) {
         #if os(iOS) || os(tvOS)
             _ = try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
             _ = try? AVAudioSession.sharedInstance().setActive(active)
         #endif
     }
 
-
     // MARK: Public computed properties
 
     /// Boolean value indicating whether the player should resume playing (after buffering)
     var shouldResumePlaying: Bool {
         return !pausedForInterruption &&
-            state != .Paused &&
-            (stateWhenConnectionLost == nil || stateWhenConnectionLost != .Paused) &&
-            (stateBeforeBuffering == nil || stateBeforeBuffering != .Paused)
+            !state.isPaused &&
+            (stateWhenConnectionLost == nil || !stateWhenConnectionLost!.isPaused) &&
+            (stateBeforeBuffering == nil || !stateBeforeBuffering!.isPaused)
     }
-
 
     // MARK: Retrying
 
@@ -334,7 +325,7 @@ public class AudioPlayer: NSObject {
      (or enabled). If not, it'll just play the next item in queue.
      */
     func retryOrPlayNext() {
-        guard state != .Playing else {
+        guard !state.isPlaying else {
             retryEventProducer.stopProducingEvents()
             return
         }
@@ -343,23 +334,25 @@ public class AudioPlayer: NSObject {
         let ci = currentItem
         currentItem = ci
         if let cip = cip {
-            //We can't call self.seekToTime in here since the player is new
+            //We can't call self.seek(to:) in here since the player is new
             //and `cip` is probably not in the seekableTimeRanges.
-            player?.seekToTime(CMTime(seconds: cip, preferredTimescale: 1000000000))
+            player?.seek(to: CMTime(timeInterval: cip))
         }
     }
 }
 
 extension AudioPlayer: EventListener {
-    func onEvent(event: Event, generetedBy eventProducer: EventProducer) {
+    func onEvent(_ event: Event, generetedBy eventProducer: EventProducer) {
         if let event = event as? NetworkEventProducer.NetworkEvent {
-            handleNetworkEvent(event)
+            handleNetworkEvent(from: eventProducer, with: event)
         } else if let event = event as? PlayerEventProducer.PlayerEvent {
-            handlePlayerEvent(event)
+            handlePlayerEvent(from: eventProducer, with: event)
         } else if let event = event as? AudioItemEventProducer.AudioItemEvent {
-            handleAudioItemEvent(event)
+            handleAudioItemEvent(from: eventProducer, with: event)
         } else if let event = event as? QualityAdjustmentEventProducer.QualityAdjustmentEvent {
-            handleQualityEvent(event)
+            handleQualityEvent(from: eventProducer, with: event)
+        } else if let event = event as? RetryEventProducer.RetryEvent {
+            handleRetryEvent(from: eventProducer, with: event)
         }
     }
 }

@@ -29,17 +29,17 @@ class QualityAdjustmentEventProducer_Tests: XCTestCase {
     }
 
     func testEventListenerGetsCalledWhenInterruptionCountHitsLimit() {
-        let expectation = expectationWithDescription("Waiting for `onEvent` to get called")
+        let e = expectation(description: "Waiting for `onEvent` to get called")
         listener.eventClosure = { event, producer in
             XCTAssertEqual(event as? QualityAdjustmentEventProducer.QualityAdjustmentEvent,
-                QualityAdjustmentEventProducer.QualityAdjustmentEvent.GoDown)
-            expectation.fulfill()
+                QualityAdjustmentEventProducer.QualityAdjustmentEvent.goDown)
+            e.fulfill()
         }
 
         producer.adjustQualityAfterInterruptionCount = 5
         producer.interruptionCount = producer.adjustQualityAfterInterruptionCount
 
-        waitForExpectationsWithTimeout(1) { e in
+        waitForExpectations(timeout: 1) { e in
             if let _ = e {
                 XCTFail()
             }
@@ -65,16 +65,16 @@ class QualityAdjustmentEventProducer_Tests: XCTestCase {
     }
 
     func testEventListenerGetsCalledWhenInterruptionShouldGoUp() {
-        let expectation = expectationWithDescription("Waiting for `onEvent` to get called")
+        let e = expectation(description: "Waiting for `onEvent` to get called")
         listener.eventClosure = { event, producer in
             XCTAssertEqual(event as? QualityAdjustmentEventProducer.QualityAdjustmentEvent,
-                QualityAdjustmentEventProducer.QualityAdjustmentEvent.GoUp)
-            expectation.fulfill()
+                QualityAdjustmentEventProducer.QualityAdjustmentEvent.goUp)
+            e.fulfill()
         }
 
         producer.adjustQualityTimeInternal = 1
 
-        waitForExpectationsWithTimeout(1.5) { e in
+        waitForExpectations(timeout: 1.5) { e in
             if let _ = e {
                 XCTFail()
             }
@@ -82,20 +82,20 @@ class QualityAdjustmentEventProducer_Tests: XCTestCase {
     }
 
     func testEventListenerGetsCalledImmediatelyWhenAdjustQualityTimeIntervalIsChangedToAValueThatShouldAlreadyHaveBeenFired() {
-        let expectation = expectationWithDescription("Waiting for `onEvent` to get called")
+        let e = expectation(description: "Waiting for `onEvent` to get called")
         listener.eventClosure = { event, producer in
             XCTAssertEqual(event as? QualityAdjustmentEventProducer.QualityAdjustmentEvent,
-                QualityAdjustmentEventProducer.QualityAdjustmentEvent.GoUp)
-            expectation.fulfill()
+                QualityAdjustmentEventProducer.QualityAdjustmentEvent.goUp)
+            e.fulfill()
         }
 
         producer.adjustQualityTimeInternal = 5
-        let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(2 * Double(NSEC_PER_SEC)))
-        dispatch_after(delayTime, dispatch_get_main_queue()) {
+        let delay = DispatchTime(uptimeNanoseconds: UInt64(0.2 * Double(NSEC_PER_SEC)))
+        DispatchQueue.main.asyncAfter(deadline: delay) {
             self.producer.adjustQualityTimeInternal = 1
         }
 
-        waitForExpectationsWithTimeout(2.5) { e in
+        waitForExpectations(timeout: 2.5) { e in
             if let _ = e {
                 XCTFail()
             }

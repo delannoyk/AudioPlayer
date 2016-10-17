@@ -14,10 +14,7 @@ extension AudioPlayer {
 
     /// The current item index in queue.
     public var currentItemIndexInQueue: Int? {
-        if let currentItem = currentItem {
-            return queue?.items.indexOf(currentItem)
-        }
-        return nil
+        return currentItem.flatMap { queue?.items.index(of: $0) }
     }
 
     /// A boolean value indicating whether there is a next item to play or not.
@@ -31,12 +28,12 @@ extension AudioPlayer {
     }
 
     /**
-     Play an item.
+     Plays an item.
 
      - parameter item: The item to play.
      */
-    public func playItem(item: AudioItem) {
-        playItems([item])
+    public func play(item: AudioItem) {
+        play(items: [item])
     }
 
     /**
@@ -45,10 +42,10 @@ extension AudioPlayer {
      - parameter items: The items to play.
      - parameter index: The index to start the player with.
      */
-    public func playItems(items: [AudioItem], startAtIndex index: Int = 0) {
+    public func play(items: [AudioItem], startAtIndex index: Int = 0) {
         if items.count > 0 {
             queue = AudioItemQueue(items: items, mode: mode)
-            if let realIndex = queue?.queue.indexOf(items[index]) {
+            if let realIndex = queue?.queue.index(of: items[index]) {
                 queue?.nextPosition = realIndex
             }
             currentItem = queue?.nextItem()
@@ -60,25 +57,25 @@ extension AudioPlayer {
 
     /**
      Adds an item at the end of the queue. If queue is empty and player isn't
-     playing, the behaviour will be similar to `playItem(item)`.
+     playing, the behaviour will be similar to `play(item:)`.
 
      - parameter item: The item to add.
      */
-    public func addItemToQueue(item: AudioItem) {
-        addItemsToQueue([item])
+    public func add(item: AudioItem) {
+        add(items: [item])
     }
 
     /**
      Adds items at the end of the queue. If the queue is empty and player isn't
-     playing, the behaviour will be similar to `playItems(items)`.
+     playing, the behaviour will be similar to `play(items:)`.
 
      - parameter items: The items to add.
      */
-    public func addItemsToQueue(items: [AudioItem]) {
+    public func add(items: [AudioItem]) {
         if let queue = queue {
-            queue.addItems(items)
+            queue.add(items: items)
         } else {
-            playItems(items)
+            play(items: items)
         }
     }
 
@@ -87,7 +84,7 @@ extension AudioPlayer {
 
      - parameter index: The index of the item to remove.
      */
-    public func removeItemAtIndex(index: Int) {
-        queue?.removeItemAtIndex(index)
+    public func removeItem(at index: Int) {
+        queue?.remove(at: index)
     }
 }

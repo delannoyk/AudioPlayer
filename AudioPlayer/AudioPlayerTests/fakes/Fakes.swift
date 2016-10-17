@@ -14,16 +14,15 @@ import SystemConfiguration
 class FakeEventListener: EventListener {
     var eventClosure: ((Event, EventProducer) -> ())?
 
-    func onEvent(event: Event, generetedBy eventProducer: EventProducer) {
+    func onEvent(_ event: Event, generetedBy eventProducer: EventProducer) {
         eventClosure?(event, eventProducer)
     }
 }
 
 class FakeReachability: Reachability {
-    var reachabilityStatus = Reachability.NetworkStatus.NotReachable {
+    var reachabilityStatus = Reachability.NetworkStatus.notReachable {
         didSet {
-            NSNotificationCenter.defaultCenter().postNotificationName(kReachabilityChangedNotification,
-                object: self)
+            NotificationCenter.default.post(name: .ReachabilityChanged, object: self)
         }
     }
 
@@ -32,51 +31,41 @@ class FakeReachability: Reachability {
             return reachabilityStatus
         }
     }
-
-    override class func reachabilityForInternetConnection() -> FakeReachability {
-        var zeroAddress = sockaddr_in()
-        zeroAddress.sin_len = UInt8(sizeofValue(zeroAddress))
-        zeroAddress.sin_family = sa_family_t(AF_INET)
-        let ref = withUnsafePointer(&zeroAddress) {
-            SCNetworkReachabilityCreateWithAddress(nil, UnsafePointer($0))
-        }
-        return FakeReachability(reachabilityRef: ref)
-    }
 }
 
 class FakeItem: AVPlayerItem {
     var bufferEmpty = true {
         willSet {
-            willChangeValueForKey("playbackBufferEmpty")
+            willChangeValue(forKey: "playbackBufferEmpty")
         }
         didSet {
-            didChangeValueForKey("playbackBufferEmpty")
+            didChangeValue(forKey: "playbackBufferEmpty")
         }
     }
 
-    override var playbackBufferEmpty: Bool {
+    override var isPlaybackBufferEmpty: Bool {
         return bufferEmpty
     }
 
     var likelyToKeepUp = false {
         willSet {
-            willChangeValueForKey("playbackLikelyToKeepUp")
+            willChangeValue(forKey: "playbackLikelyToKeepUp")
         }
         didSet {
-            didChangeValueForKey("playbackLikelyToKeepUp")
+            didChangeValue(forKey: "playbackLikelyToKeepUp")
         }
     }
 
-    override var playbackLikelyToKeepUp: Bool {
+    override var isPlaybackLikelyToKeepUp: Bool {
         return likelyToKeepUp
     }
 
     var timeRanges = [NSValue]() {
         willSet {
-            willChangeValueForKey("loadedTimeRanges")
+            willChangeValue(forKey: "loadedTimeRanges")
         }
         didSet {
-            didChangeValueForKey("loadedTimeRanges")
+            didChangeValue(forKey: "loadedTimeRanges")
         }
     }
 
@@ -84,12 +73,12 @@ class FakeItem: AVPlayerItem {
         return timeRanges
     }
 
-    var stat = AVPlayerItemStatus.Unknown {
+    var stat = AVPlayerItemStatus.unknown {
         willSet {
-            willChangeValueForKey("status")
+            willChangeValue(forKey: "status")
         }
         didSet {
-            didChangeValueForKey("status")
+            didChangeValue(forKey: "status")
         }
     }
 
@@ -99,10 +88,10 @@ class FakeItem: AVPlayerItem {
 
     var dur = CMTime() {
         willSet {
-            willChangeValueForKey("duration")
+            willChangeValue(forKey: "duration")
         }
         didSet {
-            didChangeValueForKey("duration")
+            didChangeValue(forKey: "duration")
         }
     }
 
@@ -116,15 +105,15 @@ private extension Selector {
 }
 
 class FakePlayer: AVPlayer {
-    var timer: NSTimer?
+    var timer: Timer?
     var startDate: NSDate?
-    var observerClosure: (CMTime -> Void)?
+    var observerClosure: ((CMTime) -> Void)?
     var item: FakeItem? {
         willSet {
-            willChangeValueForKey("currentItem")
+            willChangeValue(forKey: "currentItem")
         }
         didSet {
-            didChangeValueForKey("currentItem")
+            didChangeValue(forKey: "currentItem")
         }
     }
 
@@ -132,21 +121,21 @@ class FakePlayer: AVPlayer {
         return item
     }
 
-    override func addPeriodicTimeObserverForInterval(interval: CMTime, queue: dispatch_queue_t?, usingBlock block: (CMTime) -> Void) -> AnyObject {
+    override func addPeriodicTimeObserver(forInterval interval: CMTime, queue: DispatchQueue?, using block: @escaping (CMTime) -> Void) -> Any {
         observerClosure = block
         startDate = NSDate()
-        timer = NSTimer.scheduledTimerWithTimeInterval(CMTimeGetSeconds(interval), target: self, selector: .fakePlayerTimerTicked, userInfo: nil, repeats: true)
+        timer = Timer.scheduledTimer(timeInterval: CMTimeGetSeconds(interval), target: self, selector: .fakePlayerTimerTicked, userInfo: nil, repeats: true)
         return self
     }
 
-    override func removeTimeObserver(observer: AnyObject) {
+    override func removeTimeObserver(_ observer: Any) {
         timer?.invalidate()
         timer = nil
         startDate = nil
         observerClosure = nil
     }
 
-    @objc private func timerTicked(_: NSTimer) {
+    @objc fileprivate func timerTicked(_: Timer) {
         let t = fabs(startDate!.timeIntervalSinceNow)
         observerClosure?(CMTime(timeInterval: t))
     }
@@ -154,9 +143,9 @@ class FakePlayer: AVPlayer {
 
 class FakeMetadataItem: AVMetadataItem {
     var _commonKey: String
-    var _value: protocol<NSCopying, NSObjectProtocol>
+    var _value: NSCopying & NSObjectProtocol
 
-    init(commonKey: String, value: protocol<NSCopying, NSObjectProtocol>) {
+    init(commonKey: String, value: NSCopying & NSObjectProtocol) {
         _commonKey = commonKey
         _value = value
     }
@@ -165,20 +154,20 @@ class FakeMetadataItem: AVMetadataItem {
         return _commonKey
     }
 
-    override var value: protocol<NSCopying, NSObjectProtocol>? {
+    override var value: NSCopying & NSObjectProtocol {
         return _value
     }
 }
 
 class FakeApplication: BackgroundTaskCreator {
-    var onBegin: ((() -> ())? -> UIBackgroundTaskIdentifier)?
-    var onEnd: (UIBackgroundTaskIdentifier -> ())?
+    var onBegin: (((() -> Void)?) -> UIBackgroundTaskIdentifier)?
+    var onEnd: ((UIBackgroundTaskIdentifier) -> Void)?
 
-    func beginBackgroundTaskWithExpirationHandler(handler: (() -> Void)?) -> UIBackgroundTaskIdentifier {
+    func beginBackgroundTask(expirationHandler handler: (() -> Void)?) -> UIBackgroundTaskIdentifier {
         return onBegin?(handler) ?? UIBackgroundTaskInvalid
     }
 
-    func endBackgroundTask(identifier: UIBackgroundTaskIdentifier) {
+    func endBackgroundTask(_ identifier: UIBackgroundTaskIdentifier) {
         onEnd?(identifier)
     }
 }

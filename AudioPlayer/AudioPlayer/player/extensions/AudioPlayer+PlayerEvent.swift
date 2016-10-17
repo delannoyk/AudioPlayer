@@ -7,24 +7,24 @@
 //
 
 extension AudioPlayer {
-    func handlePlayerEvent(event: PlayerEventProducer.PlayerEvent) {
+    func handlePlayerEvent(from producer: EventProducer, with event: PlayerEventProducer.PlayerEvent) {
         switch event {
-        case .EndedPlaying(let error):
+        case .endedPlaying(let error):
             if let error = error {
-                state = .Failed(.FoundationError(error))
+                state = .failed(.foundationError(error))
             } else {
                 nextOrStop()
             }
 
-        case .InterruptionBegan:
-            if state == .Playing || state == .Buffering {
+        case .interruptionBegan:
+            if state.isPlaying || state.isBuffering {
                 //We pause the player when an interruption is detected
                 backgroundHandler.beginBackgroundTask()
                 pausedForInterruption = true
                 pause()
             }
 
-        case .InterruptionEnded:
+        case .interruptionEnded:
             if pausedForInterruption {
                 if resumeAfterInterruption {
                     resume()
@@ -33,95 +33,91 @@ extension AudioPlayer {
                 backgroundHandler.endBackgroundTask()
             }
 
-        case .LoadedDuration(let time):
-            if let currentItem = currentItem, time = time.ap_timeIntervalValue {
+        case .loadedDuration(let time):
+            if let currentItem = currentItem, let time = time.ap_timeIntervalValue {
                 updateNowPlayingInfoCenter()
-                delegate?.audioPlayer(self,
-                                      didFindDuration: time,
-                                      forItem: currentItem)
+                delegate?.audioPlayer(self, didFindDuration: time, for: currentItem)
             }
 
-        case .LoadedMetadata(let metadata):
-            if let currentItem = currentItem where metadata.count > 0 {
+        case .loadedMetadata(let metadata):
+            if let currentItem = currentItem, metadata.count > 0 {
                 currentItem.parseMetadata(metadata)
-                delegate?.audioPlayer(self, didUpdateEmptyMetadataOnItem: currentItem, withData: metadata)
+                delegate?.audioPlayer(self, didUpdateEmptyMetadataOn: currentItem, withData: metadata)
             }
 
-        case .LoadedMoreRange:
-            if let currentItem = currentItem, currentItemLoadedRange = currentItemLoadedRange {
-                delegate?.audioPlayer(self,
-                                      didLoadRange: currentItemLoadedRange,
-                                      forItem: currentItem)
+        case .loadedMoreRange:
+            if let currentItem = currentItem, let currentItemLoadedRange = currentItemLoadedRange {
+                delegate?.audioPlayer(self, didLoad: currentItemLoadedRange, for: currentItem)
             }
 
-        case .Progressed(let time):
+        case .progressed(let time):
             if let currentItemProgression = time.ap_timeIntervalValue,
-                currentItemDuration = currentItemDuration, item = player?.currentItem
-                where currentItemDuration > 0 && item.status == .ReadyToPlay {
+                let currentItemDuration = currentItemDuration, let item = player?.currentItem,
+                currentItemDuration > 0 && item.status == .readyToPlay {
                 //This fixes the behavior where sometimes the `playbackLikelyToKeepUp` isn't
                 //changed even though it's playing (happens mostly at the first play though).
-                if state == .Buffering || state == .Paused {
+                if state.isBuffering || state.isPaused {
                     if shouldResumePlaying {
                         stateBeforeBuffering = nil
-                        state = .Playing
+                        state = .playing
                         player?.rate = rate
                     } else {
                         player?.rate = 0
-                        state = .Paused
+                        state = .paused
                     }
                     backgroundHandler.endBackgroundTask()
                 }
 
                 //Then we can call the didUpdateProgressionToTime: delegate method
                 let percentage = Float(currentItemProgression / currentItemDuration) * 100
-                delegate?.audioPlayer(self, didUpdateProgressionToTime: currentItemProgression,
+                delegate?.audioPlayer(self, didUpdateProgressionTo: currentItemProgression,
                                       percentageRead: percentage)
             }
 
-        case .ReadyToPlay:
+        case .readyToPlay:
             //There is enough data in the buffer
             if shouldResumePlaying {
                 stateBeforeBuffering = nil
-                state = .Playing
+                state = .playing
                 player?.rate = rate
             } else {
                 player?.rate = 0
-                state = .Paused
+                state = .paused
             }
 
             //TODO: where to start?
             retryEventProducer.stopProducingEvents()
             backgroundHandler.endBackgroundTask()
 
-        case .RouteChanged:
+        case .routeChanged:
             //In some route changes, the player pause automatically
             //TODO: there should be a check if state == playing
-            if let player = player where player.rate == 0 {
-                state = .Paused
+            if let player = player, player.rate == 0 {
+                state = .paused
             }
 
-        case .SessionMessedUp:
+        case .sessionMessedUp:
             #if os(iOS) || os(tvOS)
                 //We reenable the audio session directly in case we're in background
-                setAudioSessionActive(true)
+                setAudioSession(active: true)
 
                 //Aaaaand we: restart playing/go to next
-                state = .Stopped
+                state = .stopped
                 qualityAdjustmentEventProducer.interruptionCount += 1
                 retryOrPlayNext()
             #endif
 
-        case .StartedBuffering:
+        case .startedBuffering:
             //The buffer is empty and player is loading
-            if state == .Playing && !qualityIsBeingChanged {
+            if case .playing = state, !qualityIsBeingChanged {
                 qualityAdjustmentEventProducer.interruptionCount += 1
             }
 
             stateBeforeBuffering = state
-            if reachability.isReachable() || (currentItem?.soundURLs[currentQuality ?? defaultQuality]?.ap_isOfflineURL ?? false) {
-                state = .Buffering
+            if reachability.isReachable() || (currentItem?.soundURLs[currentQuality]?.ap_isOfflineURL ?? false) {
+                state = .buffering
             } else {
-                state = .WaitingForConnection
+                state = .waitingForConnection
             }
             backgroundHandler.beginBackgroundTask()
         }

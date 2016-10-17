@@ -26,12 +26,12 @@ class QualityAdjustmentEventProducer: NSObject, EventProducer {
      - GoUp:   The quality should go up if possible.
      */
     enum QualityAdjustmentEvent: Event {
-        case GoDown
-        case GoUp
+        case goDown
+        case goUp
     }
 
     /// The timer used to adjust quality
-    private var timer: NSTimer?
+    private var timer: Timer?
 
     /// The listener that will be alerted a new event occured.
     weak var eventListener: EventListener?
@@ -48,13 +48,13 @@ class QualityAdjustmentEventProducer: NSObject, EventProducer {
 
     /// Defines the delay within which the player wait for an interruption before upgrading the
     /// quality. Default value is 10 minutes.
-    var adjustQualityTimeInternal = NSTimeInterval(10 * 60) {
+    var adjustQualityTimeInternal = TimeInterval(10 * 60) {
         didSet {
-            if let timer = timer where listening {
+            if let timer = timer, listening {
                 //We don't want to reset state in here because we want to keep the interruption
                 //count and we also have to change the timer fire date.
                 let delta = adjustQualityTimeInternal - oldValue
-                let newFireDate = timer.fireDate.dateByAddingTimeInterval(delta)
+                let newFireDate = timer.fireDate.addingTimeInterval(delta)
                 let timeInterval = newFireDate.timeIntervalSinceNow
 
                 timer.invalidate()
@@ -65,9 +65,12 @@ class QualityAdjustmentEventProducer: NSObject, EventProducer {
                     timerTicked(timer)
                 } else {
                     //In this case, the timer fire date just needs to be adjusted.
-                    self.timer = NSTimer.scheduledTimerWithTimeInterval(
-                        timeInterval, target: self, selector: .timerTicked,
-                        userInfo: nil, repeats: false)
+                    self.timer = Timer.scheduledTimer(
+                        timeInterval: timeInterval,
+                        target: self,
+                        selector: .timerTicked,
+                        userInfo: nil,
+                        repeats: false)
                 }
             }
         }
@@ -126,9 +129,12 @@ class QualityAdjustmentEventProducer: NSObject, EventProducer {
         interruptionCount = 0
 
         timer?.invalidate()
-        timer = NSTimer.scheduledTimerWithTimeInterval(
-            adjustQualityTimeInternal, target: self, selector: .timerTicked,
-            userInfo: nil, repeats: false)
+        timer = Timer.scheduledTimer(
+            timeInterval: adjustQualityTimeInternal,
+            target: self,
+            selector: .timerTicked,
+            userInfo: nil,
+            repeats: false)
     }
 
     /**
@@ -141,7 +147,7 @@ class QualityAdjustmentEventProducer: NSObject, EventProducer {
             timer?.invalidate()
 
             //Calls the listener
-            eventListener?.onEvent(QualityAdjustmentEvent.GoDown, generetedBy: self)
+            eventListener?.onEvent(QualityAdjustmentEvent.goDown, generetedBy: self)
 
             //Reset state
             resetState()
@@ -151,9 +157,9 @@ class QualityAdjustmentEventProducer: NSObject, EventProducer {
     /**
      The quality adjuster ticked.
      */
-    @objc private func timerTicked(_: AnyObject) {
+    @objc fileprivate func timerTicked(_: AnyObject) {
         if interruptionCount == 0 {
-            eventListener?.onEvent(QualityAdjustmentEvent.GoUp, generetedBy: self)
+            eventListener?.onEvent(QualityAdjustmentEvent.goUp, generetedBy: self)
         }
 
         //Reset state
