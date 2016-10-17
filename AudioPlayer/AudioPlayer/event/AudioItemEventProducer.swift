@@ -104,30 +104,29 @@ class AudioItemEventProducer: NSObject, EventProducer {
      - parameter keyPath: The key path, relative to `object`, to the value that has changed.
      - parameter object:  The source object of the key path `keyPath`.
      - parameter change:  A dictionary that describes the changes that have been made to the value
-        of the property at the key path `keyPath` relative to `object`. Entries are described in
-        Change Dictionary Keys.
+     of the property at the key path `keyPath` relative to `object`. Entries are described in
+     Change Dictionary Keys.
      - parameter context: The value that was provided when the receiver was registered to receive
-        key-value observation notifications.
+     key-value observation notifications.
      */
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?,
-        change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
-            if let keyPath = keyPath {
-                switch keyPath {
-                case "artist":
-                    eventListener?.onEvent(AudioItemEvent.updatedArtist, generetedBy: self)
-                case "title":
-                    eventListener?.onEvent(AudioItemEvent.updatedTitle, generetedBy: self)
-                case "album":
-                    eventListener?.onEvent(AudioItemEvent.updatedAlbum, generetedBy: self)
-                case "trackCount":
-                    eventListener?.onEvent(AudioItemEvent.updatedTrackCount, generetedBy: self)
-                case "trackNumber":
-                    eventListener?.onEvent(AudioItemEvent.updatedTrackNumber, generetedBy: self)
-                case "artworkImage":
-                    eventListener?.onEvent(AudioItemEvent.updatedArtworkImage, generetedBy: self)
-                default:
-                    break
-                }
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+        if let keyPath = keyPath {
+            switch keyPath {
+            case "artist":
+                eventListener?.onEvent(AudioItemEvent.updatedArtist, generetedBy: self)
+            case "title":
+                eventListener?.onEvent(AudioItemEvent.updatedTitle, generetedBy: self)
+            case "album":
+                eventListener?.onEvent(AudioItemEvent.updatedAlbum, generetedBy: self)
+            case "trackCount":
+                eventListener?.onEvent(AudioItemEvent.updatedTrackCount, generetedBy: self)
+            case "trackNumber":
+                eventListener?.onEvent(AudioItemEvent.updatedTrackNumber, generetedBy: self)
+            case "artworkImage":
+                eventListener?.onEvent(AudioItemEvent.updatedArtworkImage, generetedBy: self)
+            default:
+                break
             }
+        }
     }
 }

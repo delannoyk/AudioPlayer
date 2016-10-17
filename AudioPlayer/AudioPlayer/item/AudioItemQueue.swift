@@ -64,14 +64,14 @@ class AudioItemQueue {
     /**
      Adapts the queue to the new mode.
      Behaviour is:
-       - `oldMode` contains .Repeat, `mode` doesn't and last item played == nextItem, we increment
-            position.
-       - `oldMode` contains .Shuffle, `mode` doesnt. We should set the queue to `items` and set
-            current position to the current item index in the new queue.
-       - `mode` contains .Shuffle, `oldMode` doesn't. We should shuffle the leftover items in queue.
-            Also, the items already played should also be shuffled. Current implementation has a
-            limitation which is that the "already played items" will be shuffled at the begining of
-            the queue while the leftovers will be shuffled at the end of the array.
+     - `oldMode` contains .Repeat, `mode` doesn't and last item played == nextItem, we increment
+     position.
+     - `oldMode` contains .Shuffle, `mode` doesnt. We should set the queue to `items` and set
+     current position to the current item index in the new queue.
+     - `mode` contains .Shuffle, `oldMode` doesn't. We should shuffle the leftover items in queue.
+     Also, the items already played should also be shuffled. Current implementation has a
+     limitation which is that the "already played items" will be shuffled at the begining of
+     the queue while the leftovers will be shuffled at the end of the array.
 
      - parameter oldMode: The mode before it changed.
      */
@@ -83,7 +83,7 @@ class AudioItemQueue {
 
         if oldMode.contains(.repeat) && !mode.contains(.repeat) &&
             historic.last == queue[nextPosition] {
-                nextPosition += 1
+            nextPosition += 1
         }
         if oldMode.contains(.shuffle) && !mode.contains(.shuffle) {
             queue = items
@@ -128,7 +128,7 @@ class AudioItemQueue {
     var hasNextItem: Bool {
         if queue.count > 0 &&
             (queue.count > nextPosition || mode.contains(.repeat) || mode.contains(.repeatAll)) {
-                return true
+            return true
         }
         return false
     }
@@ -163,7 +163,7 @@ class AudioItemQueue {
     var hasPreviousItem: Bool {
         if queue.count > 0 &&
             (nextPosition > 0 || mode.contains(.repeat) || mode.contains(.repeatAll)) {
-                return true
+            return true
         }
         return false
     }

@@ -49,20 +49,20 @@ private extension Selector {
  */
 class PlayerEventProducer: NSObject, EventProducer {
     /**
-       A `PlayerEvent` is an event a player generates over time.
+     A `PlayerEvent` is an event a player generates over time.
 
-       - startedBuffering:  The player started buffering the audio file.
-       - readyToPlay:       The player is ready to play. It buffered enough data.
-       - loadedMoreRange:   The player loaded more range of time.
-       - loadedMetadata:    The player loaded metadata.
-       - loadedDuration:    The player has found audio item duration.
-       - progressed:        The player progressed in its playing.
-       - endedPlaying:      The player ended playing the current item because it went through the
-            file or because of an error.
-       - interruptionBegan: The player got interrupted (phone call, Siri, ...).
-       - interruptionEnded: The interruption ended.
-       - routeChanged:      The player's route changed.
-       - sessionMessedUp:   The audio session is messed up.
+     - startedBuffering:  The player started buffering the audio file.
+     - readyToPlay:       The player is ready to play. It buffered enough data.
+     - loadedMoreRange:   The player loaded more range of time.
+     - loadedMetadata:    The player loaded metadata.
+     - loadedDuration:    The player has found audio item duration.
+     - progressed:        The player progressed in its playing.
+     - endedPlaying:      The player ended playing the current item because it went through the
+     file or because of an error.
+     - interruptionBegan: The player got interrupted (phone call, Siri, ...).
+     - interruptionEnded: The interruption ended.
+     - routeChanged:      The player's route changed.
+     - sessionMessedUp:   The audio session is messed up.
      */
     enum PlayerEvent: Event {
         case startedBuffering
@@ -113,17 +113,32 @@ class PlayerEventProducer: NSObject, EventProducer {
         //Observing notifications sent through `NSNotificationCenter`
         let center = NotificationCenter.default
         #if os(iOS) || os(tvOS)
-            center.addObserver(self, selector: .audioSessionInterrupted,
-                name: .AVAudioSessionInterruption, object: player)
-            center.addObserver(self, selector: .audioRouteChanged,
-                name: .AVAudioSessionRouteChange, object: player)
-            center.addObserver(self, selector: .audioSessionMessedUp,
-                name: .AVAudioSessionMediaServicesWereLost, object: player)
-            center.addObserver(self, selector: .audioSessionMessedUp,
-                name: .AVAudioSessionMediaServicesWereReset, object: player)
+            center.addObserver(
+                self,
+                selector: .audioSessionInterrupted,
+                name: .AVAudioSessionInterruption,
+                object: player)
+            center.addObserver(
+                self,
+                selector: .audioRouteChanged,
+                name: .AVAudioSessionRouteChange,
+                object: player)
+            center.addObserver(
+                self,
+                selector: .audioSessionMessedUp,
+                name: .AVAudioSessionMediaServicesWereLost,
+                object: player)
+            center.addObserver(
+                self,
+                selector: .audioSessionMessedUp,
+                name: .AVAudioSessionMediaServicesWereReset,
+                object: player)
         #endif
-        center.addObserver(self, selector: .itemDidEnd,
-            name: .AVPlayerItemDidPlayToEndTime, object: player)
+        center.addObserver(
+            self,
+            selector: .itemDidEnd,
+            name: .AVPlayerItemDidPlayToEndTime,
+            object: player)
 
         //Observing AVPlayer's property
         for keyPath in AVPlayer.ap_KVOProperties {
@@ -131,11 +146,10 @@ class PlayerEventProducer: NSObject, EventProducer {
         }
 
         //Observing timing event
-        timeObserver = player.addPeriodicTimeObserver(forInterval: CMTimeMake(1, 2),
-            queue: DispatchQueue.main) { [weak self] time in
-                if let `self` = self {
-                    self.eventListener?.onEvent(PlayerEvent.progressed(time), generetedBy: self)
-                }
+        timeObserver = player.addPeriodicTimeObserver(forInterval: CMTimeMake(1, 2), queue: DispatchQueue.main) { [weak self] time in
+            if let `self` = self {
+                self.eventListener?.onEvent(PlayerEvent.progressed(time), generetedBy: self)
+            }
         }
 
         listening = true
@@ -152,14 +166,10 @@ class PlayerEventProducer: NSObject, EventProducer {
         //Unobserving notifications sent through `NSNotificationCenter`
         let center = NotificationCenter.default
         #if os(iOS) || os(tvOS)
-            center.removeObserver(self,
-                name: .AVAudioSessionInterruption, object: player)
-            center.removeObserver(self,
-                name: .AVAudioSessionRouteChange, object: player)
-            center.removeObserver(self,
-                name: .AVAudioSessionMediaServicesWereLost, object: player)
-            center.removeObserver(self,
-                name: .AVAudioSessionMediaServicesWereReset, object: player)
+            center.removeObserver(self, name: .AVAudioSessionInterruption, object: player)
+            center.removeObserver(self, name: .AVAudioSessionRouteChange, object: player)
+            center.removeObserver(self, name: .AVAudioSessionMediaServicesWereLost, object: player)
+            center.removeObserver(self, name: .AVAudioSessionMediaServicesWereReset, object: player)
         #endif
         center.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: player)
 
@@ -185,44 +195,41 @@ class PlayerEventProducer: NSObject, EventProducer {
      - parameter keyPath: The key path, relative to `object`, to the value that has changed.
      - parameter object:  The source object of the key path `keyPath`.
      - parameter change:  A dictionary that describes the changes that have been made to the value
-        of the property at the key path `keyPath` relative to `object`. Entries are described in
-        Change Dictionary Keys.
+     of the property at the key path `keyPath` relative to `object`. Entries are described in
+     Change Dictionary Keys.
      - parameter context: The value that was provided when the receiver was registered to receive
-        key-value observation notifications.
+     key-value observation notifications.
      */
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?,
-        change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
-            if let keyPath = keyPath, let p = object as? AVPlayer, let currentItem = p.currentItem {
-                switch keyPath {
-                case "currentItem.duration":
-                    let duration = currentItem.duration
-                    eventListener?.onEvent(PlayerEvent.loadedDuration(duration),
-                                           generetedBy: self)
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+        if let keyPath = keyPath, let p = object as? AVPlayer, let currentItem = p.currentItem {
+            switch keyPath {
+            case "currentItem.duration":
+                let duration = currentItem.duration
+                eventListener?.onEvent(PlayerEvent.loadedDuration(duration), generetedBy: self)
 
-                    let metadata = currentItem.asset.commonMetadata
-                    eventListener?.onEvent(PlayerEvent.loadedMetadata(metadata),
-                                           generetedBy: self)
+                let metadata = currentItem.asset.commonMetadata
+                eventListener?.onEvent(PlayerEvent.loadedMetadata(metadata), generetedBy: self)
 
-                case "currentItem.playbackBufferEmpty" where currentItem.isPlaybackBufferEmpty:
-                    eventListener?.onEvent(PlayerEvent.startedBuffering, generetedBy: self)
+            case "currentItem.playbackBufferEmpty" where currentItem.isPlaybackBufferEmpty:
+                eventListener?.onEvent(PlayerEvent.startedBuffering, generetedBy: self)
 
-                case "currentItem.playbackLikelyToKeepUp" where currentItem.isPlaybackLikelyToKeepUp:
-                    eventListener?.onEvent(PlayerEvent.readyToPlay, generetedBy: self)
+            case "currentItem.playbackLikelyToKeepUp" where currentItem.isPlaybackLikelyToKeepUp:
+                eventListener?.onEvent(PlayerEvent.readyToPlay, generetedBy: self)
 
-                case "currentItem.status" where currentItem.status == .failed:
-                    eventListener?.onEvent(PlayerEvent.endedPlaying(currentItem.error),
-                                           generetedBy: self)
+            case "currentItem.status" where currentItem.status == .failed:
+                eventListener?.onEvent(
+                    PlayerEvent.endedPlaying(currentItem.error), generetedBy: self)
 
-                case "currentItem.loadedTimeRanges":
-                    if let range = currentItem.loadedTimeRanges.last?.timeRangeValue {
-                        eventListener?.onEvent(PlayerEvent.loadedMoreRange(range.start, range.end),
-                            generetedBy: self)
-                    }
-
-                default:
-                    break
+            case "currentItem.loadedTimeRanges":
+                if let range = currentItem.loadedTimeRanges.last?.timeRangeValue {
+                    eventListener?.onEvent(
+                        PlayerEvent.loadedMoreRange(range.start, range.end), generetedBy: self)
                 }
+
+            default:
+                break
             }
+        }
     }
 
     #if os(iOS) || os(tvOS)
@@ -237,16 +244,16 @@ class PlayerEventProducer: NSObject, EventProducer {
         if let userInfo = note.userInfo,
             let typeInt = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
             let type = AVAudioSessionInterruptionType(rawValue: typeInt) {
-                if type == .began {
-                    eventListener?.onEvent(PlayerEvent.interruptionBegan, generetedBy: self)
-                } else {
-                    if let optionInt = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
-                        let options = AVAudioSessionInterruptionOptions(rawValue: optionInt)
-                        if options.contains(.shouldResume) {
-                            eventListener?.onEvent(PlayerEvent.interruptionEnded, generetedBy: self)
-                        }
+            if type == .began {
+                eventListener?.onEvent(PlayerEvent.interruptionBegan, generetedBy: self)
+            } else {
+                if let optionInt = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
+                    let options = AVAudioSessionInterruptionOptions(rawValue: optionInt)
+                    if options.contains(.shouldResume) {
+                        eventListener?.onEvent(PlayerEvent.interruptionEnded, generetedBy: self)
                     }
                 }
+            }
         }
     }
     #endif
@@ -270,10 +277,10 @@ class PlayerEventProducer: NSObject, EventProducer {
     @objc fileprivate func audioSessionMessedUp(note: NSNotification) {
         eventListener?.onEvent(PlayerEvent.sessionMessedUp, generetedBy: self)
     }
-
+    
     /**
      Playing item did end. We can play next or stop the player if queue is empty.
-
+     
      - parameter note: The notification information.
      */
     @objc fileprivate func playerItemDidEnd(note: NSNotification) {

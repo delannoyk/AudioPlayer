@@ -14,11 +14,11 @@ import AVFoundation
 // MARK: - AudioPlayer
 
 /**
-An `AudioPlayer` instance is used to play `AudioPlayerItem`. It's an easy to use
-AVPlayer with simple methods to handle the whole playing audio process.
+ An `AudioPlayer` instance is used to play `AudioPlayerItem`. It's an easy to use
+ AVPlayer with simple methods to handle the whole playing audio process.
 
-You can get events (such as state change or time observation) by registering a delegate.
-*/
+ You can get events (such as state change or time observation) by registering a delegate.
+ */
 public class AudioPlayer: NSObject {
     // MARK: Handlers
 

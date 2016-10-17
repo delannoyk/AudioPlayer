@@ -22,10 +22,10 @@
          `UIBackgroundTaskInvalid` if running in the background is not possible.
 
          - parameter handler: A handler to be called shortly before the app’s remaining background
-            time reaches 0. You should use this handler to clean up and mark the end of the
-            background task. Failure to end the task explicitly will result in the termination of
-            the app. The handler is called synchronously on the main thread, blocking the app’s
-            suspension momentarily while the app is notified.
+         time reaches 0. You should use this handler to clean up and mark the end of the
+         background task. Failure to end the task explicitly will result in the termination of
+         the app. The handler is called synchronously on the main thread, blocking the app’s
+         suspension momentarily while the app is notified.
 
          - returns: A unique identifier for the new background task.
          */
@@ -40,7 +40,7 @@
          This method can be safely called on a non-main thread.
 
          - parameter: An identifier returned by the `beginBackgroundTaskWithExpirationHandler:`
-            method.
+         method.
          */
         func endBackgroundTask(_ identifier: UIBackgroundTaskIdentifier)
     }

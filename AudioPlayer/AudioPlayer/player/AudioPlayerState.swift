@@ -28,7 +28,7 @@ public enum AudioPlayerError: Error {
  - `stopped`:              The player is stopped.
  - `waitingForConnection`: The player is waiting for internet connection.
  - `failed`:               An error occured. It contains AVPlayer's error if any.
-*/
+ */
 public enum AudioPlayerState {
     case buffering
     case playing

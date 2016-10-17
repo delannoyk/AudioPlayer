@@ -19,11 +19,11 @@ private extension Selector {
  */
 class NetworkEventProducer: NSObject, EventProducer {
     /**
-       A `NetworkEvent` is an event a network monitor
+     A `NetworkEvent` is an event a network monitor
 
-       - networkChanged:           The network changed.
-       - connectionRetrieved:      The connection is now up.
-       - connectionLost:           The connection has been lost.
+     - networkChanged:           The network changed.
+     - connectionRetrieved:      The connection is now up.
+     - connectionLost:           The connection has been lost.
      */
     enum NetworkEvent: Event {
         case networkChanged
@@ -79,8 +79,11 @@ class NetworkEventProducer: NSObject, EventProducer {
         lastStatus = reachability.currentReachabilityStatus
 
         //Starting to listen to events
-        NotificationCenter.default.addObserver(self, selector: .reachabilityStatusChanged,
-            name: .ReachabilityChanged, object: reachability)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: .reachabilityStatusChanged,
+            name: .ReachabilityChanged,
+            object: reachability)
         reachability.startNotifier()
 
         //Saving that we're currently listening
@@ -96,9 +99,8 @@ class NetworkEventProducer: NSObject, EventProducer {
         }
 
         //Stops listening to events
-        NotificationCenter.default.removeObserver(self,
-            name: .ReachabilityChanged,
-            object: reachability)
+        NotificationCenter.default.removeObserver(
+            self, name: .ReachabilityChanged, object: reachability)
         reachability.stopNotifier()
 
         //Saving that we're not listening anymore

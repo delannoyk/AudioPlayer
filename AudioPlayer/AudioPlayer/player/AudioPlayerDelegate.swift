@@ -26,7 +26,7 @@ public protocol AudioPlayerDelegate: class {
      - parameter state:       The new state.
      */
     func audioPlayer(_ audioPlayer: AudioPlayer, didChangeStateFrom from: AudioPlayerState,
-        to state: AudioPlayerState)
+                     to state: AudioPlayerState)
 
     /**
      This method is called when the audio player is about to start playing a new item.
@@ -43,10 +43,10 @@ public protocol AudioPlayerDelegate: class {
      - parameter audioPlayer:    The audio player.
      - parameter time:           The current progression.
      - parameter percentageRead: The percentage of the file that has been read. It's a Float value
-        between 0 & 100 so that you can easily update an `UISlider` for example.
+     between 0 & 100 so that you can easily update an `UISlider` for example.
      */
     func audioPlayer(_ audioPlayer: AudioPlayer, didUpdateProgressionTo time: TimeInterval,
-        percentageRead: Float)
+                     percentageRead: Float)
 
     /**
      This method gets called when the current item duration has been found.
@@ -66,7 +66,7 @@ public protocol AudioPlayerDelegate: class {
      - parameter data:        Current item.
      */
     func audioPlayer(_ audioPlayer: AudioPlayer, didUpdateEmptyMetadataOn item: AudioItem,
-        withData data: Metadata)
+                     withData data: Metadata)
 
     /**
      This method gets called while the audio player is loading the file (over the network or
@@ -93,6 +93,6 @@ extension AudioPlayerDelegate {
 
     func audioPlayer(_ audioPlayer: AudioPlayer, didUpdateEmptyMetadataOn item: AudioItem,
                      withData data: Metadata) {}
-
+    
     func audioPlayer(_ audioPlayer: AudioPlayer, didLoad range: TimeRange, for item: AudioItem) {}
 }

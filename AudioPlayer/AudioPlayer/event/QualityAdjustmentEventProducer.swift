@@ -161,7 +161,7 @@ class QualityAdjustmentEventProducer: NSObject, EventProducer {
         if interruptionCount == 0 {
             eventListener?.onEvent(QualityAdjustmentEvent.goUp, generetedBy: self)
         }
-
+        
         //Reset state
         resetState()
     }
