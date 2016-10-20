@@ -104,7 +104,7 @@ class AudioItemQueue {
      */
     func nextItem() -> AudioItem? {
         //Early exit if queue is empty
-        guard queue.count > 0 else {
+        guard !queue.isEmpty else {
             return nil
         }
 
@@ -126,7 +126,7 @@ class AudioItemQueue {
 
     /// A boolean value indicating whether the queue has a next item to play or not.
     var hasNextItem: Bool {
-        if queue.count > 0 &&
+        if !queue.isEmpty &&
             (queue.count > nextPosition || mode.contains(.repeat) || mode.contains(.repeatAll)) {
             return true
         }
@@ -140,7 +140,7 @@ class AudioItemQueue {
      */
     func previousItem() -> AudioItem? {
         //Early exit if queue is empty
-        guard queue.count > 0 else {
+        guard !queue.isEmpty else {
             return nil
         }
 
@@ -161,7 +161,7 @@ class AudioItemQueue {
 
     /// A boolean value indicating whether the queue has a previous item to play or not.
     var hasPreviousItem: Bool {
-        if queue.count > 0 &&
+        if !queue.isEmpty &&
             (nextPosition > 0 || mode.contains(.repeat) || mode.contains(.repeatAll)) {
             return true
         }

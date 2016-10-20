@@ -1,0 +1,8 @@
+included:
+  - AudioPlayer
+excluded:
+  - AudioPlayerTests
+opt_in_rules:
+  - empty_count
+
+line_length: 120

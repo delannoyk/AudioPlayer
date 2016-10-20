@@ -163,41 +163,40 @@ extension AudioPlayer {
     }
 
     #if os(iOS) || os(tvOS)
+    //swiftlint:disable cyclomatic_complexity
     /**
      Handle events received from Control Center/Lock screen/Other in UIApplicationDelegate.
 
      - parameter event: The event received.
      */
-    public func remoteControlReceivedWithEvent(event: UIEvent) {
-        if event.type == .remoteControl {
-            switch event.subtype {
-            case .remoteControlBeginSeekingBackward:
-                rate = -(rate * rateMultiplerOnSeeking)
-            case .remoteControlBeginSeekingForward:
-                rate = rate * rateMultiplerOnSeeking
-            case .remoteControlEndSeekingBackward:
-                rate = -(rate / rateMultiplerOnSeeking)
-            case .remoteControlEndSeekingForward:
-                rate = rate / rateMultiplerOnSeeking
-            case .remoteControlNextTrack:
-                next()
-            case .remoteControlPause:
-                pause()
-            case .remoteControlPlay:
-                resume()
-            case .remoteControlPreviousTrack:
-                previous()
-            case .remoteControlStop:
-                stop()
-            case .remoteControlTogglePlayPause:
-                if case .playing = state {
-                    pause()
-                } else {
-                    resume()
-                }
-            default:
-                break
-            }
+    public func remoteControlReceived(with event: UIEvent) {
+        guard event.type == .remoteControl else {
+            return
+        }
+
+        switch event.subtype {
+        case .remoteControlBeginSeekingBackward:
+            rate = -(rate * rateMultiplerOnSeeking)
+        case .remoteControlBeginSeekingForward:
+            rate = rate * rateMultiplerOnSeeking
+        case .remoteControlEndSeekingBackward:
+            rate = -(rate / rateMultiplerOnSeeking)
+        case .remoteControlEndSeekingForward:
+            rate = rate / rateMultiplerOnSeeking
+        case .remoteControlNextTrack:
+            next()
+        case .remoteControlPause,
+             .remoteControlTogglePlayPause where state.isPlaying:
+            pause()
+        case .remoteControlPlay,
+             .remoteControlTogglePlayPause where state.isPaused:
+            resume()
+        case .remoteControlPreviousTrack:
+            previous()
+        case .remoteControlStop:
+            stop()
+        default:
+            break
         }
     }
     #endif

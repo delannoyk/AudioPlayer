@@ -93,6 +93,6 @@ extension AudioPlayerDelegate {
 
     func audioPlayer(_ audioPlayer: AudioPlayer, didUpdateEmptyMetadataOn item: AudioItem,
                      withData data: Metadata) {}
-    
+
     func audioPlayer(_ audioPlayer: AudioPlayer, didLoad range: TimeRange, for item: AudioItem) {}
 }

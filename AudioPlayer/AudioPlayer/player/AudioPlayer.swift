@@ -47,7 +47,7 @@ public class AudioPlayer: NSObject {
     /// The retry event producer.
     var retryEventProducer = RetryEventProducer()
 
-    //MARK: Player
+    // MARK: Player
 
     /// The queue containing items to play.
     var queue: AudioItemQueue?

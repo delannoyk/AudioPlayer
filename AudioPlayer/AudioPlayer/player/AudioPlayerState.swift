@@ -87,7 +87,7 @@ public enum AudioPlayerState {
     }
 }
 
-//MARK: - Equatable
+// MARK: - Equatable
 
 extension AudioPlayerState: Equatable {}
 

@@ -16,22 +16,18 @@ extension AudioPlayer {
                 nextOrStop()
             }
 
-        case .interruptionBegan:
-            if state.isPlaying || state.isBuffering {
-                //We pause the player when an interruption is detected
-                backgroundHandler.beginBackgroundTask()
-                pausedForInterruption = true
-                pause()
-            }
+        case .interruptionBegan where state.isPlaying || state.isBuffering:
+            //We pause the player when an interruption is detected
+            backgroundHandler.beginBackgroundTask()
+            pausedForInterruption = true
+            pause()
 
-        case .interruptionEnded:
-            if pausedForInterruption {
-                if resumeAfterInterruption {
-                    resume()
-                }
-                pausedForInterruption = false
-                backgroundHandler.endBackgroundTask()
+        case .interruptionEnded where pausedForInterruption:
+            if resumeAfterInterruption {
+                resume()
             }
+            pausedForInterruption = false
+            backgroundHandler.endBackgroundTask()
 
         case .loadedDuration(let time):
             if let currentItem = currentItem, let time = time.ap_timeIntervalValue {
@@ -40,7 +36,7 @@ extension AudioPlayer {
             }
 
         case .loadedMetadata(let metadata):
-            if let currentItem = currentItem, metadata.count > 0 {
+            if let currentItem = currentItem, !metadata.isEmpty {
                 currentItem.parseMetadata(metadata)
                 delegate?.audioPlayer(self, didUpdateEmptyMetadataOn: currentItem, withData: metadata)
             }
@@ -120,6 +116,9 @@ extension AudioPlayer {
                 state = .waitingForConnection
             }
             backgroundHandler.beginBackgroundTask()
+
+        default:
+            break
         }
     }
 }

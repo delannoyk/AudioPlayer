@@ -43,7 +43,7 @@ extension AudioPlayer {
      - parameter index: The index to start the player with.
      */
     public func play(items: [AudioItem], startAtIndex index: Int = 0) {
-        if items.count > 0 {
+        if !items.isEmpty {
             queue = AudioItemQueue(items: items, mode: mode)
             if let realIndex = queue?.queue.index(of: items[index]) {
                 queue?.nextPosition = realIndex

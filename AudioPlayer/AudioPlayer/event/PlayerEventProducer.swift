@@ -11,6 +11,7 @@ import AVFoundation
 // MARK: - AVPlayer+KVO
 
 private extension AVPlayer {
+    //swiftlint:disable variable_name
     /// The list of properties that is observed through KVO.
     static var ap_KVOProperties: [String] {
         return [
@@ -146,10 +147,11 @@ class PlayerEventProducer: NSObject, EventProducer {
         }
 
         //Observing timing event
-        timeObserver = player.addPeriodicTimeObserver(forInterval: CMTimeMake(1, 2), queue: DispatchQueue.main) { [weak self] time in
-            if let `self` = self {
-                self.eventListener?.onEvent(PlayerEvent.progressed(time), generetedBy: self)
-            }
+        timeObserver = player.addPeriodicTimeObserver(
+            forInterval: CMTimeMake(1, 2), queue: DispatchQueue.main) { [weak self] time in
+                if let `self` = self {
+                    self.eventListener?.onEvent(PlayerEvent.progressed(time), generetedBy: self)
+                }
         }
 
         listening = true
@@ -200,7 +202,10 @@ class PlayerEventProducer: NSObject, EventProducer {
      - parameter context: The value that was provided when the receiver was registered to receive
      key-value observation notifications.
      */
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+    override func observeValue(forKeyPath keyPath: String?,
+                               of object: Any?,
+                               change: [NSKeyValueChangeKey: Any]?,
+                               context: UnsafeMutableRawPointer?) {
         if let keyPath = keyPath, let p = object as? AVPlayer, let currentItem = p.currentItem {
             switch keyPath {
             case "currentItem.duration":
@@ -277,10 +282,10 @@ class PlayerEventProducer: NSObject, EventProducer {
     @objc fileprivate func audioSessionMessedUp(note: NSNotification) {
         eventListener?.onEvent(PlayerEvent.sessionMessedUp, generetedBy: self)
     }
-    
+
     /**
      Playing item did end. We can play next or stop the player if queue is empty.
-     
+
      - parameter note: The notification information.
      */
     @objc fileprivate func playerItemDidEnd(note: NSNotification) {

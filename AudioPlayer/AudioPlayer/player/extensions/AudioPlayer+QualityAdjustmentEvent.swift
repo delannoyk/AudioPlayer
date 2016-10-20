@@ -9,7 +9,8 @@
 import AVFoundation
 
 extension AudioPlayer {
-    func handleQualityEvent(from producer: EventProducer, with event: QualityAdjustmentEventProducer.QualityAdjustmentEvent) {
+    func handleQualityEvent(from producer: EventProducer,
+                            with event: QualityAdjustmentEventProducer.QualityAdjustmentEvent) {
         //Early exit if user doesn't want to adjust quality
         guard adjustQualityAutomatically else {
             return

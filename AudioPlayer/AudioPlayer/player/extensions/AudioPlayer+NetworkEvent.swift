@@ -45,7 +45,7 @@ extension AudioPlayer {
             }
 
             stateWhenConnectionLost = nil
-            
+
         case .networkChanged:
             break
         }

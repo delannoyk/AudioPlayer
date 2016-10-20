@@ -29,7 +29,7 @@ import SystemConfiguration
 import Foundation
 
 extension NSNotification.Name {
-    static let ReachabilityChanged = NSNotification.Name(rawValue: "ReachabilityChangedNotification")
+    static let ReachabilityChanged = NSNotification.Name(rawValue: "ReachabilityChanged")
 }
 
 func callback(reachability: SCNetworkReachability, flags: SCNetworkReachabilityFlags, info: UnsafeMutableRawPointer?) {
@@ -91,7 +91,8 @@ class Reachability: NSObject {
 
         var context = SCNetworkReachabilityContext(version: 0, info: nil, retain: nil, release: nil,
                                                    copyDescription: nil)
-        context.info = UnsafeMutableRawPointer(Unmanaged<Reachability>.passUnretained(self).toOpaque())
+        context.info = UnsafeMutableRawPointer(
+            Unmanaged<Reachability>.passUnretained(self).toOpaque())
 
         if SCNetworkReachabilitySetCallback(reachabilityRef!, callback, &context) {
             if SCNetworkReachabilitySetDispatchQueue(reachabilityRef!, reachabilitySerialQueue) {
@@ -213,15 +214,15 @@ class Reachability: NSObject {
             let gotFlags = withUnsafeMutablePointer(to: &flags) {
                 SCNetworkReachabilityGetFlags(reachabilityRef, UnsafeMutablePointer($0))
             }
-            
+
             if gotFlags {
                 return flags
             }
         }
-        
+
         return []
     }
-    
+
     deinit {
         stopNotifier()
         reachabilityRef = nil

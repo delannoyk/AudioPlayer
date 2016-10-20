@@ -11,6 +11,7 @@ import Foundation
 // MARK: - AudioItem+KVO
 
 extension AudioItem {
+    //swiftlint:disable variable_name
     /// The list of properties that is observed through KVO.
     fileprivate static var ap_KVOProperties: [String] {
         return ["artist", "title", "album", "trackCount", "trackNumber", "artworkImage"]
@@ -109,7 +110,10 @@ class AudioItemEventProducer: NSObject, EventProducer {
      - parameter context: The value that was provided when the receiver was registered to receive
      key-value observation notifications.
      */
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+    override func observeValue(forKeyPath keyPath: String?,
+                               of object: Any?,
+                               change: [NSKeyValueChangeKey: Any]?,
+                               context: UnsafeMutableRawPointer?) {
         if let keyPath = keyPath {
             switch keyPath {
             case "artist":

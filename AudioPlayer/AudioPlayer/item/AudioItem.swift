@@ -96,7 +96,7 @@ open class AudioItem: NSObject {
         self.soundURLs = soundURLs
         super.init()
 
-        if soundURLs.count == 0 {
+        if soundURLs.isEmpty {
             return nil
         }
     }
