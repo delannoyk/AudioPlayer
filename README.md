@@ -81,6 +81,15 @@ override func remoteControlReceivedWithEvent(event: UIEvent?) {
 4. Push to the branch: `git push origin my-new-feature`
 5. Submit a pull request :D
 
+## Todo list
+
+* Add Danger for future PR
+* Add a fully working example project
+* Integrate with SPM
+* Add more unit tests
+* Add Objective-C support if possible ([#67](https://github.com/delannoyk/AudioPlayer/issues/67))
+* Refactor current state handling
+
 ## License
 
 The MIT License (MIT)
