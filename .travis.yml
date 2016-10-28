@@ -1,5 +1,7 @@
 language: objective-c
-osx_image: xcode7.2
+osx_image: xcode8
+before_install:
+  - gem install slather
 env:
   global:
   - LC_CTYPE=en_US.UTF-8
@@ -8,20 +10,14 @@ env:
   - IOS_FRAMEWORK_SCHEME="AudioPlayer iOS"
   - OSX_FRAMEWORK_SCHEME="AudioPlayer OSX"
   - TVOS_FRAMEWORK_SCHEME="AudioPlayer tvOS"
-  - IOS_SDK=iphonesimulator9.2
-  - OSX_SDK=macosx10.11
-  - TVOS_SDK=appletvsimulator9.1
-  - WATCHOS_SDK=watchsimulator2.1
+  - IOS_SDK=iphonesimulator10.0
+  - OSX_SDK=macosx10.12
+  - TVOS_SDK=appletvsimulator10.0
+  - WATCHOS_SDK=watchsimulator3.0
   matrix:
-    - DESTINATION="OS=8.1,name=iPhone 4S"      SCHEME="$IOS_FRAMEWORK_SCHEME"  SDK="$IOS_SDK"  RUN_TESTS="NO"
-    - DESTINATION="OS=8.2,name=iPhone 5"       SCHEME="$IOS_FRAMEWORK_SCHEME"  SDK="$IOS_SDK"  RUN_TESTS="NO"
-    - DESTINATION="OS=8.3,name=iPhone 5S"      SCHEME="$IOS_FRAMEWORK_SCHEME"  SDK="$IOS_SDK"  RUN_TESTS="NO"
-    - DESTINATION="OS=8.4,name=iPhone 6"       SCHEME="$IOS_FRAMEWORK_SCHEME"  SDK="$IOS_SDK"  RUN_TESTS="NO"
-    - DESTINATION="OS=9.0,name=iPhone 6 Plus"  SCHEME="$IOS_FRAMEWORK_SCHEME"  SDK="$IOS_SDK"  RUN_TESTS="NO"
-    - DESTINATION="OS=9.1,name=iPhone 6S"      SCHEME="$IOS_FRAMEWORK_SCHEME"  SDK="$IOS_SDK"  RUN_TESTS="NO"
-    - DESTINATION="OS=9.2,name=iPhone 6S Plus" SCHEME="$IOS_FRAMEWORK_SCHEME"  SDK="$IOS_SDK"  RUN_TESTS="NO"
+    - DESTINATION="OS=10.0,name=iPhone 7"       SCHEME="$IOS_FRAMEWORK_SCHEME"  SDK="$IOS_SDK"  RUN_TESTS="YES"
     - DESTINATION="arch=x86_64"                SCHEME="$OSX_FRAMEWORK_SCHEME"  SDK="$OSX_SDK"  RUN_TESTS="NO"
-    - DESTINATION="OS=9.1,name=Apple TV 1080p" SCHEME="$TVOS_FRAMEWORK_SCHEME" SDK="$TVOS_SDK" RUN_TESTS="NO"
+    - DESTINATION="OS=10.0,name=Apple TV 1080p" SCHEME="$TVOS_FRAMEWORK_SCHEME" SDK="$TVOS_SDK" RUN_TESTS="NO"
 script:
   - set -o pipefail
   - xcodebuild -version
@@ -29,9 +25,11 @@ script:
 
   # Build Framework in Debug and Run Tests if specified
   - if [ $RUN_TESTS == "YES" ]; then
-      xcodebuild -project "$PROJECT" -scheme "$SCHEME" -sdk "$SDK" -destination "$DESTINATION" -configuration Debug ONLY_ACTIVE_ARCH=NO test | xcpretty -c;
+      xcodebuild -project "$PROJECT" -scheme "$SCHEME" -sdk "$SDK" -destination "$DESTINATION" build test | xcpretty -c;
+      slather coverage --input-format profdata -i ".*Tests.*" --scheme "AudioPlayer iOS" AudioPlayer/AudioPlayer.xcodeproj;
+      bash <(curl -s https://codecov.io/bash) -f cobertura.xml;
     else
-      xcodebuild -project "$PROJECT" -scheme "$SCHEME" -sdk "$SDK" -destination "$DESTINATION" -configuration Debug ONLY_ACTIVE_ARCH=NO build | xcpretty -c;
+      xcodebuild -project "$PROJECT" -scheme "$SCHEME" -sdk "$SDK" -destination "$DESTINATION" build | xcpretty -c;
     fi
 notifications:
   slack:
