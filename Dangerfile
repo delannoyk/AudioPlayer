@@ -2,7 +2,7 @@
 warn("Big PR") if git.lines_of_code > 300
 
 # Warn pod spec changes
-warn("KDEAudioPlayer.podspec changed") if modified_files.include?("KDEAudioPlayer.podspec")
+warn("KDEAudioPlayer.podspec changed") if git.modified_files.include?("KDEAudioPlayer.podspec")
 
 # Added (or removed) library files need to be added (or removed) from the
 # Carthage Xcode project to avoid breaking things for our Carthage users.
