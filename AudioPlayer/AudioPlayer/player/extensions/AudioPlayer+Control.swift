@@ -176,13 +176,13 @@ extension AudioPlayer {
 
         switch event.subtype {
         case .remoteControlBeginSeekingBackward:
-            rate = -(rate * rateMultiplerOnSeeking)
+            seekingBehavior.handleSeekingStart(player: self, forward: false)
         case .remoteControlBeginSeekingForward:
-            rate = rate * rateMultiplerOnSeeking
+            seekingBehavior.handleSeekingStart(player: self, forward: true)
         case .remoteControlEndSeekingBackward:
-            rate = -(rate / rateMultiplerOnSeeking)
+            seekingBehavior.handleSeekingEnd(player: self, forward: false)
         case .remoteControlEndSeekingForward:
-            rate = rate / rateMultiplerOnSeeking
+            seekingBehavior.handleSeekingEnd(player: self, forward: true)
         case .remoteControlNextTrack:
             next()
         case .remoteControlPause,

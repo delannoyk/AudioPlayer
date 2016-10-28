@@ -38,6 +38,9 @@ public class AudioPlayer: NSObject {
     /// The player event producer.
     let playerEventProducer = PlayerEventProducer()
 
+    /// The seek event producer.
+    let seekEventProducer = SeekEventProducer()
+
     /// The quality adjustment event producer.
     var qualityAdjustmentEventProducer = QualityAdjustmentEventProducer()
 
@@ -211,11 +214,53 @@ public class AudioPlayer: NSObject {
         }
     }
 
-    #if os(iOS) || os(tvOS)
-    /// Defines the rate multiplier of the player when the backward/forward buttons are pressed.
-    /// Default value is 2.
-    public var rateMultiplerOnSeeking = Float(2)
-    #endif
+    /// Defines how to behave when the user is seeking through the lockscreen or the control center.
+    ///
+    /// - multiplyRate: Multiples the rate by a factor.
+    /// - changeTime:   Changes the current position by adding/substracting a time interval.
+    public enum SeekingBehavior {
+        case multiplyRate(Float)
+        case changeTime(every: TimeInterval, delta: TimeInterval)
+
+        func handleSeekingStart(player: AudioPlayer, forward: Bool) {
+            switch self {
+            case .multiplyRate(let rateMultiplier):
+                if forward {
+                    player.rate = player.rate * rateMultiplier
+                } else {
+                    player.rate = -(player.rate * rateMultiplier)
+                }
+
+            case .changeTime:
+                player.seekEventProducer.isBackward = !forward
+                player.seekEventProducer.startProducingEvents()
+            }
+        }
+
+        func handleSeekingEnd(player: AudioPlayer, forward: Bool) {
+            switch self {
+            case .multiplyRate(let rateMultiplier):
+                if forward {
+                    player.rate = player.rate / rateMultiplier
+                } else {
+                    player.rate = -(player.rate / rateMultiplier)
+                }
+
+            case .changeTime:
+                player.seekEventProducer.stopProducingEvents()
+            }
+        }
+    }
+
+    /// Defines the rate behavior of the player when the backward/forward buttons are pressed.
+    /// Default value is `multiplyRate(2)`.
+    public var seekingBehavior = SeekingBehavior.multiplyRate(2) {
+        didSet {
+            if case .changeTime(let timerInterval, _) = seekingBehavior {
+                seekEventProducer.intervalBetweenEvents = timerInterval
+            }
+        }
+    }
 
     // MARK: Readonly properties
 
@@ -353,6 +398,8 @@ extension AudioPlayer: EventListener {
             handleQualityEvent(from: eventProducer, with: event)
         } else if let event = event as? RetryEventProducer.RetryEvent {
             handleRetryEvent(from: eventProducer, with: event)
+        } else if let event = event as? SeekEventProducer.SeekEvent {
+            handleSeekEvent(from: eventProducer, with: event)
         }
     }
 }

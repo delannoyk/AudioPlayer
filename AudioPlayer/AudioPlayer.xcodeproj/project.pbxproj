@@ -43,6 +43,13 @@
 		46AADEE71CA1BA5A00CF7A3D /* BackgroundHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46AADEE61CA1BA5A00CF7A3D /* BackgroundHandler.swift */; };
 		46AADEE81CA1BA5A00CF7A3D /* BackgroundHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46AADEE61CA1BA5A00CF7A3D /* BackgroundHandler.swift */; };
 		46AADEE91CA1BA5A00CF7A3D /* BackgroundHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46AADEE61CA1BA5A00CF7A3D /* BackgroundHandler.swift */; };
+		46BF0BCA1DC2DCC300560FD1 /* SeekEventProducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46BF0BC91DC2DCC300560FD1 /* SeekEventProducer.swift */; };
+		46BF0BCB1DC2DCC300560FD1 /* SeekEventProducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46BF0BC91DC2DCC300560FD1 /* SeekEventProducer.swift */; };
+		46BF0BCC1DC2DCC300560FD1 /* SeekEventProducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46BF0BC91DC2DCC300560FD1 /* SeekEventProducer.swift */; };
+		46BF0BCE1DC2DED900560FD1 /* AudioPlayer+SeekEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46BF0BCD1DC2DED900560FD1 /* AudioPlayer+SeekEvent.swift */; };
+		46BF0BCF1DC2DED900560FD1 /* AudioPlayer+SeekEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46BF0BCD1DC2DED900560FD1 /* AudioPlayer+SeekEvent.swift */; };
+		46BF0BD01DC2DED900560FD1 /* AudioPlayer+SeekEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46BF0BCD1DC2DED900560FD1 /* AudioPlayer+SeekEvent.swift */; };
+		46BF0BD21DC2DFF000560FD1 /* SeekEventProducer_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46BF0BD11DC2DFF000560FD1 /* SeekEventProducer_Tests.swift */; };
 		46D3A2E11C8F480A00635FE4 /* EventProducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D3A2E01C8F480A00635FE4 /* EventProducer.swift */; };
 		46D3A2E21C8F480A00635FE4 /* EventProducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D3A2E01C8F480A00635FE4 /* EventProducer.swift */; };
 		46D3A2E31C8F480A00635FE4 /* EventProducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D3A2E01C8F480A00635FE4 /* EventProducer.swift */; };
@@ -127,6 +134,9 @@
 		467D61261CB1145000D50807 /* URL+Offline.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "URL+Offline.swift"; sourceTree = "<group>"; };
 		468E897B1CA1C8E0007F53AD /* BackgroundHandler_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackgroundHandler_Tests.swift; sourceTree = "<group>"; };
 		46AADEE61CA1BA5A00CF7A3D /* BackgroundHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackgroundHandler.swift; sourceTree = "<group>"; };
+		46BF0BC91DC2DCC300560FD1 /* SeekEventProducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SeekEventProducer.swift; sourceTree = "<group>"; };
+		46BF0BCD1DC2DED900560FD1 /* AudioPlayer+SeekEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AudioPlayer+SeekEvent.swift"; sourceTree = "<group>"; };
+		46BF0BD11DC2DFF000560FD1 /* SeekEventProducer_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SeekEventProducer_Tests.swift; sourceTree = "<group>"; };
 		46D3A2E01C8F480A00635FE4 /* EventProducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventProducer.swift; sourceTree = "<group>"; };
 		46D3A2E41C8F489700635FE4 /* PlayerEventProducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerEventProducer.swift; sourceTree = "<group>"; };
 		46D3A2E81C8F4A7B00635FE4 /* NetworkEventProducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkEventProducer.swift; sourceTree = "<group>"; };
@@ -222,6 +232,7 @@
 			isa = PBXGroup;
 			children = (
 				46D3A2FB1C90920B00635FE4 /* fakes */,
+				46BF0BD11DC2DFF000560FD1 /* SeekEventProducer_Tests.swift */,
 				46D3A2F71C90905C00635FE4 /* NetworkEventProducer_Tests.swift */,
 				46D3A2F81C90905C00635FE4 /* PlayerEventProducer_Tests.swift */,
 				46D3A3261C94469E00635FE4 /* QualityAdjustmentEventProducer_Tests.swift */,
@@ -249,6 +260,7 @@
 			isa = PBXGroup;
 			children = (
 				46D3A2E01C8F480A00635FE4 /* EventProducer.swift */,
+				46BF0BC91DC2DCC300560FD1 /* SeekEventProducer.swift */,
 				460FA1DE1CBA946F00156DFC /* RetryEventProducer.swift */,
 				46D3A2E41C8F489700635FE4 /* PlayerEventProducer.swift */,
 				46D3A2E81C8F4A7B00635FE4 /* NetworkEventProducer.swift */,
@@ -313,6 +325,7 @@
 				46DE85091CAB067400F00287 /* AudioPlayer+Control.swift */,
 				46DE850D1CAB07DE00F00287 /* AudioPlayer+Queue.swift */,
 				46DE85111CAB0A3200F00287 /* AudioPlayer+CurrentItem.swift */,
+				46BF0BCD1DC2DED900560FD1 /* AudioPlayer+SeekEvent.swift */,
 				467D61161CB110BD00D50807 /* AudioPlayer+PlayerEvent.swift */,
 				467D611A1CB1113500D50807 /* AudioPlayer+NetworkEvent.swift */,
 				467D611E1CB1119600D50807 /* AudioPlayer+QualityAdjustmentEvent.swift */,
@@ -552,8 +565,10 @@
 				46D3A2E91C8F4A7B00635FE4 /* NetworkEventProducer.swift in Sources */,
 				467D61271CB1145000D50807 /* URL+Offline.swift in Sources */,
 				46D3A3131C93405400635FE4 /* QualityAdjustmentEventProducer.swift in Sources */,
+				46BF0BCA1DC2DCC300560FD1 /* SeekEventProducer.swift in Sources */,
 				46DDB09E1C959D3C007B60C6 /* AudioItemEventProducer.swift in Sources */,
 				46D3A30D1C933A7F00635FE4 /* CMTime+TimeIntervalValue.swift in Sources */,
+				46BF0BCE1DC2DED900560FD1 /* AudioPlayer+SeekEvent.swift in Sources */,
 				46D3A31B1C9340D000635FE4 /* AudioItemQueue.swift in Sources */,
 				467D611B1CB1113500D50807 /* AudioPlayer+NetworkEvent.swift in Sources */,
 				4631A0311CA7D6F300202AA3 /* MPNowPlayingInfoCenter+AudioItem.swift in Sources */,
@@ -578,6 +593,7 @@
 				468E897C1CA1C8E0007F53AD /* BackgroundHandler_Tests.swift in Sources */,
 				460FA1E31CC1805A00156DFC /* RetryEventProducer_Tests.swift in Sources */,
 				46D3A2F91C90905C00635FE4 /* NetworkEventProducer_Tests.swift in Sources */,
+				46BF0BD21DC2DFF000560FD1 /* SeekEventProducer_Tests.swift in Sources */,
 				46170A311C9B2DA0001F85F9 /* AudioPlayerState_Tests.swift in Sources */,
 				46E49EF41C94B27000490721 /* AudioItemQueue_Tests.swift in Sources */,
 				46D3A3271C94469E00635FE4 /* QualityAdjustmentEventProducer_Tests.swift in Sources */,
@@ -594,6 +610,7 @@
 			files = (
 				46D3A3111C933A8600635FE4 /* AudioPlayerState.swift in Sources */,
 				467D61191CB110BD00D50807 /* AudioPlayer+PlayerEvent.swift in Sources */,
+				46BF0BD01DC2DED900560FD1 /* AudioPlayer+SeekEvent.swift in Sources */,
 				46DE85101CAB07DE00F00287 /* AudioPlayer+Queue.swift in Sources */,
 				462FC8051C9D7C33005A674B /* AudioPlayerMode.swift in Sources */,
 				46D3A2E31C8F480A00635FE4 /* EventProducer.swift in Sources */,
@@ -603,6 +620,7 @@
 				46D3A3151C93405400635FE4 /* QualityAdjustmentEventProducer.swift in Sources */,
 				460FA1E71CC1814500156DFC /* AudioPlayer+RetryEvent.swift in Sources */,
 				46DE85141CAB0A3200F00287 /* AudioPlayer+CurrentItem.swift in Sources */,
+				46BF0BCC1DC2DCC300560FD1 /* SeekEventProducer.swift in Sources */,
 				460FA1E11CBA946F00156DFC /* RetryEventProducer.swift in Sources */,
 				46DAE4BC1C40275F00572EB2 /* AudioPlayer.swift in Sources */,
 				46DDB0A01C959D3C007B60C6 /* AudioItemEventProducer.swift in Sources */,
@@ -633,8 +651,10 @@
 				46D3A3141C93405400635FE4 /* QualityAdjustmentEventProducer.swift in Sources */,
 				467D61281CB1145000D50807 /* URL+Offline.swift in Sources */,
 				653E188C1C3541B8003C0CAB /* AudioPlayer.swift in Sources */,
+				46BF0BCB1DC2DCC300560FD1 /* SeekEventProducer.swift in Sources */,
 				46DDB09F1C959D3C007B60C6 /* AudioItemEventProducer.swift in Sources */,
 				46D3A3031C90A93900635FE4 /* AudioPlayerDelegate.swift in Sources */,
+				46BF0BCF1DC2DED900560FD1 /* AudioPlayer+SeekEvent.swift in Sources */,
 				46D3A31C1C9340D000635FE4 /* AudioItemQueue.swift in Sources */,
 				467D611C1CB1113500D50807 /* AudioPlayer+NetworkEvent.swift in Sources */,
 				4631A0321CA7D6F300202AA3 /* MPNowPlayingInfoCenter+AudioItem.swift in Sources */,
