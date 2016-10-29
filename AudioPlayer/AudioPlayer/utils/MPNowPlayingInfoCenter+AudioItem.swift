@@ -26,11 +26,9 @@ extension MPNowPlayingInfoCenter {
         if let trackNumber = item.trackNumber {
             info[MPMediaItemPropertyAlbumTrackNumber] = trackNumber
         }
-        #if os(iOS)
-            if let artwork = item.artworkImage {
-                info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(image: artwork)
-            }
-        #endif
+        if let artwork = item.artworkImage {
+            info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(image: artwork)
+        }
         if let duration = duration {
             info[MPMediaItemPropertyPlaybackDuration] = duration
         }
