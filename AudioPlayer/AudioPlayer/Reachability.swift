@@ -88,14 +88,15 @@ class Reachability: NSObject {
         if notifierRunning {
             return true
         }
+        guard let reachabilityRef = reachabilityRef else { return false }
 
         var context = SCNetworkReachabilityContext(version: 0, info: nil, retain: nil, release: nil,
                                                    copyDescription: nil)
         context.info = UnsafeMutableRawPointer(
             Unmanaged<Reachability>.passUnretained(self).toOpaque())
 
-        if SCNetworkReachabilitySetCallback(reachabilityRef!, callback, &context) {
-            if SCNetworkReachabilitySetDispatchQueue(reachabilityRef!, reachabilitySerialQueue) {
+        if SCNetworkReachabilitySetCallback(reachabilityRef, callback, &context) {
+            if SCNetworkReachabilitySetDispatchQueue(reachabilityRef, reachabilitySerialQueue) {
                 notifierRunning = true
                 return true
             }

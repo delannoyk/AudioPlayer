@@ -105,6 +105,7 @@ open class AudioItem: NSObject {
 
     /// Returns the highest quality URL found or nil if no URLs are available
     open var highestQualityURL: AudioItemURL {
+        //swiftlint:disable force_unwrapping
         return (AudioItemURL(quality: .high, url: soundURLs[.high]) ??
             AudioItemURL(quality: .medium, url: soundURLs[.medium]) ??
             AudioItemURL(quality: .low, url: soundURLs[.low]))!
@@ -112,6 +113,7 @@ open class AudioItem: NSObject {
 
     /// Returns the medium quality URL found or nil if no URLs are available
     open var mediumQualityURL: AudioItemURL {
+        //swiftlint:disable force_unwrapping
         return (AudioItemURL(quality: .medium, url: soundURLs[.medium]) ??
             AudioItemURL(quality: .low, url: soundURLs[.low]) ??
             AudioItemURL(quality: .high, url: soundURLs[.high]))!
@@ -119,6 +121,7 @@ open class AudioItem: NSObject {
 
     /// Returns the lowest quality URL found or nil if no URLs are available
     open var lowestQualityURL: AudioItemURL {
+        //swiftlint:disable force_unwrapping
         return (AudioItemURL(quality: .low, url: soundURLs[.low]) ??
             AudioItemURL(quality: .medium, url: soundURLs[.medium]) ??
             AudioItemURL(quality: .high, url: soundURLs[.high]))!

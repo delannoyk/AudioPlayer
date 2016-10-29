@@ -11,8 +11,6 @@ import AVFoundation
     import MediaPlayer
 #endif
 
-// MARK: - AudioPlayer
-
 /**
  An `AudioPlayer` instance is used to play `AudioPlayerItem`. It's an easy to use
  AVPlayer with simple methods to handle the whole playing audio process.
@@ -357,10 +355,9 @@ public class AudioPlayer: NSObject {
 
     /// Boolean value indicating whether the player should resume playing (after buffering)
     var shouldResumePlaying: Bool {
-        return !pausedForInterruption &&
-            !state.isPaused &&
-            (stateWhenConnectionLost == nil || !stateWhenConnectionLost!.isPaused) &&
-            (stateBeforeBuffering == nil || !stateBeforeBuffering!.isPaused)
+        return !pausedForInterruption && !state.isPaused &&
+            (stateWhenConnectionLost.map { !$0.isPaused } ?? true) &&
+            (stateBeforeBuffering.map { !$0.isPaused } ?? true)
     }
 
     // MARK: Retrying
