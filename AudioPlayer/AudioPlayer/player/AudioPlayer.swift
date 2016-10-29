@@ -12,8 +12,8 @@ import AVFoundation
 #endif
 
 /**
- An `AudioPlayer` instance is used to play `AudioPlayerItem`. It's an easy to use
- AVPlayer with simple methods to handle the whole playing audio process.
+ An `AudioPlayer` instance is used to play `AudioPlayerItem`. It's an easy to use AVPlayer with simple methods
+ to handle the whole playing audio process.
 
  You can get events (such as state change or time observation) by registering a delegate.
  */
@@ -125,20 +125,19 @@ public class AudioPlayer: NSObject {
     /// The delegate that will be called upon events.
     public weak var delegate: AudioPlayerDelegate?
 
-    /// Defines the maximum to wait after a connection loss before putting the player to Stopped
-    /// mode and cancelling the resume. Default value is 60 seconds.
+    /// Defines the maximum to wait after a connection loss before putting the player to Stopped mode and cancelling
+    /// the resume. Default value is 60 seconds.
     public var maximumConnectionLossTime = TimeInterval(60)
 
-    /// Defines whether the player should automatically adjust sound quality based on the number of
-    /// interruption before a delay and the maximum number of interruption whithin this delay.
-    /// Default value is `true`.
+    /// Defines whether the player should automatically adjust sound quality based on the number of interruption before
+    /// a delay and the maximum number of interruption whithin this delay. Default value is `true`.
     public var adjustQualityAutomatically = true
 
     /// Defines the default quality used to play. Default value is `.medium`
     public var defaultQuality = AudioQuality.medium
 
-    /// Defines the delay within which the player wait for an interruption before upgrading the
-    /// quality. Default value is 10minutes.
+    /// Defines the delay within which the player wait for an interruption before upgrading the quality. Default value
+    /// is 10 minutes.
     public var adjustQualityTimeInternal: TimeInterval {
         get {
             return qualityAdjustmentEventProducer.adjustQualityTimeInternal
@@ -148,8 +147,8 @@ public class AudioPlayer: NSObject {
         }
     }
 
-    /// Defines the maximum number of interruption to have within the `adjustQualityTimeInterval`
-    /// delay before downgrading the quality. Default value is 5.
+    /// Defines the maximum number of interruption to have within the `adjustQualityTimeInterval` delay before
+    /// downgrading the quality. Default value is 5.
     public var adjustQualityAfterInterruptionCount: Int {
         get {
             return qualityAdjustmentEventProducer.adjustQualityAfterInterruptionCount
@@ -159,8 +158,7 @@ public class AudioPlayer: NSObject {
         }
     }
 
-    /// The maximum number of interruption before putting the player to Stopped mode. Default
-    /// value is 10.
+    /// The maximum number of interruption before putting the player to Stopped mode. Default value is 10.
     public var maximumRetryCount: Int {
         get {
             return retryEventProducer.maximumRetryCount
@@ -180,12 +178,10 @@ public class AudioPlayer: NSObject {
         }
     }
 
-    /// Defines whether the player should resume after a system interruption or not. Default value
-    /// is `true`.
+    /// Defines whether the player should resume after a system interruption or not. Default value is `true`.
     public var resumeAfterInterruption = true
 
-    /// Defines whether the player should resume after a connection loss or not. Default value
-    /// is `true`.
+    /// Defines whether the player should resume after a connection loss or not. Default value is `true`.
     public var resumeAfterConnectionLoss = true
 
     /// Defines the mode of the player. Default is `.Normal`.
@@ -250,8 +246,8 @@ public class AudioPlayer: NSObject {
         }
     }
 
-    /// Defines the rate behavior of the player when the backward/forward buttons are pressed.
-    /// Default value is `multiplyRate(2)`.
+    /// Defines the rate behavior of the player when the backward/forward buttons are pressed. Default value
+    /// is `multiplyRate(2)`.
     public var seekingBehavior = SeekingBehavior.multiplyRate(2) {
         didSet {
             if case .changeTime(let timerInterval, _) = seekingBehavior {
@@ -284,16 +280,14 @@ public class AudioPlayer: NSObject {
 
     // MARK: Private properties
 
-    /// A boolean value indicating whether the player has been paused because of a system
-    /// interruption.
+    /// A boolean value indicating whether the player has been paused because of a system interruption.
     var pausedForInterruption = false
 
-    /// A boolean value indicating if quality is being changed. It's necessary for the interruption
-    /// count to not be incremented while new quality is buffering.
+    /// A boolean value indicating if quality is being changed. It's necessary for the interruption count to not be
+    /// incremented while new quality is buffering.
     var qualityIsBeingChanged = false
 
-    /// The state before the player went into .Buffering. It helps to know whether to restart or not
-    /// the player.
+    /// The state before the player went into .Buffering. It helps to know whether to restart or not the player.
     var stateBeforeBuffering: AudioPlayerState?
 
     /// The state of the player when the connection was lost
@@ -315,8 +309,7 @@ public class AudioPlayer: NSObject {
     }
 
     /**
-     Deinitializes the AudioPlayer. On deinit, the player will simply stop playing anything
-     it was previously playing.
+     Deinitializes the AudioPlayer. On deinit, the player will simply stop playing anything it was previously playing.
      */
     deinit {
         stop()
@@ -363,8 +356,8 @@ public class AudioPlayer: NSObject {
     // MARK: Retrying
 
     /**
-     This will retry to play current item and seek back at the correct position if possible
-     (or enabled). If not, it'll just play the next item in queue.
+     This will retry to play current item and seek back at the correct position if possible (or enabled). If not, it'll
+     just play the next item in queue.
      */
     func retryOrPlayNext() {
         guard !state.isPlaying else {
