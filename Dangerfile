@@ -15,3 +15,10 @@ end
 
 # Run SwiftLint
 swiftlint.lint_files
+
+# Asserts the test coverage meets the threshold
+xcov.report(
+   scheme: 'AudioPlayer iOS',
+   project: 'AudioPlayer/AudioPlayer.xcodeproj',
+   minimum_coverage_percentage: 50
+)
