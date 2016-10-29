@@ -90,8 +90,7 @@ class QualityAdjustmentEventProducer_Tests: XCTestCase {
         }
 
         producer.adjustQualityTimeInternal = 5
-        let delay = DispatchTime(uptimeNanoseconds: UInt64(0.2 * Double(NSEC_PER_SEC)))
-        DispatchQueue.main.asyncAfter(deadline: delay) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(200)) {
             self.producer.adjustQualityTimeInternal = 1
         }
 

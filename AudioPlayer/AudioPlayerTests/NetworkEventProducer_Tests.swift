@@ -55,8 +55,7 @@ class NetworkEventProducer_Tests: XCTestCase {
         reachability.reachabilityStatus = reachability.currentReachabilityStatus
 
         let e = expectation(description: "Waiting for `onEvent` to get called")
-        let delay = DispatchTime(uptimeNanoseconds: UInt64(0.2 * Double(NSEC_PER_SEC)))
-        DispatchQueue.main.asyncAfter(deadline: delay) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(200)) {
             e.fulfill()
         }
 
