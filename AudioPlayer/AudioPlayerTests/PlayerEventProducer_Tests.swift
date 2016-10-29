@@ -172,6 +172,7 @@ class PlayerEventProducer_Tests: XCTestCase {
 
         item.dur = CMTime(timeInterval: 10)
         XCTAssertEqual(item.dur.ap_timeIntervalValue, 10)
+        XCTAssertNil(CMTime(value: 0, timescale: 1, flags: [], epoch: 0).ap_timeIntervalValue)
 
         waitForExpectations(timeout: 1) { e in
             if let _ = e {

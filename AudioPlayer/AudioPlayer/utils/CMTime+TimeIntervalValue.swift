@@ -21,9 +21,11 @@ extension CMTime {
     //swiftlint:disable variable_name
     /// Returns the TimerInterval value of CMTime (only if it's a valid value).
     var ap_timeIntervalValue: TimeInterval? {
-        let seconds = CMTimeGetSeconds(self)
-        if !seconds.isNaN {
-            return TimeInterval(seconds)
+        if flags.contains(.valid) {
+            let seconds = CMTimeGetSeconds(self)
+            if !seconds.isNaN {
+                return TimeInterval(seconds)
+            }
         }
         return nil
     }
