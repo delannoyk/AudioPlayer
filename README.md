@@ -83,7 +83,6 @@ override func remoteControlReceivedWithEvent(event: UIEvent?) {
 
 ## Todo list
 
-* Add Danger for future PR
 * Add a fully working example project
 * Integrate with SPM
 * Add more unit tests
