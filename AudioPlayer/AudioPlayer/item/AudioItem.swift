@@ -34,9 +34,17 @@ public enum AudioQuality: Int {
 
 /// `AudioItemURL` contains information about an Item URL such as its quality.
 public struct AudioItemURL {
+    /// The quality of the stream.
     public let quality: AudioQuality
+
+    /// The url of the stream.
     public let url: URL
 
+    /// Initializes an AudioItemURL.
+    ///
+    /// - Parameters:
+    ///   - quality: The quality of the stream.
+    ///   - url: The url of the stream.
     public init?(quality: AudioQuality, url: URL?) {
         guard let url = url else { return nil }
 
@@ -51,7 +59,7 @@ public struct AudioItemURL {
 ///
 /// URLs can be remote or local.
 open class AudioItem: NSObject {
-    /// Returns the available qualities
+    /// Returns the available qualities.
     public let soundURLs: [AudioQuality: URL]
 
     // MARK: Initialization

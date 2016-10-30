@@ -71,7 +71,7 @@ class QualityAdjustmentEventProducer: NSObject, EventProducer {
         }
     }
 
-    /// Defines the maximum number of interruption to have within the `adjustQualityTimeInterval` delay before 
+    /// Defines the maximum number of interruption to have within the `adjustQualityTimeInterval` delay before
     /// downgrading the quality. Default value is 5.
     var adjustQualityAfterInterruptionCount = 5 {
         didSet {
@@ -124,7 +124,7 @@ class QualityAdjustmentEventProducer: NSObject, EventProducer {
             repeats: false)
     }
 
-    /// Checks that the interruption count is lower than `adjustQualityAfterInterruptionCount`. If it isn't, the 
+    /// Checks that the interruption count is lower than `adjustQualityAfterInterruptionCount`. If it isn't, the
     /// function generates an event and reset its state.
     private func checkInterruptionCount() {
         if interruptionCount >= adjustQualityAfterInterruptionCount && listening {

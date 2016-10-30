@@ -181,7 +181,7 @@ class PlayerEventProducer: NSObject, EventProducer {
     ///   - object: The source object of the key path `keyPath`.
     ///   - change: A dictionary that describes the changes that have been made to the value of the property at the key
     ///         path `keyPath` relative to `object`. Entries are described in Change Dictionary Keys.
-    ///   - context: The value that was provided when the receiver was registered to receive key-value observation 
+    ///   - context: The value that was provided when the receiver was registered to receive key-value observation
     ///         notifications.
     override func observeValue(forKeyPath keyPath: String?,
                                of object: Any?,
