@@ -7,6 +7,11 @@
 //
 
 extension AudioPlayer {
+    /// Handles player events.
+    ///
+    /// - Parameters:
+    ///   - producer: The event producer that generated the player event.
+    ///   - event: The player event.
     func handlePlayerEvent(from producer: EventProducer, with event: PlayerEventProducer.PlayerEvent) {
         switch event {
         case .endedPlaying(let error):

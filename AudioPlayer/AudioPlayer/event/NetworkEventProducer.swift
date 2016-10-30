@@ -14,17 +14,13 @@ private extension Selector {
         #selector(NetworkEventProducer.reachabilityStatusChanged(note:))
 }
 
-/**
- *  A `NetworkEventProducer` generates `NetworkEvent`s when there is changes on the network.
- */
+/// A `NetworkEventProducer` generates `NetworkEvent`s when there is changes on the network.
 class NetworkEventProducer: NSObject, EventProducer {
-    /**
-     A `NetworkEvent` is an event a network monitor
-
-     - networkChanged:           The network changed.
-     - connectionRetrieved:      The connection is now up.
-     - connectionLost:           The connection has been lost.
-     */
+    /// A `NetworkEvent` is an event a network monitor.
+    ///
+    /// - networkChanged: The network changed.
+    /// - connectionRetrieved: The connection is now up.
+    /// - connectionLost: The connection has been lost.
     enum NetworkEvent: Event {
         case networkChanged
         case connectionRetrieved
@@ -46,11 +42,9 @@ class NetworkEventProducer: NSObject, EventProducer {
     /// The last status received.
     private var lastStatus: Reachability.NetworkStatus
 
-    /**
-     Initializes a `NetworkEventProducer` with a reachability.
-
-     - parameter reachability: The reachability to work with.
-     */
+    /// Initializes a `NetworkEventProducer` with a reachability.
+    ///
+    /// - Parameter reachability: The reachability to work with.
     init(reachability: Reachability) {
         lastStatus = reachability.currentReachabilityStatus
         self.reachability = reachability
@@ -60,16 +54,12 @@ class NetworkEventProducer: NSObject, EventProducer {
         }
     }
 
-    /**
-     Stops producing events on deinitialization.
-     */
+    /// Stops producing events on deinitialization.
     deinit {
         stopProducingEvents()
     }
 
-    /**
-     Starts listening to the player events.
-     */
+    /// Starts listening to the player events.
     func startProducingEvents() {
         guard !listening else {
             return
@@ -90,9 +80,7 @@ class NetworkEventProducer: NSObject, EventProducer {
         listening = true
     }
 
-    /**
-     Stops listening to the player events.
-     */
+    /// Stops listening to the player events.
     func stopProducingEvents() {
         guard listening else {
             return
@@ -107,11 +95,9 @@ class NetworkEventProducer: NSObject, EventProducer {
         listening = false
     }
 
-    /**
-     The method that will be called when Reachability generates an event.
-
-     - parameter note: The sender information.
-     */
+    /// The method that will be called when Reachability generates an event.
+    ///
+    /// - Parameter note: The notification information.
     @objc fileprivate func reachabilityStatusChanged(note: NSNotification) {
         let newStatus = reachability.currentReachabilityStatus
         if newStatus != lastStatus {

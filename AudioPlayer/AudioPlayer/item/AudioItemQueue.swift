@@ -11,11 +11,9 @@ import Foundation
 // MARK: - Array+Shuffe
 
 private extension Array {
-    /**
-     Shuffles the element in the array and returns the new array.
-
-     - returns: A shuffled array.
-     */
+    /// Shuffles the element in the array and returns the new array.
+    ///
+    /// - Returns: A shuffled array.
     func ap_shuffled() -> [Element] {
         return sorted { element1, element2 in
             arc4random() % 2 == 0
@@ -25,9 +23,7 @@ private extension Array {
 
 // MARK: - AudioItemQueue
 
-/**
- *  `AudioItemQueue` handles queueing items with a playing mode.
- */
+/// `AudioItemQueue` handles queueing items with a playing mode.
 class AudioItemQueue {
     /// The original items, keeping the same order.
     private(set) var items: [AudioItem]
@@ -48,12 +44,11 @@ class AudioItemQueue {
         }
     }
 
-    /**
-     Initializes a queue with a list of items and the mode.
-
-     - parameter items: The list of items to play.
-     - parameter mode:  The mode to play items with.
-     */
+    /// Initializes a queue with a list of items and the mode.
+    ///
+    /// - Parameters:
+    ///   - items: The list of items to play.
+    ///   - mode: The mode to play items with.
     init(items: [AudioItem], mode: AudioPlayerMode) {
         self.items = items
         self.mode = mode
@@ -61,20 +56,19 @@ class AudioItemQueue {
         historic = []
     }
 
-    /**
-     Adapts the queue to the new mode.
-     Behaviour is:
-     - `oldMode` contains .Repeat, `mode` doesn't and last item played == nextItem, we increment
-     position.
-     - `oldMode` contains .Shuffle, `mode` doesnt. We should set the queue to `items` and set
-     current position to the current item index in the new queue.
-     - `mode` contains .Shuffle, `oldMode` doesn't. We should shuffle the leftover items in queue.
-     Also, the items already played should also be shuffled. Current implementation has a
-     limitation which is that the "already played items" will be shuffled at the begining of
-     the queue while the leftovers will be shuffled at the end of the array.
-
-     - parameter oldMode: The mode before it changed.
-     */
+    /// Adapts the queue to the new mode.
+    ///
+    /// Behaviour is:
+    /// - `oldMode` contains .Repeat, `mode` doesn't and last item played == nextItem, we increment position.
+    /// - `oldMode` contains .Shuffle, `mode` doesnt. We should set the queue to `items` and set current position to the
+    ///     current item index in the new queue.
+    /// - `mode` contains .Shuffle, `oldMode` doesn't. We should shuffle the leftover items in queue.
+    ///
+    /// Also, the items already played should also be shuffled. Current implementation has a limitation which is that
+    /// the "already played items" will be shuffled at the begining of the queue while the leftovers will be shuffled at
+    /// the end of the array.
+    ///
+    /// - Parameter oldMode: The mode before it changed.
     private func adaptQueue(oldMode: AudioPlayerMode) {
         //Early exit if queue is empty
         guard queue.count > nextPosition else {
@@ -97,11 +91,9 @@ class AudioItemQueue {
         }
     }
 
-    /**
-     Returns the next item in the queue.
-
-     - returns: The next item in the queue.
-     */
+    /// Returns the next item in the queue.
+    ///
+    /// - Returns: The next item in the queue.
     func nextItem() -> AudioItem? {
         //Early exit if queue is empty
         guard !queue.isEmpty else {
@@ -133,11 +125,9 @@ class AudioItemQueue {
         return false
     }
 
-    /**
-     Returns the previous item in the queue.
-
-     - returns: The previous item in the queue.
-     */
+    /// Returns the previous item in the queue.
+    ///
+    /// - Returns: The previous item in the queue.
     func previousItem() -> AudioItem? {
         //Early exit if queue is empty
         guard !queue.isEmpty else {
@@ -168,21 +158,17 @@ class AudioItemQueue {
         return false
     }
 
-    /**
-     Adds a list of items to the queue.
-
-     - parameter items: The items to add to the queue.
-     */
+    /// Adds a list of items to the queue.
+    ///
+    /// - Parameter items: The items to add to the queue.
     func add(items: [AudioItem]) {
         self.items.append(contentsOf: items)
         self.queue.append(contentsOf: items)
     }
 
-    /**
-     Removes an item from the queue.
-
-     - parameter index: The index of the item to remove.
-     */
+    /// Removes an item from the queue.
+    ///
+    /// - Parameter index: The index of the item to remove.
     func remove(at index: Int) {
         let item = queue.remove(at: index)
         if let index = items.index(of: item) {

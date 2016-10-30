@@ -9,11 +9,9 @@
 import CoreMedia
 
 extension CMTime {
-    /**
-     Initializes a `CMTime` instance from a time interval.
-
-     - parameter timeInterval: The time in seconds.
-     */
+    /// Initializes a `CMTime` instance from a time interval.
+    ///
+    /// - Parameter timeInterval: The time in seconds.
     init(timeInterval: TimeInterval) {
         self.init(seconds: timeInterval, preferredTimescale: 1000000000)
     }

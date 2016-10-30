@@ -11,12 +11,10 @@ import AVFoundation
     import MediaPlayer
 #endif
 
-/**
- An `AudioPlayer` instance is used to play `AudioPlayerItem`. It's an easy to use AVPlayer with simple methods
- to handle the whole playing audio process.
-
- You can get events (such as state change or time observation) by registering a delegate.
- */
+/// An `AudioPlayer` instance is used to play `AudioPlayerItem`. It's an easy to use AVPlayer with simple methods to
+/// handle the whole playing audio process.
+///
+/// You can get events (such as state change or time observation) by registering a delegate.
 public class AudioPlayer: NSObject {
     // MARK: Handlers
 
@@ -295,9 +293,7 @@ public class AudioPlayer: NSObject {
 
     // MARK: Initialization
 
-    /**
-     Initializes a new AudioPlayer.
-     */
+    /// Initializes a new AudioPlayer.
     public override init() {
         currentQuality = defaultQuality
         super.init()
@@ -308,18 +304,15 @@ public class AudioPlayer: NSObject {
         qualityAdjustmentEventProducer.eventListener = self
     }
 
-    /**
-     Deinitializes the AudioPlayer. On deinit, the player will simply stop playing anything it was previously playing.
-     */
+    /// Deinitializes the AudioPlayer. On deinit, the player will simply stop playing anything it was previously
+    /// playing.
     deinit {
         stop()
     }
 
     // MARK: Utility methods
 
-    /**
-     Updates the MPNowPlayingInfoCenter with current item's info.
-     */
+    /// Updates the MPNowPlayingInfoCenter with current item's info.
     func updateNowPlayingInfoCenter() {
         #if os(iOS) || os(tvOS)
             if let item = currentItem {
@@ -334,9 +327,9 @@ public class AudioPlayer: NSObject {
         #endif
     }
 
-    /**
-     Activates the `AVAudioSession` and sets the right category.
-     */
+    /// Enables or disables the `AVAudioSession` and sets the right category.
+    ///
+    /// - Parameter active: A boolean value indicating whether the audio session should be set to active or not.
     func setAudioSession(active: Bool) {
         #if os(iOS) || os(tvOS)
             _ = try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
@@ -355,10 +348,8 @@ public class AudioPlayer: NSObject {
 
     // MARK: Retrying
 
-    /**
-     This will retry to play current item and seek back at the correct position if possible (or enabled). If not, it'll
-     just play the next item in queue.
-     */
+    /// This will retry to play current item and seek back at the correct position if possible (or enabled). If not,
+    /// it'll just play the next item in queue.
     func retryOrPlayNext() {
         guard !state.isPlaying else {
             retryEventProducer.stopProducingEvents()
@@ -377,6 +368,12 @@ public class AudioPlayer: NSObject {
 }
 
 extension AudioPlayer: EventListener {
+    /// The implementation of `EventListener`. It handles network events, player events, audio item events, quality
+    /// adjustment events, retry events and seek events.
+    ///
+    /// - Parameters:
+    ///   - event: The event.
+    ///   - eventProducer: The producer of the event.
     func onEvent(_ event: Event, generetedBy eventProducer: EventProducer) {
         if let event = event as? NetworkEventProducer.NetworkEvent {
             handleNetworkEvent(from: eventProducer, with: event)

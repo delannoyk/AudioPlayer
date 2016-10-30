@@ -9,6 +9,13 @@
 import MediaPlayer
 
 extension MPNowPlayingInfoCenter {
+    /// Updates the MPNowPlayingInfoCenter with the latest information on a `AudioItem`.
+    ///
+    /// - Parameters:
+    ///   - item: The item that is currently played.
+    ///   - duration: The item's duration.
+    ///   - progression: The current progression.
+    ///   - playbackRate: The current playback rate.
     func ap_update(with item: AudioItem, duration: TimeInterval?, progression: TimeInterval?, playbackRate: Float) {
         var info = [String: Any]()
         if let title = item.title {

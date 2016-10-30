@@ -9,6 +9,11 @@
 import Foundation
 
 extension AudioPlayer {
+    /// Handles seek events.
+    ///
+    /// - Parameters:
+    ///   - producer: The event producer that generated the seek event.
+    ///   - event: The seek event.
     func handleSeekEvent(from producer: EventProducer, with event: SeekEventProducer.SeekEvent) {
         guard let currentItemProgression = currentItemProgression,
             case .changeTime(_, let delta) = seekingBehavior else { return }

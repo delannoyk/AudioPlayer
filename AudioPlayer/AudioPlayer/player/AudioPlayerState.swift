@@ -8,27 +8,23 @@
 
 import Foundation
 
-/**
- The possible errors an `AudioPlayer` can fail with.
-
- - MaximumRetryCountHit: The player hit the maximum retry count.
- - FoundationError:      The `AVPlayer` failed to play.
- */
+/// The possible errors an `AudioPlayer` can fail with.
+///
+/// - maximumRetryCountHit: The player hit the maximum retry count.
+/// - foundationError: The `AVPlayer` failed to play.
 public enum AudioPlayerError: Error {
     case maximumRetryCountHit
     case foundationError(Error)
 }
 
-/**
- `AudioPlayerState` defines 4 state an `AudioPlayer` instance can be in.
-
- - `buffering`:            The player is buffering data before playing them.
- - `playing`:              The player is playing.
- - `paused`:               The player is paused.
- - `stopped`:              The player is stopped.
- - `waitingForConnection`: The player is waiting for internet connection.
- - `failed`:               An error occured. It contains AVPlayer's error if any.
- */
+/// `AudioPlayerState` defines 4 state an `AudioPlayer` instance can be in.
+///
+/// - buffering: The player is buffering data before playing them.
+/// - playing: The player is playing.
+/// - paused: The player is paused.
+/// - stopped: The player is stopped.
+/// - waitingForConnection: The player is waiting for internet connection.
+/// - failed: An error occured. It contains AVPlayer's error if any.
 public enum AudioPlayerState {
     case buffering
     case playing
@@ -37,6 +33,7 @@ public enum AudioPlayerState {
     case waitingForConnection
     case failed(AudioPlayerError)
 
+    /// A boolean value indicating is self = `buffering`.
     var isBuffering: Bool {
         if case .buffering = self {
             return true
@@ -44,6 +41,7 @@ public enum AudioPlayerState {
         return false
     }
 
+    /// A boolean value indicating is self = `playing`.
     var isPlaying: Bool {
         if case .playing = self {
             return true
@@ -51,6 +49,7 @@ public enum AudioPlayerState {
         return false
     }
 
+    /// A boolean value indicating is self = `paused`.
     var isPaused: Bool {
         if case .paused = self {
             return true
@@ -58,6 +57,7 @@ public enum AudioPlayerState {
         return false
     }
 
+    /// A boolean value indicating is self = `stopped`.
     var isStopped: Bool {
         if case .stopped = self {
             return true
@@ -65,6 +65,7 @@ public enum AudioPlayerState {
         return false
     }
 
+    /// A boolean value indicating is self = `waitingForConnection`.
     var isWaitingForConnection: Bool {
         if case .waitingForConnection = self {
             return true
@@ -72,6 +73,7 @@ public enum AudioPlayerState {
         return false
     }
 
+    /// A boolean value indicating is self = `failed`.
     var isFailed: Bool {
         if case .failed = self {
             return true
@@ -79,6 +81,7 @@ public enum AudioPlayerState {
         return false
     }
 
+    /// The error if self = `failed`.
     var error: AudioPlayerError? {
         if case .failed(let error) = self {
             return error

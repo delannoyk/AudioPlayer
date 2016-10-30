@@ -9,6 +9,11 @@
 import Foundation
 
 extension AudioPlayer {
+    /// Handles retry events.
+    ///
+    /// - Parameters:
+    ///   - producer: The event producer that generated the retry event.
+    ///   - event: The retry event.
     func handleRetryEvent(from producer: EventProducer, with event: RetryEventProducer.RetryEvent) {
         switch event {
         case .retryAvailable:

@@ -8,19 +8,15 @@
 
 import Foundation
 
-/**
- Represents the mode in which the player should play. Modes can be used as masks
- so that you can play in `.Shuffle` mode and still `.RepeatAll`.
- */
+/// Represents the mode in which the player should play. Modes can be used as masks so that you can play in `.shuffle`
+/// mode and still `.repeatAll`.
 public struct AudioPlayerMode: OptionSet {
     /// The raw value describing the mode.
     public let rawValue: UInt
 
-    /**
-     Initializes an `AudioPlayerMode` from a `rawValue`.
-
-     - parameter rawValue: The raw value describing the mode.
-     */
+    /// Initializes an `AudioPlayerMode` from a `rawValue`.
+    ///
+    /// - Parameter rawValue: The raw value describing the mode.
     public init(rawValue: UInt) {
         self.rawValue = rawValue
     }

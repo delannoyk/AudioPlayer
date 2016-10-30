@@ -7,6 +7,11 @@
 //
 
 extension AudioPlayer {
+    /// Handles network events.
+    ///
+    /// - Parameters:
+    ///   - producer: The event producer that generated the network event.
+    ///   - event: The network event.
     func handleNetworkEvent(from producer: EventProducer, with event: NetworkEventProducer.NetworkEvent) {
         switch event {
         case .connectionLost:

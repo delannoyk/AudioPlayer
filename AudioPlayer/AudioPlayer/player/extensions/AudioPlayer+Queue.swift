@@ -27,21 +27,18 @@ extension AudioPlayer {
         return queue?.hasPreviousItem ?? false
     }
 
-    /**
-     Plays an item.
-
-     - parameter item: The item to play.
-     */
+    /// Plays an item.
+    ///
+    /// - Parameter item: The item to play.
     public func play(item: AudioItem) {
         play(items: [item])
     }
 
-    /**
-     Creates a queue according to the current mode and plays it.
-
-     - parameter items: The items to play.
-     - parameter index: The index to start the player with.
-     */
+    /// Creates a queue according to the current mode and plays it.
+    ///
+    /// - Parameters:
+    ///   - items: The items to play.
+    ///   - index: The index to start the player with.
     public func play(items: [AudioItem], startAtIndex index: Int = 0) {
         if !items.isEmpty {
             queue = AudioItemQueue(items: items, mode: mode)
@@ -55,22 +52,18 @@ extension AudioPlayer {
         }
     }
 
-    /**
-     Adds an item at the end of the queue. If queue is empty and player isn't
-     playing, the behaviour will be similar to `play(item:)`.
-
-     - parameter item: The item to add.
-     */
+    /// Adds an item at the end of the queue. If queue is empty and player isn't playing, the behaviour will be similar
+    /// to `play(item:)`.
+    ///
+    /// - Parameter item: The item to add.
     public func add(item: AudioItem) {
         add(items: [item])
     }
 
-    /**
-     Adds items at the end of the queue. If the queue is empty and player isn't
-     playing, the behaviour will be similar to `play(items:)`.
-
-     - parameter items: The items to add.
-     */
+    /// Adds items at the end of the queue. If the queue is empty and player isn't playing, the behaviour will be
+    /// similar to `play(items:)`.
+    ///
+    /// - Parameter items: The items to add.
     public func add(items: [AudioItem]) {
         if let queue = queue {
             queue.add(items: items)
@@ -79,11 +72,9 @@ extension AudioPlayer {
         }
     }
 
-    /**
-     Removes an item at a specific index in the queue.
-
-     - parameter index: The index of the item to remove.
-     */
+    /// Removes an item at a specific index in the queue.
+    ///
+    /// - Parameter index: The index of the item to remove.
     public func removeItem(at index: Int) {
         queue?.remove(at: index)
     }

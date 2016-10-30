@@ -9,6 +9,11 @@
 import AVFoundation
 
 extension AudioPlayer {
+    /// Handles quality adjustment events.
+    ///
+    /// - Parameters:
+    ///   - producer: The event producer that generated the quality adjustment event.
+    ///   - event: The quality adjustment event.
     func handleQualityEvent(from producer: EventProducer,
                             with event: QualityAdjustmentEventProducer.QualityAdjustmentEvent) {
         //Early exit if user doesn't want to adjust quality
@@ -31,6 +36,9 @@ extension AudioPlayer {
         }
     }
 
+    /// Changes quality of the stream if possible.
+    ///
+    /// - Parameter newQuality: The new quality.
     private func changeQuality(to newQuality: AudioQuality) {
         guard let url = currentItem?.soundURLs[newQuality] else {
             return

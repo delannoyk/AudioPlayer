@@ -12,9 +12,7 @@ import CoreMedia
 #endif
 
 extension AudioPlayer {
-    /**
-     Resume the player.
-     */
+    /// Resumes the player.
     public func resume() {
         player?.rate = rate
 
@@ -27,9 +25,7 @@ extension AudioPlayer {
         retryEventProducer.startProducingEvents()
     }
 
-    /**
-     Pauses the player.
-     */
+    /// Pauses the player.
     public func pause() {
         //We ensure the player actually pauses
         player?.rate = 0
@@ -43,9 +39,7 @@ extension AudioPlayer {
         backgroundHandler.beginBackgroundTask()
     }
 
-    /**
-     Plays previous item in the queue or rewind current item.
-     */
+    /// Plays previous item in the queue or rewind current item.
     public func previous() {
         if hasPrevious {
             currentItem = queue?.previousItem()
@@ -54,18 +48,14 @@ extension AudioPlayer {
         }
     }
 
-    /**
-     Plays next item in the queue.
-     */
+    /// Plays next item in the queue.
     public func next() {
         if hasNext {
             currentItem = queue?.nextItem()
         }
     }
 
-    /**
-     Plays the next item in the queue and if there isn't, the player will stop.
-     */
+    /// Plays the next item in the queue and if there isn't, the player will stop.
     public func nextOrStop() {
         if hasNext {
             next()
@@ -74,9 +64,7 @@ extension AudioPlayer {
         }
     }
 
-    /**
-     Stops the player and clear the queue.
-     */
+    /// Stops the player and clear the queue.
     public func stop() {
         retryEventProducer.stopProducingEvents()
 
@@ -95,15 +83,14 @@ extension AudioPlayer {
         state = .stopped
     }
 
-    /**
-     Seeks to a specific time.
-
-     - parameter time:                              The time to seek to.
-     - parameter byAdaptingTimeToFitSeekableRanges: A boolean value indicating whether the time
-     should be adapted to current seekable ranges in order to be bufferless.
-     - parameter toleranceBefore:                   The tolerance allowed before time.
-     - parameter toleranceAfter:                    The tolerance allowed after time.
-     */
+    /// Seeks to a specific time.
+    ///
+    /// - Parameters:
+    ///   - time: The time to seek to.
+    ///   - byAdaptingTimeToFitSeekableRanges: A boolean value indicating whether the time should be adapted to current
+    ///         seekable ranges in order to be bufferless.
+    ///   - toleranceBefore: The tolerance allowed before time.
+    ///   - toleranceAfter: The tolerance allowed after time.
     public func seek(to time: TimeInterval,
                      byAdaptingTimeToFitSeekableRanges: Bool = false,
                      toleranceBefore: CMTime = kCMTimePositiveInfinity,
@@ -136,11 +123,9 @@ extension AudioPlayer {
         }
     }
 
-    /**
-     Seeks backwards as far as possible.
-
-     - parameter padding: The padding to apply if any.
-     */
+    /// Seeks backwards as far as possible.
+    ///
+    /// - Parameter padding: The padding to apply if any.
     public func seekToSeekableRangeStart(padding: TimeInterval) {
         if let range = currentItemSeekableRange {
             let position = min(range.latest, range.earliest + padding)
@@ -149,11 +134,9 @@ extension AudioPlayer {
         }
     }
 
-    /**
-     Seeks forward as far as possible.
-
-     - parameter padding: The padding to apply if any.
-     */
+    /// Seeks forward as far as possible.
+    ///
+    /// - Parameter padding: The padding to apply if any.
     public func seekToSeekableRangeEnd(padding: TimeInterval) {
         if let range = currentItemSeekableRange {
             let position = max(range.earliest, range.latest - padding)
@@ -164,11 +147,9 @@ extension AudioPlayer {
 
     #if os(iOS) || os(tvOS)
     //swiftlint:disable cyclomatic_complexity
-    /**
-     Handle events received from Control Center/Lock screen/Other in UIApplicationDelegate.
-
-     - parameter event: The event received.
-     */
+    /// Handle events received from Control Center/Lock screen/Other in UIApplicationDelegate.
+    ///
+    /// - Parameter event: The event received.
     public func remoteControlReceived(with event: UIEvent) {
         guard event.type == .remoteControl else {
             return
