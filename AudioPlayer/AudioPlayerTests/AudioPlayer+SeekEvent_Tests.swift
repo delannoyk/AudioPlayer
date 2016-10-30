@@ -84,4 +84,19 @@ class AudioPlayer_SeekEvent_Tests: XCTestCase {
             }
         }
     }
+
+    func testRateMultiplierIsAppliedUponSeeking() {
+        player.seekingBehavior = .multiplyRate(2)
+        player.rate = 1
+
+        player.seekingBehavior.handleSeekingStart(player: player, forward: false)
+        XCTAssertEqual(player.rate, -2)
+        player.seekingBehavior.handleSeekingEnd(player: player, forward: false)
+        XCTAssertEqual(player.rate, 1)
+
+        player.seekingBehavior.handleSeekingStart(player: player, forward: true)
+        XCTAssertEqual(player.rate, 2)
+        player.seekingBehavior.handleSeekingEnd(player: player, forward: true)
+        XCTAssertEqual(player.rate, 1)
+    }
 }
