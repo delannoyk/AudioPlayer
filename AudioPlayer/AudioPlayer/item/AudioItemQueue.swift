@@ -21,6 +21,20 @@ private extension Array {
     }
 }
 
+// MARK: - AudioItemQueueDelegate
+
+/// `AudioItemQueueDelegate` defines the behavior of `AudioItem` in certain circumstances and is notified upon notable 
+/// events.
+protocol AudioItemQueueDelegate: class {
+    /// Returns a boolean value indicating whether an item should be consider playable in the queue.
+    ///
+    /// - Parameters:
+    ///   - queue: The queue.
+    ///   - item: The item we ask the information for.
+    /// - Returns: A boolean value indicating whether an item should be consider playable in the queue.
+    func audioItemQueue(_ queue: AudioItemQueue, shouldConsiderItem item: AudioItem) -> Bool
+}
+
 // MARK: - AudioItemQueue
 
 /// `AudioItemQueue` handles queueing items with a playing mode.
@@ -43,6 +57,9 @@ class AudioItemQueue {
             adaptQueue(oldMode: oldValue)
         }
     }
+
+    /// The queue delegate.
+    weak var delegate: AudioItemQueueDelegate?
 
     /// Initializes a queue with a list of items and the mode.
     ///
