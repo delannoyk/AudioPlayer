@@ -200,4 +200,11 @@ class AudioItemQueue {
             items.remove(at: index)
         }
     }
+
+    /// Returns a boolean value indicating whether an item should be consider playable in the queue.
+    ///
+    /// - Returns: A boolean value indicating whether an item should be consider playable in the queue.
+    private func shouldConsiderItem(item: AudioItem) -> Bool {
+        return delegate?.audioItemQueue(self, shouldConsiderItem: item) ?? true
+    }
 }
