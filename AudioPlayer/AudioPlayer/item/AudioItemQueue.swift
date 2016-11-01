@@ -39,10 +39,10 @@ protocol AudioItemQueueDelegate: class {
 
 /// `AudioItemQueue` handles queueing items with a playing mode.
 class AudioItemQueue {
-    /// <#Description#>
+    /// The errors that can be thrown from `nextItem()` and `previousItem()`.
     ///
-    /// - currentItemConsideredUnplayable: <#currentItemConsideredUnplayable description#>
-    /// - noPlayableItemsInQueue: <#noPlayableItemsInQueue description#>
+    /// - currentItemConsideredUnplayable: The item that should be played is considered unplayable.
+    /// - noPlayableItemsInQueue: None of the items in the queue are considered playable.
     enum QueueError: Error {
         case currentItemConsideredUnplayable
         case noPlayableItemsInQueue
