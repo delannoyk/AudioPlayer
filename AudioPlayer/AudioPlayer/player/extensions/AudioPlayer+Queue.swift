@@ -46,7 +46,11 @@ extension AudioPlayer {
             if let realIndex = queue?.queue.index(of: items[index]) {
                 queue?.nextPosition = realIndex
             }
-            currentItem = queue?.nextItem()
+            do {
+                currentItem = try queue?.nextItem()
+            } catch {
+                //TODO: handle queue error
+            }
         } else {
             stop()
             queue = nil

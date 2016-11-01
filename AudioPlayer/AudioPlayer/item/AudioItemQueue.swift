@@ -39,6 +39,15 @@ protocol AudioItemQueueDelegate: class {
 
 /// `AudioItemQueue` handles queueing items with a playing mode.
 class AudioItemQueue {
+    /// <#Description#>
+    ///
+    /// - currentItemConsideredUnplayable: <#currentItemConsideredUnplayable description#>
+    /// - noPlayableItemsInQueue: <#noPlayableItemsInQueue description#>
+    enum QueueError: Error {
+        case currentItemConsideredUnplayable
+        case noPlayableItemsInQueue
+    }
+
     /// The original items, keeping the same order.
     private(set) var items: [AudioItem]
 
@@ -110,7 +119,7 @@ class AudioItemQueue {
     /// Returns the next item in the queue.
     ///
     /// - Returns: The next item in the queue.
-    func nextItem() -> AudioItem? {
+    func nextItem() throws -> AudioItem? {
         //Early exit if queue is empty
         guard !queue.isEmpty else {
             return nil
@@ -127,7 +136,7 @@ class AudioItemQueue {
 
         if mode.contains(.repeatAll) {
             nextPosition = 0
-            return nextItem()
+            return try nextItem()
         }
         return nil
     }
@@ -144,7 +153,7 @@ class AudioItemQueue {
     /// Returns the previous item in the queue.
     ///
     /// - Returns: The previous item in the queue.
-    func previousItem() -> AudioItem? {
+    func previousItem() throws -> AudioItem? {
         //Early exit if queue is empty
         guard !queue.isEmpty else {
             return nil
@@ -168,7 +177,7 @@ class AudioItemQueue {
 
         if mode.contains(.repeatAll) {
             nextPosition = queue.count + 1
-            return previousItem()
+            return try previousItem()
         }
         return nil
     }

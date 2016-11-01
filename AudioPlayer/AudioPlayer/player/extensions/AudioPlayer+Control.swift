@@ -55,26 +55,38 @@ extension AudioPlayer {
 
     /// Plays previous item in the queue or rewind current item.
     public func previous() {
-        if let previousItem = queue?.previousItem() {
-            currentItem = previousItem
-        } else {
-            seek(to: 0)
+        do {
+            if let previousItem = try queue?.previousItem() {
+                currentItem = previousItem
+            } else {
+                seek(to: 0)
+            }
+        } catch {
+            //TODO: handle queue error
         }
     }
 
     /// Plays next item in the queue.
     public func next() {
-        if let nextItem = queue?.nextItem() {
-            currentItem = nextItem
+        do {
+            if let nextItem = try queue?.nextItem() {
+                currentItem = nextItem
+            }
+        } catch {
+            //TODO: handle queue error
         }
     }
 
     /// Plays the next item in the queue and if there isn't, the player will stop.
     public func nextOrStop() {
-        if let nextItem = queue?.nextItem() {
-            currentItem = nextItem
-        } else {
-            stop()
+        do {
+            if let nextItem = try queue?.nextItem() {
+                currentItem = nextItem
+            } else {
+                stop()
+            }
+        } catch {
+            //TODO: handle queue error
         }
     }
 
