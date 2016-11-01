@@ -92,8 +92,7 @@ class AudioItemQueue {
             return
         }
 
-        if oldMode.contains(.repeat) && !mode.contains(.repeat) &&
-            historic.last == queue[nextPosition] {
+        if oldMode.contains(.repeat) && !mode.contains(.repeat) && historic.last == queue[nextPosition] {
             nextPosition += 1
         }
         if oldMode.contains(.shuffle) && !mode.contains(.shuffle) {
