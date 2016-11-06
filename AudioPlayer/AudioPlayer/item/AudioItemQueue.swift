@@ -97,13 +97,20 @@ class AudioItemQueue {
     /// - Parameter oldMode: The mode before it changed.
     private func adaptQueue(oldMode: AudioPlayerMode) {
         //Early exit if queue is empty
-        guard queue.count > nextPosition else {
+        guard !queue.isEmpty else {
             return
+        }
+
+        if !oldMode.contains(.repeatAll) && mode.contains(.repeatAll) {
+            nextPosition = nextPosition % queue.count
         }
 
         if oldMode.contains(.repeat) && !mode.contains(.repeat) && historic.last == queue[nextPosition] {
             nextPosition += 1
+        } else if !oldMode.contains(.repeat) && mode.contains(.repeat) && nextPosition == queue.count {
+            nextPosition -= 1
         }
+
         if oldMode.contains(.shuffle) && !mode.contains(.shuffle) {
             queue = items
             if let last = historic.last, let index = queue.index(of: last) {
@@ -159,6 +166,10 @@ class AudioItemQueue {
             return nil
         }
 
+        if mode.contains(.repeatAll), nextPosition <= 1 {
+            nextPosition = queue.count + 1
+        }
+
         let previousPosition = nextPosition - 1
 
         if mode.contains(.repeat) {
@@ -167,17 +178,11 @@ class AudioItemQueue {
             historic.append(item)
             return item
         }
-
-        if previousPosition > 0 {
-            let item = queue[previousPosition - 1]
+        if previousPosition >= 0 {
+            let item = queue[max(previousPosition - 1, 0)]
             nextPosition = previousPosition
             historic.append(item)
             return item
-        }
-
-        if mode.contains(.repeatAll) {
-            nextPosition = queue.count + 1
-            return try previousItem()
         }
         return nil
     }
