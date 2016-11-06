@@ -188,4 +188,10 @@ class AudioItemQueue_Tests: XCTestCase {
         queue.remove(at: 2)
         XCTAssertEqual(queue.queue, [item1, item2])
     }
+
+    func testEmptyQueueHasNoPreviousNorNextItem() {
+        let queue = AudioItemQueue(items: [], mode: .normal)
+        XCTAssertFalse(queue.hasPreviousItem)
+        XCTAssertFalse(queue.hasNextItem)
+    }
 }
