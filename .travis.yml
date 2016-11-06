@@ -1,6 +1,7 @@
 language: objective-c
 osx_image: xcode8
 before_install:
+  - gem install xcov -v 0.11.3
   - gem install slather danger danger-swiftlint danger-xcov
 env:
   global:
