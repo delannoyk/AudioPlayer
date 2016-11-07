@@ -29,11 +29,10 @@ script:
       xcodebuild -project "$PROJECT" -scheme "$SCHEME" -sdk "$SDK" -destination "$DESTINATION" build test | xcpretty -c;
       slather coverage --input-format profdata -i ".*Tests.*" --scheme "AudioPlayer iOS" AudioPlayer/AudioPlayer.xcodeproj;
       bash <(curl -s https://codecov.io/bash) -f cobertura.xml;
+      danger;
     else
       xcodebuild -project "$PROJECT" -scheme "$SCHEME" -sdk "$SDK" -destination "$DESTINATION" build | xcpretty -c;
     fi
-
-  - danger
 notifications:
   slack:
     secure: JGuQNTO7Aeu4Jtm3enUT/TSoDeIkcBCFH4He3QfnBS19VVDPb3mxX+Qfy2HY5EG6u1IcNbBuBzhjGb1phBrCoDdQM7AWac24hFku1mVQykxW6wgrAVAOYfvffZmBzgno3OyEzODF4MgZJKR24B577YplsBCa64lWAkAGceCZGHo=
