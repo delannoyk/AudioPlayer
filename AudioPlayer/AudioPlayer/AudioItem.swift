@@ -23,9 +23,9 @@ import AVFoundation
 - `Low`:    The lowest quality.
 */
 public enum AudioQuality {
-    case high
-    case medium
-    case low
+    case High
+    case Medium
+    case Low
 }
 
 
@@ -37,9 +37,9 @@ quality.
 */
 public struct AudioItemURL {
     public let quality: AudioQuality
-    public let URL: Foundation.URL
+    public let URL: NSURL
 
-    public init?(quality: AudioQuality, URL: Foundation.URL?) {
+    public init?(quality: AudioQuality, URL: NSURL?) {
         if let URL = URL {
             self.quality = quality
             self.URL = URL
@@ -58,9 +58,9 @@ An `AudioItem` instance contains every piece of information needed for an `Audio
 
 URLs can be remote or local.
 */
-open class AudioItem: NSObject {
+public class AudioItem: NSObject {
     /// Returns the available qualities
-    open let soundURLs: [AudioQuality: URL]
+    public let soundURLs: [AudioQuality: NSURL]
 
 
     // MARK: Initialization
@@ -74,16 +74,16 @@ open class AudioItem: NSObject {
 
     - returns: An initialized `AudioItem` if there is at least a non-null URL.
     */
-    public convenience init?(highQualitySoundURL: URL? = nil, mediumQualitySoundURL: URL? = nil, lowQualitySoundURL: URL? = nil) {
-        var URLs = [AudioQuality: URL]()
+    public convenience init?(highQualitySoundURL: NSURL? = nil, mediumQualitySoundURL: NSURL? = nil, lowQualitySoundURL: NSURL? = nil) {
+        var URLs = [AudioQuality: NSURL]()
         if let highURL = highQualitySoundURL {
-            URLs[.high] = highURL
+            URLs[.High] = highURL
         }
         if let mediumURL = mediumQualitySoundURL {
-            URLs[.medium] = mediumURL
+            URLs[.Medium] = mediumURL
         }
         if let lowURL = lowQualitySoundURL {
-            URLs[.low] = lowURL
+            URLs[.Low] = lowURL
         }
         self.init(soundURLs: URLs)
     }
@@ -95,7 +95,7 @@ open class AudioItem: NSObject {
 
     - returns: An initialized `AudioItem` if there is at least an URL in the `soundURLs` dictionary.
     */
-    public init?(soundURLs: [AudioQuality: URL]) {
+    public init?(soundURLs: [AudioQuality: NSURL]) {
         self.soundURLs = soundURLs
         super.init()
 
@@ -108,24 +108,24 @@ open class AudioItem: NSObject {
     // MARK: Quality selection
 
     /// Returns the highest quality URL found or nil if no URLs are available
-    open var highestQualityURL: AudioItemURL {
-        return (AudioItemURL(quality: .high, URL: soundURLs[.high]) ??
-            AudioItemURL(quality: .medium, URL: soundURLs[.medium]) ??
-            AudioItemURL(quality: .low, URL: soundURLs[.low]))!
+    public var highestQualityURL: AudioItemURL {
+        return (AudioItemURL(quality: .High, URL: soundURLs[.High]) ??
+            AudioItemURL(quality: .Medium, URL: soundURLs[.Medium]) ??
+            AudioItemURL(quality: .Low, URL: soundURLs[.Low]))!
     }
 
     /// Returns the medium quality URL found or nil if no URLs are available
-    open var mediumQualityURL: AudioItemURL {
-        return (AudioItemURL(quality: .medium, URL: soundURLs[.medium]) ??
-            AudioItemURL(quality: .low, URL: soundURLs[.low]) ??
-            AudioItemURL(quality: .high, URL: soundURLs[.high]))!
+    public var mediumQualityURL: AudioItemURL {
+        return (AudioItemURL(quality: .Medium, URL: soundURLs[.Medium]) ??
+            AudioItemURL(quality: .Low, URL: soundURLs[.Low]) ??
+            AudioItemURL(quality: .High, URL: soundURLs[.High]))!
     }
 
     /// Returns the lowest quality URL found or nil if no URLs are available
-    open var lowestQualityURL: AudioItemURL {
-        return (AudioItemURL(quality: .low, URL: soundURLs[.low]) ??
-            AudioItemURL(quality: .medium, URL: soundURLs[.medium]) ??
-            AudioItemURL(quality: .high, URL: soundURLs[.high]))!
+    public var lowestQualityURL: AudioItemURL {
+        return (AudioItemURL(quality: .Low, URL: soundURLs[.Low]) ??
+            AudioItemURL(quality: .Medium, URL: soundURLs[.Medium]) ??
+            AudioItemURL(quality: .High, URL: soundURLs[.High]))!
     }
 
 
@@ -136,35 +136,35 @@ open class AudioItem: NSObject {
 
     This can change over time which is why the property is dynamic. It enables KVO on the property.
     */
-    open dynamic var artist: String?
+    public dynamic var artist: String?
 
     /**
     The title of the item.
 
     This can change over time which is why the property is dynamic. It enables KVO on the property.
     */
-    open dynamic var title: String?
+    public dynamic var title: String?
 
     /**
     The album of the item.
 
     This can change over time which is why the property is dynamic. It enables KVO on the property.
     */
-    open dynamic var album: String?
+    public dynamic var album: String?
 
     /**
     The track count of the item's album.
 
     This can change over time which is why the property is dynamic. It enables KVO on the property.
     */
-    open dynamic var trackCount: NSNumber?
+    public dynamic var trackCount: NSNumber?
 
     /**
     The track number of the item in its album.
 
     This can change over time which is why the property is dynamic. It enables KVO on the property.
     */
-    open dynamic var trackNumber: NSNumber?
+    public dynamic var trackNumber: NSNumber?
 
     #if os(iOS)
     /**
@@ -172,7 +172,7 @@ open class AudioItem: NSObject {
 
     This can change over time which is why the property is dynamic. It enables KVO on the property.
     */
-    open dynamic var artworkImage: UIImage?
+    public dynamic var artworkImage: UIImage?
     #endif
 
 
@@ -185,7 +185,7 @@ open class AudioItem: NSObject {
 
     // MARK: Metadata
 
-    open func parseMetadata(_ items: [AVMetadataItem]) {
+    public func parseMetadata(items: [AVMetadataItem]) {
         items.forEach {
             if let commonKey = $0.commonKey {
                 switch commonKey {
@@ -200,7 +200,7 @@ open class AudioItem: NSObject {
                 default:
                     #if os(iOS)
                         if commonKey == AVMetadataCommonKeyArtwork && artworkImage == nil {
-                            artworkImage = ($0.value as? Data).map { UIImage(data: $0) } ?? nil
+                            artworkImage = ($0.value as? NSData).map { UIImage(data: $0) } ?? nil
                         }
                     #endif
                 }
