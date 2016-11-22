@@ -101,21 +101,29 @@ extension AudioPlayer {
             let latest = currentItemSeekableRange?.latest else {
                 //In case we don't have a valid `seekableRange`, although this *shouldn't* happen
                 //let's just call `AVPlayer.seek(to:)` with given values.
-                player?.seek(to: CMTime(timeInterval: time), toleranceBefore: toleranceBefore, toleranceAfter: toleranceAfter) { [weak self] finished in
-                    completionHandler?(finished)
-                    self?.updateNowPlayingInfoCenter()
+                if let player = self.player {
+                    player.seek(to: CMTime(timeInterval: time), toleranceBefore: toleranceBefore, toleranceAfter: toleranceAfter) { [weak self] finished in
+                        completionHandler?(finished)
+                        self?.updateNowPlayingInfoCenter()
+                    }
+                } else {
+                    completionHandler?(false)
                 }
                 return
         }
 
         if !byAdaptingTimeToFitSeekableRanges || (time >= earliest && time <= latest) {
             //Time is in seekable range, there's no problem here.
-            player?.seek(
-                to: CMTime(timeInterval: time),
-                toleranceBefore: toleranceBefore,
-                toleranceAfter: toleranceAfter) { [weak self] finished in
-                    completionHandler?(finished)
-                    self?.updateNowPlayingInfoCenter()
+            if let player = self.player {
+                player.seek(
+                    to: CMTime(timeInterval: time),
+                    toleranceBefore: toleranceBefore,
+                    toleranceAfter: toleranceAfter) { [weak self] finished in
+                        completionHandler?(finished)
+                        self?.updateNowPlayingInfoCenter()
+                }
+            } else {
+                completionHandler?(false)
             }
         } else if time < earliest {
             //Time is before seekable start, so just move to the most early position as possible.
@@ -131,12 +139,15 @@ extension AudioPlayer {
     /// - Parameter padding: The padding to apply if any.
     /// - completionHandler: The optional callback that gets executed upon completion with a boolean param indicating if the operation has finished.
     public func seekToSeekableRangeStart(padding: TimeInterval, completionHandler: ((Bool) -> Void)? = nil) {
-        if let range = currentItemSeekableRange {
-            let position = min(range.latest, range.earliest + padding)
-            player?.seek(to: CMTime(timeInterval: position)) { [weak self] finished in
-                completionHandler?(finished)
-                self?.updateNowPlayingInfoCenter()
-            }
+        guard let range = currentItemSeekableRange,
+            let player = self.player else {
+                completionHandler?(false)
+                return
+        }
+        let position = min(range.latest, range.earliest + padding)
+        player.seek(to: CMTime(timeInterval: position)) { [weak self] finished in
+            completionHandler?(finished)
+            self?.updateNowPlayingInfoCenter()
         }
     }
 
@@ -145,12 +156,15 @@ extension AudioPlayer {
     /// - Parameter padding: The padding to apply if any.
     /// - completionHandler: The optional callback that gets executed upon completion with a boolean param indicating if the operation has finished.
     public func seekToSeekableRangeEnd(padding: TimeInterval, completionHandler: ((Bool) -> Void)? = nil) {
-        if let range = currentItemSeekableRange {
-            let position = max(range.earliest, range.latest - padding)
-            player?.seek(to: CMTime(timeInterval: position)) { [weak self] finished in
-                completionHandler?(finished)
-                self?.updateNowPlayingInfoCenter()
-            }
+        guard let range = currentItemSeekableRange,
+            let player = self.player else {
+                completionHandler?(false)
+                return
+        }
+        let position = max(range.earliest, range.latest - padding)
+        player.seek(to: CMTime(timeInterval: position)) { [weak self] finished in
+            completionHandler?(finished)
+            self?.updateNowPlayingInfoCenter()
         }
     }
 
