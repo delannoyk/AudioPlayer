@@ -1,0 +1,6 @@
+coverage_service: cobertura_xml
+xcodeproj: AudioPlayer/AudioPlayer.xcodeproj
+source_directory: AudioPlayer/AudioPlayer/*
+output_directory: .
+ignore:
+  - sources/AudioPlayerTests/*

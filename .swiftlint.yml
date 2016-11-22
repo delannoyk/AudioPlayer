@@ -1,0 +1,15 @@
+included:
+  - AudioPlayer/AudioPlayer
+
+excluded:
+  - AudioPlayer/AudioPlayerTests
+
+disabled_rules:
+  - variable_name
+
+opt_in_rules:
+  - empty_count
+  - force_unwrapping
+  - missing_docs
+
+line_length: 120
