@@ -127,7 +127,7 @@ class PlayerEventProducer: NSObject, EventProducer {
                 name: .AVAudioSessionMediaServicesWereReset,
                 object: player)
         #endif
-        center.addObserver(self, selector: .itemDidEnd, name: .AVPlayerItemDidPlayToEndTime, object: player)
+        center.addObserver(self, selector: .itemDidEnd, name: .AVPlayerItemDidPlayToEndTime, object: player.currentItem)
 
         //Observing AVPlayer's property
         for keyPath in AVPlayer.ap_KVOProperties {
