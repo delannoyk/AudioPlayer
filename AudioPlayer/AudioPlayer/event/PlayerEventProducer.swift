@@ -19,7 +19,8 @@ private extension AVPlayer {
             "currentItem.playbackLikelyToKeepUp",
             "currentItem.duration",
             "currentItem.status",
-            "currentItem.loadedTimeRanges"]
+            "currentItem.loadedTimeRanges",
+            "currentItem.timedMetadata"]
     }
 }
 
@@ -126,7 +127,7 @@ class PlayerEventProducer: NSObject, EventProducer {
                 name: .AVAudioSessionMediaServicesWereReset,
                 object: player)
         #endif
-        center.addObserver(self, selector: .itemDidEnd, name: .AVPlayerItemDidPlayToEndTime, object: player)
+        center.addObserver(self, selector: .itemDidEnd, name: .AVPlayerItemDidPlayToEndTime, object: player.currentItem)
 
         //Observing AVPlayer's property
         for keyPath in AVPlayer.ap_KVOProperties {
@@ -157,7 +158,7 @@ class PlayerEventProducer: NSObject, EventProducer {
             center.removeObserver(self, name: .AVAudioSessionMediaServicesWereLost, object: player)
             center.removeObserver(self, name: .AVAudioSessionMediaServicesWereReset, object: player)
         #endif
-        center.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: player)
+        center.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: player.currentItem)
 
         //Unobserving AVPlayer's property
         for keyPath in AVPlayer.ap_KVOProperties {
@@ -210,6 +211,11 @@ class PlayerEventProducer: NSObject, EventProducer {
                 if let range = currentItem.loadedTimeRanges.last?.timeRangeValue {
                     eventListener?.onEvent(
                         PlayerEvent.loadedMoreRange(range.start, range.end), generetedBy: self)
+                }
+            
+            case "currentItem.timedMetadata":
+                if let metadata = currentItem.timedMetadata {
+                    eventListener?.onEvent(PlayerEvent.loadedMetadata(metadata), generetedBy: self)
                 }
 
             default:

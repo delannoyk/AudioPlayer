@@ -64,7 +64,7 @@ class PlayerEventProducer_Tests: XCTestCase {
             }
         }
 
-        NotificationCenter.default.post(name: .AVPlayerItemDidPlayToEndTime, object: player)
+        NotificationCenter.default.post(name: .AVPlayerItemDidPlayToEndTime, object: player.currentItem)
 
         waitForExpectations(timeout: 1) { e in
             if let _ = e {
