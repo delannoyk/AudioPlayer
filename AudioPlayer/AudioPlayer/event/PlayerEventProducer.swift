@@ -158,7 +158,7 @@ class PlayerEventProducer: NSObject, EventProducer {
             center.removeObserver(self, name: .AVAudioSessionMediaServicesWereLost, object: player)
             center.removeObserver(self, name: .AVAudioSessionMediaServicesWereReset, object: player)
         #endif
-        center.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: player)
+        center.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: player.currentItem)
 
         //Unobserving AVPlayer's property
         for keyPath in AVPlayer.ap_KVOProperties {
