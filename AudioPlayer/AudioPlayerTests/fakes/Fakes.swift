@@ -171,3 +171,53 @@ class FakeApplication: BackgroundTaskCreator {
         onEnd?(identifier)
     }
 }
+
+class FakeAudioPlayer: AudioPlayer {
+    var avPlayer = FakePlayer()
+
+    override var player: AVPlayer? {
+        get {
+            return avPlayer
+        }
+        set { }
+    }
+}
+
+class FakeAudioPlayerDelegate: AudioPlayerDelegate {
+    var didChangeState: ((AudioPlayer, AudioPlayerState, AudioPlayerState) -> Void)?
+
+    var willStartPlaying: ((AudioPlayer, AudioItem) -> Void)?
+
+    var didUpdateProgression: ((AudioPlayer, TimeInterval, Float) -> Void)?
+
+    var didLoadRange: ((AudioPlayer, TimeRange, AudioItem) -> Void)?
+
+    var didFindDuration: ((AudioPlayer, TimeInterval, AudioItem) -> Void)?
+
+    var didUpdateEmptyMetadata: ((AudioPlayer, AudioItem, Metadata) -> Void)?
+
+
+    func audioPlayer(_ audioPlayer: AudioPlayer, didChangeStateFrom from: AudioPlayerState, to state: AudioPlayerState) {
+        didChangeState?(audioPlayer, from, state)
+    }
+
+    func audioPlayer(_ audioPlayer: AudioPlayer, willStartPlaying item: AudioItem) {
+        willStartPlaying?(audioPlayer, item)
+    }
+
+    func audioPlayer(_ audioPlayer: AudioPlayer, didUpdateProgressionTo time: TimeInterval, percentageRead: Float) {
+        didUpdateProgression?(audioPlayer, time, percentageRead)
+    }
+
+    func audioPlayer(_ audioPlayer: AudioPlayer, didLoad range: TimeRange, for item: AudioItem) {
+        didLoadRange?(audioPlayer, range, item)
+    }
+
+    func audioPlayer(_ audioPlayer: AudioPlayer, didFindDuration duration: TimeInterval, for item: AudioItem) {
+        didFindDuration?(audioPlayer, duration, item)
+    }
+
+    func audioPlayer(_ audioPlayer: AudioPlayer, didUpdateEmptyMetadataOn item: AudioItem, withData data: Metadata) {
+        didUpdateEmptyMetadata?(audioPlayer, item, data)
+    }
+}

@@ -52,9 +52,8 @@ extension AudioPlayer {
             }
 
         case .progressed(let time):
-            if let currentItemProgression = time.ap_timeIntervalValue,
-                let currentItemDuration = currentItemDuration, let item = player?.currentItem,
-                currentItemDuration > 0 && item.status == .readyToPlay {
+            if let currentItemProgression = time.ap_timeIntervalValue, let item = player?.currentItem,
+                item.status == .readyToPlay {
                 //This fixes the behavior where sometimes the `playbackLikelyToKeepUp` isn't
                 //changed even though it's playing (happens mostly at the first play though).
                 if state.isBuffering || state.isPaused {
@@ -69,10 +68,10 @@ extension AudioPlayer {
                     backgroundHandler.endBackgroundTask()
                 }
 
-                //Then we can call the didUpdateProgressionToTime: delegate method
-                let percentage = Float(currentItemProgression / currentItemDuration) * 100
-                delegate?.audioPlayer(self, didUpdateProgressionTo: currentItemProgression,
-                                      percentageRead: percentage)
+                //Then we can call the didUpdateProgressionTo: delegate method
+                let itemDuration = currentItemDuration ?? 0
+                let percentage = (itemDuration > 0 ? Float(currentItemProgression / itemDuration) * 100 : 0)
+                delegate?.audioPlayer(self, didUpdateProgressionTo: currentItemProgression, percentageRead: percentage)
             }
 
         case .readyToPlay:
