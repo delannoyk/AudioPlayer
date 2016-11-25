@@ -102,7 +102,8 @@ extension AudioPlayer {
             let latest = currentItemSeekableRange?.latest else {
                 //In case we don't have a valid `seekableRange`, although this *shouldn't* happen
                 //let's just call `AVPlayer.seek(to:)` with given values.
-                if let player = player {
+                if let player = player,
+                    player.currentItem?.status == .readyToPlay {
                     player.seek(to: CMTime(timeInterval: time),
                                 toleranceBefore: toleranceBefore,
                                 toleranceAfter: toleranceAfter){ [weak self] finished in
@@ -117,7 +118,8 @@ extension AudioPlayer {
 
         if !byAdaptingTimeToFitSeekableRanges || (time >= earliest && time <= latest) {
             //Time is in seekable range, there's no problem here.
-            if let player = player {
+            if let player = player,
+                player.currentItem?.status == .readyToPlay {
                 player.seek(
                     to: CMTime(timeInterval: time),
                     toleranceBefore: toleranceBefore,
@@ -144,7 +146,8 @@ extension AudioPlayer {
     ///     if the operation has finished.
     public func seekToSeekableRangeStart(padding: TimeInterval, completionHandler: ((Bool) -> Void)? = nil) {
         guard let range = currentItemSeekableRange,
-            let player = player else {
+            let player = player,
+            player.currentItem?.status == .readyToPlay else {
                 completionHandler?(false)
                 return
         }
@@ -162,7 +165,8 @@ extension AudioPlayer {
     ///     if the operation has finished.
     public func seekToSeekableRangeEnd(padding: TimeInterval, completionHandler: ((Bool) -> Void)? = nil) {
         guard let range = currentItemSeekableRange,
-            let player = player else {
+            let player = player,
+            player.currentItem?.status == .readyToPlay else {
                 completionHandler?(false)
                 return
         }
