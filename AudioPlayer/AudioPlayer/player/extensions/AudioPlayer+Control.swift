@@ -101,7 +101,7 @@ extension AudioPlayer {
             let latest = currentItemSeekableRange?.latest else {
                 //In case we don't have a valid `seekableRange`, although this *shouldn't* happen
                 //let's just call `AVPlayer.seek(to:)` with given values.
-                if let player = self.player {
+                if let player = player {
                     player.seek(to: CMTime(timeInterval: time), toleranceBefore: toleranceBefore, toleranceAfter: toleranceAfter) { [weak self] finished in
                         completionHandler?(finished)
                         self?.updateNowPlayingInfoCenter()
@@ -114,7 +114,7 @@ extension AudioPlayer {
 
         if !byAdaptingTimeToFitSeekableRanges || (time >= earliest && time <= latest) {
             //Time is in seekable range, there's no problem here.
-            if let player = self.player {
+            if let player = player {
                 player.seek(
                     to: CMTime(timeInterval: time),
                     toleranceBefore: toleranceBefore,
@@ -140,7 +140,7 @@ extension AudioPlayer {
     /// - completionHandler: The optional callback that gets executed upon completion with a boolean param indicating if the operation has finished.
     public func seekToSeekableRangeStart(padding: TimeInterval, completionHandler: ((Bool) -> Void)? = nil) {
         guard let range = currentItemSeekableRange,
-            let player = self.player else {
+            let player = player else {
                 completionHandler?(false)
                 return
         }
@@ -157,7 +157,7 @@ extension AudioPlayer {
     /// - completionHandler: The optional callback that gets executed upon completion with a boolean param indicating if the operation has finished.
     public func seekToSeekableRangeEnd(padding: TimeInterval, completionHandler: ((Bool) -> Void)? = nil) {
         guard let range = currentItemSeekableRange,
-            let player = self.player else {
+            let player = player else {
                 completionHandler?(false)
                 return
         }
