@@ -110,22 +110,22 @@ class PlayerEventProducer: NSObject, EventProducer {
             center.addObserver(self,
                 selector: .audioSessionInterrupted,
                 name: .AVAudioSessionInterruption,
-                object: player)
+                object: nil)
             center.addObserver(
                 self,
                 selector: .audioRouteChanged,
                 name: .AVAudioSessionRouteChange,
-                object: player)
+                object: nil)
             center.addObserver(
                 self,
                 selector: .audioSessionMessedUp,
                 name: .AVAudioSessionMediaServicesWereLost,
-                object: player)
+                object: nil)
             center.addObserver(
                 self,
                 selector: .audioSessionMessedUp,
                 name: .AVAudioSessionMediaServicesWereReset,
-                object: player)
+                object: nil)
         #endif
         center.addObserver(self, selector: .itemDidEnd, name: .AVPlayerItemDidPlayToEndTime, object: player.currentItem)
 
@@ -153,10 +153,10 @@ class PlayerEventProducer: NSObject, EventProducer {
         //Unobserving notifications sent through `NSNotificationCenter`
         let center = NotificationCenter.default
         #if os(iOS) || os(tvOS)
-            center.removeObserver(self, name: .AVAudioSessionInterruption, object: player)
-            center.removeObserver(self, name: .AVAudioSessionRouteChange, object: player)
-            center.removeObserver(self, name: .AVAudioSessionMediaServicesWereLost, object: player)
-            center.removeObserver(self, name: .AVAudioSessionMediaServicesWereReset, object: player)
+            center.removeObserver(self, name: .AVAudioSessionInterruption, object: nil)
+            center.removeObserver(self, name: .AVAudioSessionRouteChange, object: nil)
+            center.removeObserver(self, name: .AVAudioSessionMediaServicesWereLost, object: nil)
+            center.removeObserver(self, name: .AVAudioSessionMediaServicesWereReset, object: nil)
         #endif
         center.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: player.currentItem)
 

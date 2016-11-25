@@ -81,7 +81,7 @@ class PlayerEventProducer_Tests: XCTestCase {
             }
         }
 
-        NotificationCenter.default.post(name: .AVAudioSessionMediaServicesWereReset, object: player)
+        NotificationCenter.default.post(name: .AVAudioSessionMediaServicesWereReset, object: AVAudioSession.sharedInstance())
 
         waitForExpectations(timeout: 1) { e in
             if let _ = e {
@@ -98,7 +98,7 @@ class PlayerEventProducer_Tests: XCTestCase {
             }
         }
 
-        NotificationCenter.default.post(name: .AVAudioSessionMediaServicesWereLost, object: player)
+        NotificationCenter.default.post(name: .AVAudioSessionMediaServicesWereLost, object: AVAudioSession.sharedInstance())
 
         waitForExpectations(timeout: 1) { e in
             if let _ = e {
@@ -116,7 +116,7 @@ class PlayerEventProducer_Tests: XCTestCase {
             }
         }
 
-        NotificationCenter.default.post(name: .AVAudioSessionRouteChange, object: player)
+        NotificationCenter.default.post(name: .AVAudioSessionRouteChange, object: AVAudioSession.sharedInstance())
 
         waitForExpectations(timeout: 1) { e in
             if let _ = e {
@@ -149,7 +149,7 @@ class PlayerEventProducer_Tests: XCTestCase {
 
         NotificationCenter.default.post(
             name: .AVAudioSessionInterruption,
-            object: player,
+            object: AVAudioSession.sharedInstance(),
             userInfo: [
                 AVAudioSessionInterruptionTypeKey: NSNumber(value: AVAudioSessionInterruptionType.ended.rawValue),
                 AVAudioSessionInterruptionOptionKey: NSNumber(value: AVAudioSessionInterruptionOptions.shouldResume.rawValue)
