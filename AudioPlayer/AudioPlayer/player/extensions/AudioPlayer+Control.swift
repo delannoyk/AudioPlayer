@@ -102,34 +102,15 @@ extension AudioPlayer {
             let latest = currentItemSeekableRange?.latest else {
                 //In case we don't have a valid `seekableRange`, although this *shouldn't* happen
                 //let's just call `AVPlayer.seek(to:)` with given values.
-                if let player = player,
-                    player.currentItem?.status == .readyToPlay {
-                    player.seek(to: CMTime(timeInterval: time),
-                                toleranceBefore: toleranceBefore,
-                                toleranceAfter: toleranceAfter){ [weak self] finished in
-                        completionHandler?(finished)
-                        self?.updateNowPlayingInfoCenter()
-                    }
-                } else {
-                    completionHandler?(false)
-                }
+                seekSafely(to: time, toleranceBefore: toleranceBefore, toleranceAfter: toleranceAfter,
+                           completionHandler: completionHandler)
                 return
         }
 
         if !byAdaptingTimeToFitSeekableRanges || (time >= earliest && time <= latest) {
             //Time is in seekable range, there's no problem here.
-            if let player = player,
-                player.currentItem?.status == .readyToPlay {
-                player.seek(
-                    to: CMTime(timeInterval: time),
-                    toleranceBefore: toleranceBefore,
-                    toleranceAfter: toleranceAfter) { [weak self] finished in
-                        completionHandler?(finished)
-                        self?.updateNowPlayingInfoCenter()
-                }
-            } else {
-                completionHandler?(false)
-            }
+            seekSafely(to: time, toleranceBefore: toleranceBefore, toleranceAfter: toleranceAfter,
+                 completionHandler: completionHandler)
         } else if time < earliest {
             //Time is before seekable start, so just move to the most early position as possible.
             seekToSeekableRangeStart(padding: 1, completionHandler: completionHandler)
@@ -145,17 +126,12 @@ extension AudioPlayer {
     /// - completionHandler: The optional callback that gets executed upon completion with a boolean param indicating
     ///     if the operation has finished.
     public func seekToSeekableRangeStart(padding: TimeInterval, completionHandler: ((Bool) -> Void)? = nil) {
-        guard let range = currentItemSeekableRange,
-            let player = player,
-            player.currentItem?.status == .readyToPlay else {
+        guard let range = currentItemSeekableRange else {
                 completionHandler?(false)
                 return
         }
         let position = min(range.latest, range.earliest + padding)
-        player.seek(to: CMTime(timeInterval: position)) { [weak self] finished in
-            completionHandler?(finished)
-            self?.updateNowPlayingInfoCenter()
-        }
+        seekSafely(to: position, completionHandler: completionHandler)
     }
 
     /// Seeks forward as far as possible.
@@ -164,17 +140,12 @@ extension AudioPlayer {
     /// - completionHandler: The optional callback that gets executed upon completion with a boolean param indicating
     ///     if the operation has finished.
     public func seekToSeekableRangeEnd(padding: TimeInterval, completionHandler: ((Bool) -> Void)? = nil) {
-        guard let range = currentItemSeekableRange,
-            let player = player,
-            player.currentItem?.status == .readyToPlay else {
+        guard let range = currentItemSeekableRange else {
                 completionHandler?(false)
                 return
         }
         let position = max(range.earliest, range.latest - padding)
-        player.seek(to: CMTime(timeInterval: position)) { [weak self] finished in
-            completionHandler?(finished)
-            self?.updateNowPlayingInfoCenter()
-        }
+        seekSafely(to: position, completionHandler: completionHandler)
     }
 
     #if os(iOS) || os(tvOS)
@@ -213,4 +184,28 @@ extension AudioPlayer {
         }
     }
     #endif
+}
+
+extension AudioPlayer {
+    
+    fileprivate func seekSafely(to time: TimeInterval,
+              toleranceBefore: CMTime = kCMTimePositiveInfinity,
+              toleranceAfter: CMTime = kCMTimePositiveInfinity,
+              completionHandler: ((Bool) -> Void)?) {
+        guard let completionHandler = completionHandler else {
+            player?.seek(to: CMTime(timeInterval: time), toleranceBefore: toleranceBefore,
+                         toleranceAfter: toleranceAfter)
+            updateNowPlayingInfoCenter()
+            return
+        }
+        guard player?.currentItem?.status == .readyToPlay else {
+            completionHandler(false)
+            return
+        }
+        player?.seek(to: CMTime(timeInterval: time), toleranceBefore: toleranceBefore, toleranceAfter: toleranceAfter,
+                     completionHandler: { [weak self] finished in
+                        completionHandler(finished)
+                        self?.updateNowPlayingInfoCenter()
+        })
+    }
 }
