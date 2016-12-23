@@ -7,9 +7,9 @@
 //
 
 import AVFoundation
-import MediaPlayer
 #if os(iOS) || os(tvOS)
     import UIKit
+    import MediaPlayer
 
     public typealias Image = UIImage
 #else
@@ -170,26 +170,38 @@ open class AudioItem: NSObject {
     /// The artwork image of the item.
     open var artworkImage: Image? {
         get {
-            return artwork?.image(at: imageSize ?? CGSize(width: 512, height: 512))
+            #if os(OSX)
+                return artwork
+            #else
+                return artwork?.image(at: imageSize ?? CGSize(width: 512, height: 512))
+            #endif
         }
         set {
-            imageSize = newValue?.size
-            artwork = newValue.map { image in
-                if #available(iOS 10.0, *) {
-                    return MPMediaItemArtwork(boundsSize: image.size) { _ in image }
+            #if os(OSX)
+                artwork = newValue
+            #else
+                imageSize = newValue?.size
+                artwork = newValue.map { image in
+                    if #available(iOS 10.0, tvOS 10.0, *) {
+                        return MPMediaItemArtwork(boundsSize: image.size) { _ in image }
+                    }
+                    return MPMediaItemArtwork(image: image)
                 }
-                return MPMediaItemArtwork(image: image)
-            }
+            #endif
         }
     }
 
     /// The artwork image of the item.
     ///
     /// This can change over time which is why the property is dynamic. It enables KVO on the property.
+    #if os(OSX)
+    open dynamic var artwork: Image?
+    #else
     open dynamic var artwork: MPMediaItemArtwork?
 
     /// The image size.
     private var imageSize: CGSize?
+    #endif
 
     // MARK: Metadata
 
