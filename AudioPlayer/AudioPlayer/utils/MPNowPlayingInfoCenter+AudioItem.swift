@@ -33,8 +33,8 @@ extension MPNowPlayingInfoCenter {
         if let trackNumber = item.trackNumber {
             info[MPMediaItemPropertyAlbumTrackNumber] = trackNumber
         }
-        if let artwork = item.artworkImage {
-            info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(image: artwork)
+        if let artwork = item.artwork {
+            info[MPMediaItemPropertyArtwork] = artwork
         }
         if let duration = duration {
             info[MPMediaItemPropertyPlaybackDuration] = duration

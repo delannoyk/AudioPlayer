@@ -14,7 +14,7 @@ extension AudioItem {
     //swiftlint:disable variable_name
     /// The list of properties that is observed through KVO.
     fileprivate static var ap_KVOProperties: [String] {
-        return ["artist", "title", "album", "trackCount", "trackNumber", "artworkImage"]
+        return ["artist", "title", "album", "trackCount", "trackNumber", "artwork"]
     }
 }
 
@@ -29,14 +29,14 @@ class AudioItemEventProducer: NSObject, EventProducer {
     /// - updatedAlbum: `album` was updated.
     /// - updatedTrackCount: `trackCount` was updated.
     /// - updatedTrackNumber: `trackNumber` was updated.
-    /// - updatedArtworkImage: `artworkImage` was updated.
+    /// - updatedArtwork: `artwork` was updated.
     enum AudioItemEvent: String, Event {
         case updatedArtist = "artist"
         case updatedTitle = "title"
         case updatedAlbum = "album"
         case updatedTrackCount = "trackCount"
         case updatedTrackNumber = "trackNumber"
-        case updatedArtworkImage = "artworkImage"
+        case updatedArtwork = "artwork"
     }
 
     /// The player to produce events with.
