@@ -126,7 +126,7 @@ class AudioItemEventProducer_Tests: XCTestCase {
         let e = expectation(description: "Waiting for `onEvent` to get called")
         listener.eventClosure = { event, producer in
             if let event = event as? AudioItemEventProducer.AudioItemEvent,
-                event == AudioItemEventProducer.AudioItemEvent.updatedArtworkImage {
+                event == AudioItemEventProducer.AudioItemEvent.updatedArtwork {
                     e.fulfill()
             }
         }
