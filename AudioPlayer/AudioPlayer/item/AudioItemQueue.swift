@@ -134,16 +134,24 @@ class AudioItemQueue {
             return nil
         }
 
-        let previousPosition = mode.contains(.repeat) ? nextPosition : nextPosition - 1
-        if previousPosition >= 0 {
-            let item = queue[previousPosition]
+        let previousPosition = nextPosition - 1
+
+        if mode.contains(.repeat) {
+            let position = max(previousPosition, 0)
+            let item = queue[position]
+            historic.append(item)
+            return item
+        }
+
+        if previousPosition > 0 {
+            let item = queue[previousPosition - 1]
             nextPosition = previousPosition
             historic.append(item)
             return item
         }
 
         if mode.contains(.repeatAll) {
-            nextPosition = queue.count
+            nextPosition = queue.count + 1
             return previousItem()
         }
         return nil
