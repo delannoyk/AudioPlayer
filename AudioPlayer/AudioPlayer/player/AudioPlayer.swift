@@ -112,6 +112,7 @@ public class AudioPlayer: NSObject {
                 if oldValue != currentItem {
                     delegate?.audioPlayer(self, willStartPlaying: currentItem)
                 }
+                player?.rate = rate
             } else {
                 stop()
             }
