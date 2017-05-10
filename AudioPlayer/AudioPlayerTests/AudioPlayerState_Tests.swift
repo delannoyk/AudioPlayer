@@ -11,8 +11,9 @@ import XCTest
 
 class AudioPlayerState_Tests: XCTestCase {
     let buffering = AudioPlayerState.buffering
-    let failedMaximumRetryCountHit = AudioPlayerState.failed(.maximumRetryCountHit)
-    let failedWithError = AudioPlayerState.failed(.foundationError(NSError(domain: "", code: -1, userInfo: nil)))
+    let failed = AudioPlayerState.failed
+    let errorMaximumRetryCountHit = AudioPlayerError.maximumRetryCountHit
+    let errorOther = AudioPlayerError.foundationError(NSError(domain: "", code: -1, userInfo: nil))
     let paused = AudioPlayerState.paused
     let playing = AudioPlayerState.playing
     let stopped = AudioPlayerState.stopped
@@ -20,30 +21,25 @@ class AudioPlayerState_Tests: XCTestCase {
 
     func testEquatable() {
         XCTAssertEqual(buffering, buffering)
-        XCTAssertEqual(failedMaximumRetryCountHit, failedMaximumRetryCountHit)
-        XCTAssertEqual(failedWithError, failedWithError)
+//        XCTAssertEqual(errorMaximumRetryCountHit, errorMaximumRetryCountHit)
+//        XCTAssertEqual(errorOther, errorOther)
         XCTAssertEqual(paused, paused)
         XCTAssertEqual(playing, playing)
         XCTAssertEqual(stopped, stopped)
         XCTAssertEqual(waitingForConnection, waitingForConnection)
 
-        XCTAssertNotEqual(buffering, failedMaximumRetryCountHit)
-        XCTAssertNotEqual(buffering, failedWithError)
+        XCTAssertNotEqual(buffering, failed)
         XCTAssertNotEqual(buffering, paused)
         XCTAssertNotEqual(buffering, playing)
         XCTAssertNotEqual(buffering, stopped)
         XCTAssertNotEqual(buffering, waitingForConnection)
 
-        XCTAssertNotEqual(failedMaximumRetryCountHit, failedWithError)
-        XCTAssertNotEqual(failedMaximumRetryCountHit, paused)
-        XCTAssertNotEqual(failedMaximumRetryCountHit, playing)
-        XCTAssertNotEqual(failedMaximumRetryCountHit, stopped)
-        XCTAssertNotEqual(failedMaximumRetryCountHit, waitingForConnection)
+//        XCTAssertNotEqual(errorMaximumRetryCountHit, errorOther)
 
-        XCTAssertNotEqual(failedWithError, paused)
-        XCTAssertNotEqual(failedWithError, playing)
-        XCTAssertNotEqual(failedWithError, stopped)
-        XCTAssertNotEqual(failedWithError, waitingForConnection)
+        XCTAssertNotEqual(failed, paused)
+        XCTAssertNotEqual(failed, playing)
+        XCTAssertNotEqual(failed, stopped)
+        XCTAssertNotEqual(failed, waitingForConnection)
 
         XCTAssertNotEqual(paused, playing)
         XCTAssertNotEqual(paused, stopped)
@@ -61,19 +57,19 @@ class AudioPlayerState_Tests: XCTestCase {
         XCTAssertFalse(buffering.isStopped)
         XCTAssertFalse(buffering.isWaitingForConnection)
 
-        XCTAssertFalse(failedMaximumRetryCountHit.isBuffering)
-        XCTAssert(failedMaximumRetryCountHit.isFailed)
-        XCTAssertFalse(failedMaximumRetryCountHit.isPaused)
-        XCTAssertFalse(failedMaximumRetryCountHit.isPlaying)
-        XCTAssertFalse(failedMaximumRetryCountHit.isStopped)
-        XCTAssertFalse(failedMaximumRetryCountHit.isWaitingForConnection)
+        XCTAssertFalse(failed.isBuffering)
+        XCTAssert(failed.isFailed)
+        XCTAssertFalse(failed.isPaused)
+        XCTAssertFalse(failed.isPlaying)
+        XCTAssertFalse(failed.isStopped)
+        XCTAssertFalse(failed.isWaitingForConnection)
 
-        XCTAssertFalse(failedWithError.isBuffering)
-        XCTAssert(failedWithError.isFailed)
-        XCTAssertFalse(failedWithError.isPaused)
-        XCTAssertFalse(failedWithError.isPlaying)
-        XCTAssertFalse(failedWithError.isStopped)
-        XCTAssertFalse(failedWithError.isWaitingForConnection)
+        XCTAssertFalse(failed.isBuffering)
+        XCTAssert(failed.isFailed)
+        XCTAssertFalse(failed.isPaused)
+        XCTAssertFalse(failed.isPlaying)
+        XCTAssertFalse(failed.isStopped)
+        XCTAssertFalse(failed.isWaitingForConnection)
 
         XCTAssertFalse(paused.isBuffering)
         XCTAssertFalse(paused.isFailed)
