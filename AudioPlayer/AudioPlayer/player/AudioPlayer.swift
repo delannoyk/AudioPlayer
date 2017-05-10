@@ -100,9 +100,17 @@ public class AudioPlayer: NSObject {
                     backgroundHandler.beginBackgroundTask()
                     return
                 }
+                
+                //Create new AVPlayerItem
+                let playerItem = AVPlayerItem(url: info.url)
+                
+                if #available(iOS 10.0, tvOS 10.0, OSX 10.12, *) {
+                    playerItem.preferredForwardBufferDuration = self.preferredForwardBufferDuration
+                }
 
                 //Creates new player
-                player = AVPlayer(url: info.url)
+                player = AVPlayer(playerItem: playerItem)
+                
                 currentQuality = info.quality
 
                 //Updates information on the lock screen
@@ -206,6 +214,17 @@ public class AudioPlayer: NSObject {
             }
         }
     }
+    
+    /// buffering strategy
+    public var bufferingStrategy: AudioPlayerBufferingStrategy = .aggressiveBuffering
+    
+    /// Defines the preferred buffer duration in seconds before playback begins. Defaults to `60`.
+    /// This only has an effect on iOS 10+ when bufferingStrategy is `.aggressive`.
+    public var prebufferDurationBeforePlaying = TimeInterval(60)
+    
+    /// Defines the preferred size of the forward buffer for the underlying AVPlayerItem.
+    /// This onle has an effect of iOS 10+, default is 0, which lets AVPlayer decice.
+    public var preferredForwardBufferDuration = TimeInterval(0)
 
     /// Defines how to behave when the user is seeking through the lockscreen or the control center.
     ///

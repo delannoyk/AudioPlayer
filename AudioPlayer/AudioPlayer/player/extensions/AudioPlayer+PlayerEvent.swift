@@ -49,6 +49,25 @@ extension AudioPlayer {
         case .loadedMoreRange:
             if let currentItem = currentItem, let currentItemLoadedRange = currentItemLoadedRange {
                 delegate?.audioPlayer(self, didLoad: currentItemLoadedRange, for: currentItem)
+                
+                if #available(iOS 10.0, tvOS 10.0, OSX 10.12, *) {
+                    if  state != .playing,
+                        bufferingStrategy == .aggressiveBuffering,
+                        let player = player,
+                        let currentItem = player.currentItem,
+                        currentItem.duration.seconds.isNormal,
+                        currentItemLoadedRange.duration.isNormal {
+                        
+                        if (currentItemLoadedRange.duration >= self.prebufferDurationBeforePlaying ||
+                            currentItemLoadedRange.duration >= currentItem.duration.seconds) {
+                            self.state = .playing
+                            player.playImmediately(atRate: self.rate)
+                            //TODO: is this neccessary? done in .readyToPlay case
+                            retryEventProducer.stopProducingEvents()
+                            backgroundHandler.endBackgroundTask()
+                        }
+                    }
+                }
             }
 
         case .progressed(let time):
