@@ -25,13 +25,13 @@ public enum AudioPlayerError: Error {
 /// - stopped: The player is stopped.
 /// - waitingForConnection: The player is waiting for internet connection.
 /// - failed: An error occured. It contains AVPlayer's error if any.
-public enum AudioPlayerState {
-    case buffering
-    case playing
-    case paused
-    case stopped
-    case waitingForConnection
-    case failed(AudioPlayerError)
+@objc public enum AudioPlayerState: Int {
+    case buffering = 0
+    case playing = 1
+    case paused = 2
+    case stopped = 3
+    case waitingForConnection = 4
+    case failed = 5
 
     /// A boolean value indicating is self = `buffering`.
     var isBuffering: Bool {
@@ -80,14 +80,6 @@ public enum AudioPlayerState {
         }
         return false
     }
-
-    /// The error if self = `failed`.
-    var error: AudioPlayerError? {
-        if case .failed(let error) = self {
-            return error
-        }
-        return nil
-    }
 }
 
 // MARK: - Equatable
@@ -97,18 +89,9 @@ extension AudioPlayerState: Equatable {}
 public func == (lhs: AudioPlayerState, rhs: AudioPlayerState) -> Bool {
     if (lhs.isBuffering && rhs.isBuffering) || (lhs.isPlaying && rhs.isPlaying) ||
         (lhs.isPaused && rhs.isPaused) || (lhs.isStopped && rhs.isStopped) ||
-        (lhs.isWaitingForConnection && rhs.isWaitingForConnection) {
+        (lhs.isWaitingForConnection && rhs.isWaitingForConnection) ||
+        (lhs.isFailed && rhs.isFailed) {
         return true
-    }
-    if let e1 = lhs.error, let e2 = rhs.error {
-        switch (e1, e2) {
-        case (.maximumRetryCountHit, .maximumRetryCountHit):
-            return true
-        case (.foundationError, .foundationError):
-            return true
-        default:
-            return false
-        }
     }
     return false
 }

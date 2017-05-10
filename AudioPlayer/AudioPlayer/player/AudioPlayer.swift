@@ -118,6 +118,9 @@ public class AudioPlayer: NSObject {
             }
         }
     }
+  
+    /// The latest error on failed state
+    var failedError: AudioPlayerError?
 
     // MARK: Public properties
 
