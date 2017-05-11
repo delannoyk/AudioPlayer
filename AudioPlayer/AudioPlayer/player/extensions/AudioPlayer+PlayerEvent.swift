@@ -84,6 +84,8 @@ extension AudioPlayer {
                 player?.rate = 0
                 state = .paused
             }
+            
+            preloadNextItemAsset()
 
             //TODO: where to start?
             retryEventProducer.stopProducingEvents()

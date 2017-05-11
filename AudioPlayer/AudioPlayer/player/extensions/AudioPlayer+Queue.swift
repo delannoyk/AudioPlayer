@@ -41,6 +41,7 @@ extension AudioPlayer {
     ///   - index: The index to start the player with.
     public func play(items: [AudioItem], startAtIndex index: Int = 0) {
         if !items.isEmpty {
+            cachedAssets = [:]
             queue = AudioItemQueue(items: items, mode: mode)
             if let realIndex = queue?.queue.index(of: items[index]) {
                 queue?.nextPosition = realIndex
@@ -76,6 +77,11 @@ extension AudioPlayer {
     ///
     /// - Parameter index: The index of the item to remove.
     public func removeItem(at index: Int) {
-        queue?.remove(at: index)
+        if let item = queue?.queue[index] {
+            for urlInfo in item.soundURLs {
+                cachedAssets.removeValue(forKey: urlInfo.value)
+            }
+            queue?.remove(at: index)
+        }
     }
 }

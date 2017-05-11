@@ -50,6 +50,9 @@ public class AudioPlayer: NSObject {
 
     /// The queue containing items to play.
     var queue: AudioItemQueue?
+    
+    /// Cached AVAssets, mainly used for preloading next item.
+    var cachedAssets: [URL: AVURLAsset] = [:]
 
     /// The audio player.
     var player: AVPlayer? {
