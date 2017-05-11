@@ -44,4 +44,9 @@ extension AudioPlayer {
         }
         return nil
     }
+    
+    public var currentItemLoadedDuration: TimeInterval? {
+        guard let loadedRange = currentItemLoadedRange else { return nil }
+        return loadedRange.latest - loadedRange.earliest
+    }
 }

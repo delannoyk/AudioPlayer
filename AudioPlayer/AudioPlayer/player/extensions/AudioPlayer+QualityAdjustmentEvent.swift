@@ -46,9 +46,7 @@ extension AudioPlayer {
 
         let cip = currentItemProgression
         let item = AVPlayerItem(url: url)
-        if #available(iOS 10.0, tvOS 10.0, OSX 10.12, *) {
-            item.preferredForwardBufferDuration = self.preferredForwardBufferDuration
-        }
+        self.updatePlayerItemForBufferingStrategy(item)
 
         qualityIsBeingChanged = true
         player?.replaceCurrentItem(with: item)

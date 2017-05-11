@@ -59,6 +59,7 @@ public class AudioPlayer: NSObject {
             }
             player?.volume = volume
             player?.rate = rate
+            updatePlayerForBufferingStrategy()
 
             if let player = player {
                 playerEventProducer.player = player
@@ -216,14 +217,18 @@ public class AudioPlayer: NSObject {
     }
     
     /// buffering strategy
-    public var bufferingStrategy: AudioPlayerBufferingStrategy = .aggressiveBuffering
+    public var bufferingStrategy: AudioPlayerBufferingStrategy = .defaultBuffering {
+        didSet {
+            updatePlayerForBufferingStrategy()
+        }
+    }
     
-    /// Defines the preferred buffer duration in seconds before playback begins. Defaults to `60`.
-    /// This only has an effect on iOS 10+ when bufferingStrategy is `.aggressive`.
-    public var prebufferDurationBeforePlaying = TimeInterval(60)
+    /// Defines the preferred buffer duration in seconds before playback begins. Defaults to 60.
+    /// Works on iOS 10+ when `bufferingStrategy` is `.playWhenPreferredBufferDurationFull`.
+    public var preferredBufferDurationBeforePlayback = TimeInterval(60)
     
-    /// Defines the preferred size of the forward buffer for the underlying AVPlayerItem.
-    /// This onle has an effect of iOS 10+, default is 0, which lets AVPlayer decice.
+    /// Defines the preferred size of the forward buffer for the underlying `AVPlayerItem`.
+    /// Works on iOS 10+, default is 0, which lets `AVPlayer` decice.
     public var preferredForwardBufferDuration = TimeInterval(0)
 
     /// Defines how to behave when the user is seeking through the lockscreen or the control center.
@@ -383,6 +388,23 @@ public class AudioPlayer: NSObject {
             //We can't call self.seek(to:) in here since the player is new
             //and `cip` is probably not in the seekableTimeRanges.
             player?.seek(to: CMTime(timeInterval: cip))
+        }
+    }
+    
+    /// Updates the current player based on the current buffering strategy.
+    /// Only has an effect on iOS 10+, tvOS 10+ and macOS 10.12+
+    internal func updatePlayerForBufferingStrategy() {
+        if #available(iOS 10.0, tvOS 10.0, OSX 10.12, *) {
+            player?.automaticallyWaitsToMinimizeStalling = self.bufferingStrategy != .playWhenBufferNotEmpty
+        }
+    }
+    
+    /// Updates a given player item based on the `preferredForwardBufferDuration` set.
+    /// Only has an effect on iOS 10+, tvOS 10+ and macOS 10.12+
+    internal func updatePlayerItemForBufferingStrategy(_ playerItem: AVPlayerItem) {
+        //Nothing strategy-specific yet
+        if #available(iOS 10.0, tvOS 10.0, OSX 10.12, *) {
+            playerItem.preferredForwardBufferDuration = self.preferredForwardBufferDuration
         }
     }
 }

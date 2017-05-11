@@ -47,19 +47,24 @@ extension AudioPlayer {
             }
 
         case .loadedMoreRange:
-            if let currentItem = currentItem, let currentItemLoadedRange = currentItemLoadedRange {
+            if let currentItem = currentItem,
+                let currentItemLoadedRange = currentItemLoadedRange,
+                let currentItemLoadedDuration = currentItemLoadedDuration {
                 delegate?.audioPlayer(self, didLoad: currentItemLoadedRange, for: currentItem)
                 
                 if #available(iOS 10.0, tvOS 10.0, OSX 10.12, *) {
-                    if  state != .playing,
-                        bufferingStrategy == .aggressiveBuffering,
+                    if  state == .buffering || state == .waitingForConnection,
+                        bufferingStrategy == .playWhenPreferredBufferDurationFull,
                         let player = player,
                         let currentItem = player.currentItem,
-                        currentItem.duration.seconds.isNormal,
-                        currentItemLoadedRange.duration.isNormal {
+                        currentItemLoadedDuration.isNormal {
                         
-                        if (currentItemLoadedRange.duration >= self.prebufferDurationBeforePlaying ||
-                            currentItemLoadedRange.duration >= currentItem.duration.seconds) {
+                        var minBufferDuration = self.preferredBufferDurationBeforePlayback
+                        if currentItem.duration.seconds.isNormal &&
+                            currentItem.duration.seconds < minBufferDuration {
+                           minBufferDuration = currentItem.duration.seconds
+                        }
+                        if (currentItemLoadedDuration >= minBufferDuration) {
                             self.state = .playing
                             player.playImmediately(atRate: self.rate)
                             //TODO: is this neccessary? done in .readyToPlay case
