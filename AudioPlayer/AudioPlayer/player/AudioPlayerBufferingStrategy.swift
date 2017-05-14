@@ -15,7 +15,7 @@ import Foundation
     case defaultBuffering = 0
     
     /// Uses a strategy better at quickly starting playback. Duration to buffer before playback is customizable through
-    /// the `prebufferDurationBeforePlayback` variable. Requires iOS/tvOS 10+ to have any effect.
+    /// the `preferredBufferDurationBeforePlayback` variable. Requires iOS/tvOS 10+ to have any effect.
     case playWhenPreferredBufferDurationFull = 1
     
     /// Uses a strategy that simply starts playback whenever the AVPlayerItem buffer is non-empty. Requires iOS/tvOS 10+ to have any effect.
