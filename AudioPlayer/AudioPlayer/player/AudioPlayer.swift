@@ -228,7 +228,7 @@ public class AudioPlayer: NSObject {
     public var preferredBufferDurationBeforePlayback = TimeInterval(60)
     
     /// Defines the preferred size of the forward buffer for the underlying `AVPlayerItem`.
-    /// Works on iOS/tvOS 10+, default is 0, which lets `AVPlayer` decice.
+    /// Works on iOS/tvOS 10+, default is 0, which lets `AVPlayer` decide.
     public var preferredForwardBufferDuration = TimeInterval(0)
 
     /// Defines how to behave when the user is seeking through the lockscreen or the control center.
@@ -393,7 +393,7 @@ public class AudioPlayer: NSObject {
     
     /// Updates the current player based on the current buffering strategy.
     /// Only has an effect on iOS 10+, tvOS 10+ and macOS 10.12+
-    internal func updatePlayerForBufferingStrategy() {
+    func updatePlayerForBufferingStrategy() {
         if #available(iOS 10.0, tvOS 10.0, OSX 10.12, *) {
             player?.automaticallyWaitsToMinimizeStalling = self.bufferingStrategy != .playWhenBufferNotEmpty
         }
@@ -401,7 +401,7 @@ public class AudioPlayer: NSObject {
     
     /// Updates a given player item based on the `preferredForwardBufferDuration` set.
     /// Only has an effect on iOS 10+, tvOS 10+ and macOS 10.12+
-    internal func updatePlayerItemForBufferingStrategy(_ playerItem: AVPlayerItem) {
+    func updatePlayerItemForBufferingStrategy(_ playerItem: AVPlayerItem) {
         //Nothing strategy-specific yet
         if #available(iOS 10.0, tvOS 10.0, OSX 10.12, *) {
             playerItem.preferredForwardBufferDuration = self.preferredForwardBufferDuration
