@@ -104,6 +104,8 @@
 		653E188C1C3541B8003C0CAB /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462679671AED5DDC003771C9 /* AudioPlayer.swift */; };
 		653E188D1C3541BB003C0CAB /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466930791BAD30AB00C1E97C /* Reachability.swift */; };
 		BB5E356D1EC3738F001BF508 /* AudioPlayerBufferingStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB5E356C1EC3738F001BF508 /* AudioPlayerBufferingStrategy.swift */; };
+		BBEC49BA1EC8D2C300BAB484 /* AudioPlayerBufferingStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB5E356C1EC3738F001BF508 /* AudioPlayerBufferingStrategy.swift */; };
+		BBEC49BB1EC8D2C400BAB484 /* AudioPlayerBufferingStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB5E356C1EC3738F001BF508 /* AudioPlayerBufferingStrategy.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -643,6 +645,7 @@
 				46AADEE91CA1BA5A00CF7A3D /* BackgroundHandler.swift in Sources */,
 				46D3A3251C943ECC00635FE4 /* AudioItem.swift in Sources */,
 				467D61251CB111E800D50807 /* AudioPlayer+AudioItemEvent.swift in Sources */,
+				BBEC49BB1EC8D2C400BAB484 /* AudioPlayerBufferingStrategy.swift in Sources */,
 				46D3A30F1C933A8200635FE4 /* CMTime+TimeIntervalValue.swift in Sources */,
 				467D61291CB1145000D50807 /* URL+Offline.swift in Sources */,
 				46DAE4BD1C40275F00572EB2 /* Reachability.swift in Sources */,
@@ -660,6 +663,7 @@
 				46DE850F1CAB07DE00F00287 /* AudioPlayer+Queue.swift in Sources */,
 				46D3A2EA1C8F4A7B00635FE4 /* NetworkEventProducer.swift in Sources */,
 				467D61241CB111E800D50807 /* AudioPlayer+AudioItemEvent.swift in Sources */,
+				BBEC49BA1EC8D2C300BAB484 /* AudioPlayerBufferingStrategy.swift in Sources */,
 				46D3A3141C93405400635FE4 /* QualityAdjustmentEventProducer.swift in Sources */,
 				467D61281CB1145000D50807 /* URL+Offline.swift in Sources */,
 				653E188C1C3541B8003C0CAB /* AudioPlayer.swift in Sources */,
