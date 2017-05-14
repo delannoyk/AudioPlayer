@@ -47,31 +47,14 @@ extension AudioPlayer {
             }
 
         case .loadedMoreRange:
-            if let currentItem = currentItem,
-                let currentItemLoadedRange = currentItemLoadedRange,
-                let currentItemLoadedDuration = currentItemLoadedDuration {
+            if let currentItem = currentItem, let currentItemLoadedRange = currentItemLoadedRange {
                 delegate?.audioPlayer(self, didLoad: currentItemLoadedRange, for: currentItem)
                 
-                if #available(iOS 10.0, tvOS 10.0, OSX 10.12, *) {
-                    if  state == .buffering || state == .waitingForConnection,
-                        bufferingStrategy == .playWhenPreferredBufferDurationFull,
-                        let player = player,
-                        let currentItem = player.currentItem,
-                        currentItemLoadedDuration.isNormal {
-                        
-                        var minBufferDuration = self.preferredBufferDurationBeforePlayback
-                        if currentItem.duration.seconds.isNormal &&
-                            currentItem.duration.seconds < minBufferDuration {
-                           minBufferDuration = currentItem.duration.seconds
-                        }
-                        if (currentItemLoadedDuration >= minBufferDuration) {
-                            self.state = .playing
-                            player.playImmediately(atRate: self.rate)
-                            //TODO: is this neccessary? done in .readyToPlay case
-                            retryEventProducer.stopProducingEvents()
-                            backgroundHandler.endBackgroundTask()
-                        }
-                    }
+                if bufferingStrategy == .playWhenPreferredBufferDurationFull && state == .buffering,
+                    let currentItemLoadedAhead = currentItemLoadedAhead,
+                    currentItemLoadedAhead.isNormal,
+                    currentItemLoadedAhead >= self.preferredBufferDurationBeforePlayback {
+                        playImmediately()
                 }
             }
 

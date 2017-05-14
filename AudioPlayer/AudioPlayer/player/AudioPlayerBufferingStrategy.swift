@@ -17,6 +17,6 @@ import Foundation
     /// Uses `prebufferDurationBeforePlayback` to determine when to start playback. Requires iOS 10+ to have any effect.
     case playWhenPreferredBufferDurationFull = 1
     
-    /// Uses a strategy that simply starts playback whenever the AVPlayerItem buffer is non-empty
+    /// Uses a strategy that simply starts playback whenever the AVPlayerItem buffer is non-empty. Requires iOS 10+ to have any effect.
     case playWhenBufferNotEmpty = 2
 }

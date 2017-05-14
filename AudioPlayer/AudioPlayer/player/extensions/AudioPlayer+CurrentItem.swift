@@ -45,8 +45,12 @@ extension AudioPlayer {
         return nil
     }
     
-    public var currentItemLoadedDuration: TimeInterval? {
-        guard let loadedRange = currentItemLoadedRange else { return nil }
-        return loadedRange.latest - loadedRange.earliest
+    public var currentItemLoadedAhead: TimeInterval? {
+        if  let loadedRange = currentItemLoadedRange,
+            let currentTime = player?.currentTime(),
+                loadedRange.earliest <= currentTime.seconds {
+            return loadedRange.latest - currentTime.seconds
+        }
+        return nil
     }
 }
