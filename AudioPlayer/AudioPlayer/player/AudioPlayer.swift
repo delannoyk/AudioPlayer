@@ -216,7 +216,7 @@ public class AudioPlayer: NSObject {
         }
     }
     
-    /// buffering strategy
+    /// Defines the buffering strategy used to determine how much to buffer before starting playback
     public var bufferingStrategy: AudioPlayerBufferingStrategy = .defaultBuffering {
         didSet {
             updatePlayerForBufferingStrategy()
@@ -224,11 +224,11 @@ public class AudioPlayer: NSObject {
     }
     
     /// Defines the preferred buffer duration in seconds before playback begins. Defaults to 60.
-    /// Works on iOS 10+ when `bufferingStrategy` is `.playWhenPreferredBufferDurationFull`.
+    /// Works on iOS/tvOS 10+ when `bufferingStrategy` is `.playWhenPreferredBufferDurationFull`.
     public var preferredBufferDurationBeforePlayback = TimeInterval(60)
     
     /// Defines the preferred size of the forward buffer for the underlying `AVPlayerItem`.
-    /// Works on iOS 10+, default is 0, which lets `AVPlayer` decice.
+    /// Works on iOS/tvOS 10+, default is 0, which lets `AVPlayer` decice.
     public var preferredForwardBufferDuration = TimeInterval(0)
 
     /// Defines how to behave when the user is seeking through the lockscreen or the control center.
