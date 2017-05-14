@@ -18,8 +18,6 @@ public class TimeRange: NSObject {
     }
 }
 
-//public typealias TimeRange = (earliest: TimeInterval, latest: TimeInterval)
-
 extension AudioPlayer {
     /// The current item progression or nil if no item.
     public var currentItemProgression: TimeInterval? {
