@@ -38,6 +38,17 @@ extension AudioPlayer {
         //app is in foreground.
         backgroundHandler.beginBackgroundTask()
     }
+    
+    /// Starts playing the current item immediately. Works on iOS/tvOS 10+ and macOS 10.12+
+    func playImmediately() {
+        if #available(iOS 10.0, tvOS 10.0, OSX 10.12, *) {
+            self.state = .playing
+            player?.playImmediately(atRate: rate)
+            
+            retryEventProducer.stopProducingEvents()
+            backgroundHandler.endBackgroundTask()
+        }
+    }
 
     /// Plays previous item in the queue or rewind current item.
     public func previous() {
