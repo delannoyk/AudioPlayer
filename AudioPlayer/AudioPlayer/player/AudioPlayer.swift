@@ -64,14 +64,15 @@ public class AudioPlayer: NSObject {
                 playerEventProducer.player = player
                 audioItemEventProducer.item = currentItem
                 playerEventProducer.startProducingEvents()
-                networkEventProducer.startProducingEvents()
                 audioItemEventProducer.startProducingEvents()
                 qualityAdjustmentEventProducer.startProducingEvents()
+                
+                // Start producing network events, if not already doing so
+                networkEventProducer.startProducingEvents()
             } else {
                 playerEventProducer.player = nil
                 audioItemEventProducer.item = nil
                 playerEventProducer.stopProducingEvents()
-                networkEventProducer.stopProducingEvents()
                 audioItemEventProducer.stopProducingEvents()
                 qualityAdjustmentEventProducer.stopProducingEvents()
             }
@@ -322,6 +323,7 @@ public class AudioPlayer: NSObject {
     /// Deinitializes the AudioPlayer. On deinit, the player will simply stop playing anything it was previously
     /// playing.
     deinit {
+        networkEventProducer.stopProducingEvents()
         stop()
     }
 
