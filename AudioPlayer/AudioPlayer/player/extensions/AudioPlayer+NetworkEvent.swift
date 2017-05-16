@@ -16,12 +16,12 @@ extension AudioPlayer {
         switch event {
         case .connectionLost:
             //Early exit if state prevents us to handle connection loss
-            guard let currentItem = currentItem, !state.isWaitingForConnection else {
+            guard currentItem != nil, !state.isWaitingForConnection else {
                 return
             }
 
             //In case we're not playing offline file
-            if !(currentItem.soundURLs[currentQuality]?.ap_isOfflineURL ?? false) {
+            if !currentItemIsOffline {
                 stateWhenConnectionLost = state
 
                 if let currentItem = player?.currentItem, currentItem.isPlaybackBufferEmpty {
@@ -37,6 +37,7 @@ extension AudioPlayer {
         case .connectionRetrieved:
             //Early exit if connection wasn't lost during playing or `resumeAfterConnectionLoss`
             //isn't enabled.
+            print("connectionRetrieved")
             guard let lossDate = networkEventProducer.connectionLossDate,
                 let stateWhenLost = stateWhenConnectionLost, resumeAfterConnectionLoss else {
                     return
@@ -44,6 +45,8 @@ extension AudioPlayer {
 
             let isAllowedToRestart = lossDate.timeIntervalSinceNow < maximumConnectionLossTime
             let wasPlayingBeforeLoss = !stateWhenLost.isStopped
+            
+            print("connectionRetrieved. isAllowedToRestart = \(isAllowedToRestart), wasPlayingBeforeLoss = \(wasPlayingBeforeLoss)")
 
             if isAllowedToRestart && wasPlayingBeforeLoss {
                 retryOrPlayNext()
