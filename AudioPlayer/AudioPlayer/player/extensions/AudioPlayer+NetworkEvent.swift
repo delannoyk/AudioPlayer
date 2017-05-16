@@ -37,7 +37,6 @@ extension AudioPlayer {
         case .connectionRetrieved:
             //Early exit if connection wasn't lost during playing or `resumeAfterConnectionLoss`
             //isn't enabled.
-            print("connectionRetrieved")
             guard let lossDate = networkEventProducer.connectionLossDate,
                 let stateWhenLost = stateWhenConnectionLost, resumeAfterConnectionLoss else {
                     return
@@ -45,8 +44,6 @@ extension AudioPlayer {
 
             let isAllowedToRestart = lossDate.timeIntervalSinceNow < maximumConnectionLossTime
             let wasPlayingBeforeLoss = !stateWhenLost.isStopped
-            
-            print("connectionRetrieved. isAllowedToRestart = \(isAllowedToRestart), wasPlayingBeforeLoss = \(wasPlayingBeforeLoss)")
 
             if isAllowedToRestart && wasPlayingBeforeLoss {
                 retryOrPlayNext()
