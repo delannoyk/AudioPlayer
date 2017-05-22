@@ -275,7 +275,7 @@ class PlayerEventProducer: NSObject, EventProducer {
         if let currentItem = player?.currentItem {
             if currentItem.duration.seconds.isNormal && currentItem.currentTime().seconds < currentItem.duration.seconds {
                 // AVPlayer thinks we are at end, but we did not actually play the full duration.
-                // This usually happens when internet connection is lost during playback
+                // This could happen when internet connection is lost during playback
                 eventListener?.onEvent(PlayerEvent.endedPlaying(EndedError.ItemEndedEarly), generetedBy: self)
             } else {
                 // succesfully played to end of item
