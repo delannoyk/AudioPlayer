@@ -22,7 +22,7 @@ class FakeEventListener: EventListener {
 class FakeReachability: Reachability {
     var reachabilityStatus = Reachability.NetworkStatus.notReachable {
         didSet {
-            NotificationCenter.default.post(name: .ReachabilityChanged, object: self)
+            NotificationCenter.default.post(name: ReachabilityChangedNotification, object: self)
         }
     }
 

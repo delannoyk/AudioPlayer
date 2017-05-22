@@ -6,6 +6,8 @@
 //  Copyright © 2016 Kevin Delannoy. All rights reserved.
 //
 
+import Foundation
+
 extension AudioPlayer {
     /// Handles player events.
     ///
@@ -15,7 +17,15 @@ extension AudioPlayer {
     func handlePlayerEvent(from producer: EventProducer, with event: PlayerEventProducer.PlayerEvent) {
         switch event {
         case .endedPlaying(let error):
-            if let error = error {
+            if !currentItemIsOffline,
+                isInternetConnectionError(error) || (!isOnline && isEndedEarlyError(error)) {
+                // While playing online content we got an internet error or
+                // ended playing the item before it was finished while offline (likely also due to connection loss).
+                stateWhenConnectionLost = .playing
+                state = .waitingForConnection
+            } else if let error = error {
+                // Some unrecoverable error occured while playing, set failed state and
+                // let the retry handler try again if it's enabled.
                 state = .failed(.foundationError(error))
             } else {
                 nextOrStop()
@@ -121,7 +131,7 @@ extension AudioPlayer {
             }
 
             stateBeforeBuffering = state
-            if reachability.isReachable() || (currentItem?.soundURLs[currentQuality]?.ap_isOfflineURL ?? false) {
+            if isOnline || currentItemIsOffline {
                 state = .buffering
             } else {
                 state = .waitingForConnection
@@ -132,4 +142,17 @@ extension AudioPlayer {
             break
         }
     }
+}
+
+//TODO: Refactor to better location
+func isInternetConnectionError(_ error: Error?) -> Bool {
+    guard let urlErr = error as? URLError else {
+        return false
+    }
+    return urlErr.code == URLError.Code.notConnectedToInternet
+        || urlErr.code == URLError.Code.networkConnectionLost
+}
+
+func isEndedEarlyError(_ error: Error?) -> Bool {
+    return error as? EndedError == EndedError.ItemEndedEarly
 }
