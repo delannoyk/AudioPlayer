@@ -100,6 +100,9 @@ public class AudioPlayer: NSObject {
                     backgroundHandler.beginBackgroundTask()
                     return
                 }
+                
+                //Reset special state flags
+                pausedForInterruption = false
 
                 //Creates new player
                 player = AVPlayer(url: info.url)
