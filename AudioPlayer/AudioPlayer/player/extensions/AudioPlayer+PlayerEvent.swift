@@ -27,8 +27,8 @@ extension AudioPlayer {
             pausedForInterruption = true
             pause()
 
-        case .interruptionEnded where pausedForInterruption:
-            if resumeAfterInterruption {
+        case .interruptionEnded(let shouldResume) where pausedForInterruption:
+            if resumeAfterInterruption && shouldResume {
                 resume()
             }
             pausedForInterruption = false

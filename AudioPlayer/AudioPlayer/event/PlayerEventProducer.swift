@@ -70,7 +70,7 @@ class PlayerEventProducer: NSObject, EventProducer {
         case progressed(CMTime)
         case endedPlaying(Error?)
         case interruptionBegan
-        case interruptionEnded
+        case interruptionEnded(Bool)
         case routeChanged
         case sessionMessedUp
     }
@@ -238,9 +238,8 @@ class PlayerEventProducer: NSObject, EventProducer {
             } else {
                 if let optionInt = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
                     let options = AVAudioSessionInterruptionOptions(rawValue: optionInt)
-                    if options.contains(.shouldResume) {
-                        eventListener?.onEvent(PlayerEvent.interruptionEnded, generetedBy: self)
-                    }
+                    let shouldResume = options.contains(.shouldResume)
+                    eventListener?.onEvent(PlayerEvent.interruptionEnded(shouldResume), generetedBy: self)
                 }
             }
         }
