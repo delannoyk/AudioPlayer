@@ -140,8 +140,14 @@ class AudioItemQueue_Tests: XCTestCase {
         XCTAssertFalse(queue.hasPreviousItem)
         XCTAssertNil(queue.previousItem())
 
+        //Start off the queue
         _ = queue.nextItem()
+
+        //Go to item 2
+        XCTAssert(queue.nextItem() === item2)
         XCTAssert(queue.hasNextItem)
+
+        XCTAssert(queue.hasPreviousItem)
         XCTAssert(queue.previousItem() === item1)
     }
 
@@ -151,6 +157,14 @@ class AudioItemQueue_Tests: XCTestCase {
 
         for _ in 0...100 {
             XCTAssert(queue.previousItem() === item1)
+        }
+
+        queue.mode = .normal
+        XCTAssert(queue.nextItem() === item2)
+
+        queue.mode = .repeat
+        for _ in 0...100 {
+            XCTAssert(queue.previousItem() === item2)
         }
     }
 
