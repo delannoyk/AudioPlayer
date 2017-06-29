@@ -41,7 +41,7 @@ class AudioPlayer_PlayerEvent_Tests: XCTestCase {
         }
         player.delegate = delegate
 
-        player.handlePlayerEvent(from: player.playerEventProducer, with: .progressed(CMTime(timeInterval: 2)))
+        player.handlePlayerEvent(from: player.playerEventProducer, with: .progressed(time: CMTime(timeInterval: 2)))
         waitForExpectations(timeout: 1) { e in
             if let _ = e {
                 XCTFail()
@@ -64,7 +64,7 @@ class AudioPlayer_PlayerEvent_Tests: XCTestCase {
         }
         player.delegate = delegate
 
-        player.handlePlayerEvent(from: player.playerEventProducer, with: .progressed(CMTime(timeInterval: 2)))
+        player.handlePlayerEvent(from: player.playerEventProducer, with: .progressed(time: CMTime(timeInterval: 2)))
         waitForExpectations(timeout: 1) { e in
             if let _ = e {
                 XCTFail()
