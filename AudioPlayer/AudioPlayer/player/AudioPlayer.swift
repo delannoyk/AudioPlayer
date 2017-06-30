@@ -102,6 +102,9 @@ public class AudioPlayer: NSObject {
                     return
                 }
                 
+                //Reset special state flags
+                pausedForInterruption = false
+                
                 //Create new AVPlayerItem
                 let playerItem = AVPlayerItem(url: info.url)
                 
@@ -366,7 +369,7 @@ public class AudioPlayer: NSObject {
 
     /// Boolean value indicating whether the player should resume playing (after buffering)
     var shouldResumePlaying: Bool {
-        return !pausedForInterruption && !state.isPaused &&
+        return !state.isPaused &&
             (stateWhenConnectionLost.map { !$0.isPaused } ?? true) &&
             (stateBeforeBuffering.map { !$0.isPaused } ?? true)
     }
