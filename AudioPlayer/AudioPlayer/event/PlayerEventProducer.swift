@@ -19,6 +19,7 @@ private extension AVPlayer {
             "currentItem.playbackLikelyToKeepUp",
             "currentItem.duration",
             "currentItem.status",
+            "status",
             "currentItem.loadedTimeRanges",
             "currentItem.timedMetadata"]
     }
@@ -206,6 +207,9 @@ class PlayerEventProducer: NSObject, EventProducer {
             case "currentItem.status" where currentItem.status == .failed:
                 eventListener?.onEvent(
                     PlayerEvent.endedPlaying(error: currentItem.error), generetedBy: self)
+
+            case "status" where p.status == .readyToPlay:
+                eventListener?.onEvent(PlayerEvent.readyToPlay, generetedBy: self)
 
             case "currentItem.loadedTimeRanges":
                 if let range = currentItem.loadedTimeRanges.last?.timeRangeValue {
