@@ -150,8 +150,8 @@ class FakeMetadataItem: AVMetadataItem {
         _value = value
     }
 
-    override var commonKey: String? {
-        return _commonKey
+    override var commonKey: AVMetadataKey? {
+        return AVMetadataKey(rawValue: _commonKey)
     }
 
     override var value: NSCopying & NSObjectProtocol {
