@@ -142,15 +142,15 @@ class FakePlayer: AVPlayer {
 }
 
 class FakeMetadataItem: AVMetadataItem {
-    var _commonKey: String
+    var _commonKey: AVMetadataKey
     var _value: NSCopying & NSObjectProtocol
 
-    init(commonKey: String, value: NSCopying & NSObjectProtocol) {
+    init(commonKey: AVMetadataKey, value: NSCopying & NSObjectProtocol) {
         _commonKey = commonKey
         _value = value
     }
 
-    override var commonKey: String? {
+    override var commonKey: AVMetadataKey? {
         return _commonKey
     }
 
