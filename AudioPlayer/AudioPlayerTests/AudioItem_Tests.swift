@@ -103,11 +103,11 @@ class AudioItem_Tests: XCTestCase {
         let imageData = NSData(contentsOf: imageURL)!
 
         let metadata = [
-            FakeMetadataItem(commonKey: AVMetadataCommonKeyTitle, value: "title" as NSString),
-            FakeMetadataItem(commonKey: AVMetadataCommonKeyArtist, value: "artist" as NSString),
-            FakeMetadataItem(commonKey: AVMetadataCommonKeyAlbumName, value: "album" as NSString),
-            FakeMetadataItem(commonKey: AVMetadataID3MetadataKeyTrackNumber, value: NSNumber(value: 1)),
-            FakeMetadataItem(commonKey: AVMetadataCommonKeyArtwork, value: imageData)
+            FakeMetadataItem(commonKey: AVMetadataKey.commonKeyTitle.rawValue, value: "title" as NSString),
+            FakeMetadataItem(commonKey: AVMetadataKey.commonKeyArtist.rawValue, value: "artist" as NSString),
+            FakeMetadataItem(commonKey: AVMetadataKey.commonKeyAlbumName.rawValue, value: "album" as NSString),
+            FakeMetadataItem(commonKey: AVMetadataKey.id3MetadataKeyTrackNumber.rawValue, value: NSNumber(value: 1)),
+            FakeMetadataItem(commonKey: AVMetadataKey.commonKeyArtwork.rawValue, value: imageData)
         ]
 
         let item = AudioItem(soundURLs: [.low: URL(string: "https://github.com")!])
@@ -128,10 +128,10 @@ class AudioItem_Tests: XCTestCase {
         item?.trackNumber = NSNumber(value: 1)
 
         let metadata = [
-            FakeMetadataItem(commonKey: AVMetadataCommonKeyTitle, value: "abc" as NSString),
-            FakeMetadataItem(commonKey: AVMetadataCommonKeyArtist, value: "def" as NSString),
-            FakeMetadataItem(commonKey: AVMetadataCommonKeyAlbumName, value: "ghi" as NSString),
-            FakeMetadataItem(commonKey: AVMetadataID3MetadataKeyTrackNumber, value: NSNumber(value: 10))
+            FakeMetadataItem(commonKey: AVMetadataKey.commonKeyTitle.rawValue, value: "abc" as NSString),
+            FakeMetadataItem(commonKey: AVMetadataKey.commonKeyArtist.rawValue, value: "def" as NSString),
+            FakeMetadataItem(commonKey: AVMetadataKey.commonKeyAlbumName.rawValue, value: "ghi" as NSString),
+            FakeMetadataItem(commonKey: AVMetadataKey.id3MetadataKeyTrackNumber.rawValue, value: NSNumber(value: 10))
         ]
         item?.parseMetadata(metadata)
 

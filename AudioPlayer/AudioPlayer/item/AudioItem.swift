@@ -11,11 +11,11 @@ import AVFoundation
     import UIKit
     import MediaPlayer
 
-    public typealias Image = UIImage
+    public typealias AudioPlayerImage = UIImage
 #else
     import Cocoa
 
-    public typealias Image = NSImage
+    public typealias AudioPlayerImage = NSImage
 #endif
 
 // MARK: - AudioQuality
@@ -145,30 +145,30 @@ open class AudioItem: NSObject {
     /// The artist of the item.
     ///
     /// This can change over time which is why the property is dynamic. It enables KVO on the property.
-    open dynamic var artist: String?
+    @objc open dynamic var artist: String?
 
     /// The title of the item.
     ///
     /// This can change over time which is why the property is dynamic. It enables KVO on the property.
-    open dynamic var title: String?
+    @objc open dynamic var title: String?
 
     /// The album of the item.
     ///
     /// This can change over time which is why the property is dynamic. It enables KVO on the property.
-    open dynamic var album: String?
+    @objc open dynamic var album: String?
 
     ///The track count of the item's album.
     ///
     /// This can change over time which is why the property is dynamic. It enables KVO on the property.
-    open dynamic var trackCount: NSNumber?
+    @objc open dynamic var trackCount: NSNumber?
 
     /// The track number of the item in its album.
     ///
     /// This can change over time which is why the property is dynamic. It enables KVO on the property.
-    open dynamic var trackNumber: NSNumber?
+    @objc open dynamic var trackNumber: NSNumber?
 
     /// The artwork image of the item.
-    open var artworkImage: Image? {
+    open var artworkImage: AudioPlayerImage? {
         get {
             #if os(OSX)
                 return artwork
@@ -195,9 +195,9 @@ open class AudioItem: NSObject {
     ///
     /// This can change over time which is why the property is dynamic. It enables KVO on the property.
     #if os(OSX)
-    open dynamic var artwork: Image?
+    @objc open dynamic var artwork: Image?
     #else
-    open dynamic var artwork: MPMediaItemArtwork?
+    @objc open dynamic var artwork: MPMediaItemArtwork?
 
     /// The image size.
     private var imageSize: CGSize?
@@ -213,16 +213,16 @@ open class AudioItem: NSObject {
         items.forEach {
             if let commonKey = $0.commonKey {
                 switch commonKey {
-                case AVMetadataCommonKeyTitle where title == nil:
+                case AVMetadataKey.commonKeyTitle where title == nil:
                     title = $0.value as? String
-                case AVMetadataCommonKeyArtist where artist == nil:
+                case AVMetadataKey.commonKeyArtist where artist == nil:
                     artist = $0.value as? String
-                case AVMetadataCommonKeyAlbumName where album == nil:
+                case AVMetadataKey.commonKeyAlbumName where album == nil:
                     album = $0.value as? String
-                case AVMetadataID3MetadataKeyTrackNumber where trackNumber == nil:
+                case AVMetadataKey.id3MetadataKeyTrackNumber where trackNumber == nil:
                     trackNumber = $0.value as? NSNumber
-                case AVMetadataCommonKeyArtwork where artwork == nil:
-                    artworkImage = ($0.value as? Data).flatMap { Image(data: $0) }
+                case AVMetadataKey.commonKeyArtwork where artwork == nil:
+                    artworkImage = ($0.value as? Data).flatMap { AudioPlayerImage(data: $0) }
                 default:
                     break
                 }
