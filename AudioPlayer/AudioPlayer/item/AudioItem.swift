@@ -11,11 +11,11 @@ import AVFoundation
     import UIKit
     import MediaPlayer
 
-    public typealias Image = UIImage
+    public typealias AudioPlayerImage = UIImage
 #else
     import Cocoa
 
-    public typealias Image = NSImage
+    public typealias AudioPlayerImage = NSImage
 #endif
 
 // MARK: - AudioQuality
@@ -168,7 +168,7 @@ open class AudioItem: NSObject {
     @objc open dynamic var trackNumber: NSNumber?
 
     /// The artwork image of the item.
-    open var artworkImage: Image? {
+    open var artworkImage: AudioPlayerImage? {
         get {
             #if os(OSX)
                 return artwork
@@ -222,7 +222,7 @@ open class AudioItem: NSObject {
                 case AVMetadataKey.id3MetadataKeyTrackNumber where trackNumber == nil:
                     trackNumber = $0.value as? NSNumber
                 case AVMetadataKey.commonKeyArtwork where artwork == nil:
-                    artworkImage = ($0.value as? Data).flatMap { Image(data: $0) }
+                    artworkImage = ($0.value as? Data).flatMap { AudioPlayerImage(data: $0) }
                 default:
                     break
                 }
