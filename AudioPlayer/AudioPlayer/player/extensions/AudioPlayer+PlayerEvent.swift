@@ -142,17 +142,16 @@ extension AudioPlayer {
             break
         }
     }
-}
-
-//TODO: Refactor to better location
-func isInternetConnectionError(_ error: Error?) -> Bool {
-    guard let urlErr = error as? URLError else {
-        return false
+    
+    fileprivate func isInternetConnectionError(_ error: Error?) -> Bool {
+        guard let urlErr = error as? URLError else {
+            return false
+        }
+        return urlErr.code == URLError.Code.notConnectedToInternet
+            || urlErr.code == URLError.Code.networkConnectionLost
     }
-    return urlErr.code == URLError.Code.notConnectedToInternet
-        || urlErr.code == URLError.Code.networkConnectionLost
-}
-
-func isEndedEarlyError(_ error: Error?) -> Bool {
-    return error as? EndedError == EndedError.ItemEndedEarly
+    
+    fileprivate func isEndedEarlyError(_ error: Error?) -> Bool {
+        return error as? EndedError == EndedError.ItemEndedEarly
+    }
 }
