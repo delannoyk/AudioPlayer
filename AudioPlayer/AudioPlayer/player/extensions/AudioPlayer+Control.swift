@@ -14,6 +14,9 @@ import CoreMedia
 extension AudioPlayer {
     /// Resumes the player.
     public func resume() {
+        //Ensure pause flag is no longer set
+        pausedForInterruption = false
+        
         player?.rate = rate
 
         //We don't wan't to change the state to Playing in case it's Buffering. That
@@ -37,6 +40,17 @@ extension AudioPlayer {
         //background. This will mimic the default behavior of `AVPlayer` when pausing while the
         //app is in foreground.
         backgroundHandler.beginBackgroundTask()
+    }
+    
+    /// Starts playing the current item immediately. Works on iOS/tvOS 10+ and macOS 10.12+
+    func playImmediately() {
+        if #available(iOS 10.0, tvOS 10.0, OSX 10.12, *) {
+            self.state = .playing
+            player?.playImmediately(atRate: rate)
+            
+            retryEventProducer.stopProducingEvents()
+            backgroundHandler.endBackgroundTask()
+        }
     }
 
     /// Plays previous item in the queue or rewind current item.
