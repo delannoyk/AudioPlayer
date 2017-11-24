@@ -81,6 +81,9 @@ class PlayerEventProducer: NSObject, EventProducer {
         case routeChanged
         case sessionMessedUp
     }
+    
+    /// Acceptable time difference to duration when item unexpectedly ends playing.
+    private static let AcceptableItemEndedDifference: Double = 1.0
 
     /// The player to produce events with.
     ///
@@ -296,6 +299,4 @@ class PlayerEventProducer: NSObject, EventProducer {
         let timeDiff = currentItem.duration.seconds - currentItem.currentTime().seconds
         return timeDiff > PlayerEventProducer.AcceptableItemEndedDifference
     }
-    
-    private static var AcceptableItemEndedDifference: Double = 1.0
 }
