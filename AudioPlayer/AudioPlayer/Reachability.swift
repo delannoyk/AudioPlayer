@@ -139,7 +139,7 @@ class Reachability: NSObject {
 
     // MARK: - *** Private methods ***
 
-    #if (arch(i386) || arch(x86_64)) && os(iOS)
+    #if targetEnvironment(simulator)
     private let isRunningOnDevice = false
     #else
     private let isRunningOnDevice = true

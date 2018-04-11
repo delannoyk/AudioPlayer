@@ -24,7 +24,7 @@ protocol EventListener: class {
 /// An `EventProducer` serves the purpose of producing events over time.
 protocol EventProducer: class {
     /// The listener that will be alerted a new event occured.
-    weak var eventListener: EventListener? { get set }
+    var eventListener: EventListener? { get set }
 
     /// Tells the producer to start producing events.
     func startProducingEvents()
