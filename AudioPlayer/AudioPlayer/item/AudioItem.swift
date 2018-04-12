@@ -195,7 +195,7 @@ open class AudioItem: NSObject {
     ///
     /// This can change over time which is why the property is dynamic. It enables KVO on the property.
     #if os(OSX)
-    open dynamic var artwork: Image?
+    @objc open dynamic var artwork: Image?
     #else
     @objc open dynamic var artwork: MPMediaItemArtwork?
 
