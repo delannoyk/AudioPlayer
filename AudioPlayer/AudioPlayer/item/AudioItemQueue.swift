@@ -39,15 +39,6 @@ protocol AudioItemQueueDelegate: class {
 
 /// `AudioItemQueue` handles queueing items with a playing mode.
 class AudioItemQueue {
-    /// The errors that can be thrown from `nextItem()` and `previousItem()`.
-    ///
-    /// - currentItemConsideredUnplayable: The item that should be played is considered unplayable.
-    /// - noPlayableItemsInQueue: None of the items in the queue are considered playable.
-    enum QueueError: Error {
-        case currentItemConsideredUnplayable
-        case noPlayableItemsInQueue
-    }
-
     /// The original items, keeping the same order.
     private(set) var items: [AudioItem]
 
@@ -126,24 +117,35 @@ class AudioItemQueue {
     /// Returns the next item in the queue.
     ///
     /// - Returns: The next item in the queue.
-    func nextItem() throws -> AudioItem? {
+    func nextItem() -> AudioItem? {
         //Early exit if queue is empty
         guard !queue.isEmpty else {
             return nil
         }
 
-        if nextPosition < queue.count {
+        if mode.contains(.repeat) {
+            //No matter if we should still consider this item, the repeat mode will return the current item.
             let item = queue[nextPosition]
-            if !mode.contains(.repeat) {
-                nextPosition += 1
-            }
             historic.append(item)
             return item
         }
 
-        if mode.contains(.repeatAll) {
+        if mode.contains(.repeatAll) && nextPosition >= queue.count {
             nextPosition = 0
-            return try nextItem()
+        }
+
+        while nextPosition < queue.count {
+            let item = queue[nextPosition]
+            nextPosition += 1
+
+            if shouldConsiderItem(item: item) {
+                historic.append(item)
+                return item
+            }
+        }
+
+        if mode.contains(.repeatAll) && nextPosition >= queue.count {
+            nextPosition = 0
         }
         return nil
     }
@@ -160,29 +162,36 @@ class AudioItemQueue {
     /// Returns the previous item in the queue.
     ///
     /// - Returns: The previous item in the queue.
-    func previousItem() throws -> AudioItem? {
+    func previousItem() -> AudioItem? {
         //Early exit if queue is empty
         guard !queue.isEmpty else {
             return nil
         }
 
-        if mode.contains(.repeatAll), nextPosition <= 1 {
-            nextPosition = queue.count + 1
-        }
-
-        let previousPosition = nextPosition - 1
-
         if mode.contains(.repeat) {
-            let position = max(previousPosition, 0)
-            let item = queue[position]
+            //No matter if we should still consider this item, the repeat mode will return the current item.
+            let item = queue[max(0, nextPosition - 1)]
             historic.append(item)
             return item
         }
-        if previousPosition >= 0 {
-            let item = queue[max(previousPosition - 1, 0)]
+
+        if mode.contains(.repeatAll) && nextPosition <= 0 {
+            nextPosition = queue.count
+        }
+
+        while nextPosition > 0 {
+            let previousPosition = nextPosition - 1
             nextPosition = previousPosition
-            historic.append(item)
-            return item
+            let item = queue[previousPosition]
+
+            if shouldConsiderItem(item: item) {
+                historic.append(item)
+                return item
+            }
+        }
+
+        if mode.contains(.repeatAll) && nextPosition <= 0 {
+            nextPosition = queue.count
         }
         return nil
     }

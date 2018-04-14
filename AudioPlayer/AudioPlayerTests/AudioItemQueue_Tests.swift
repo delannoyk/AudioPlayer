@@ -14,18 +14,30 @@ class AudioItemQueue_Tests: XCTestCase {
     let item2 = AudioItem(highQualitySoundURL: URL(string: "https://github.com/delannoyk"))!
     let item3 = AudioItem(highQualitySoundURL: URL(string: "https://google.com"))!
 
+    private class MockDelegate: AudioItemQueueDelegate {
+        private let ununavailableItems: [AudioItem]
+
+        init(ununavailableItems: [AudioItem]) {
+            self.ununavailableItems = ununavailableItems
+        }
+
+        func audioItemQueue(_ queue: AudioItemQueue, shouldConsiderItem item: AudioItem) -> Bool {
+            return !ununavailableItems.contains(item)
+        }
+    }
+
     func testEmptyQueueGivesNilAsNextItem() {
         let queue = AudioItemQueue(items: [], mode: .normal)
-        XCTAssert((try queue.nextItem()) === nil)
+        XCTAssert(queue.nextItem() === nil)
     }
 
     func testQueueInNormalModeAndHistoric() {
         let queue = AudioItemQueue(items: [item1, item2, item3], mode: .normal)
-        XCTAssert((try queue.nextItem()) === item1)
-        XCTAssert((try queue.nextItem()) === item2)
-        XCTAssert((try queue.nextItem()) === item3)
-        XCTAssert((try queue.nextItem()) === nil)
-        XCTAssert((try queue.nextItem()) === nil)
+        XCTAssert(queue.nextItem() === item1)
+        XCTAssert(queue.nextItem() === item2)
+        XCTAssert(queue.nextItem() === item3)
+        XCTAssert(queue.nextItem() === nil)
+        XCTAssert(queue.nextItem() === nil)
 
         XCTAssertEqual(queue.historic.count, 3)
         XCTAssert(queue.historic[0] === item1)
@@ -40,40 +52,40 @@ class AudioItemQueue_Tests: XCTestCase {
     func testQueueInRepeatMode() {
         let queue = AudioItemQueue(items: [item1, item2, item3], mode: .repeat)
         for _ in 0...100 {
-            XCTAssert((try queue.nextItem()) === item1)
+            XCTAssert(queue.nextItem() === item1)
         }
     }
 
     func testQueueInRepeatAllMode() {
         let queue = AudioItemQueue(items: [item1, item2, item3], mode: .repeatAll)
         for _ in 0...100 {
-            XCTAssert((try queue.nextItem()) === item1)
-            XCTAssert((try queue.nextItem()) === item2)
-            XCTAssert((try queue.nextItem()) === item3)
+            XCTAssert(queue.nextItem() === item1)
+            XCTAssert(queue.nextItem() === item2)
+            XCTAssert(queue.nextItem() === item3)
         }
     }
 
     func testQueueInNormalModelAfterSwitchingIfFromRepeatMode() {
         let queue = AudioItemQueue(items: [item1, item2, item3], mode: .repeat)
-        XCTAssertNotNil(try queue.nextItem())
+        XCTAssertNotNil(queue.nextItem())
 
         queue.mode = .normal
-        XCTAssert((try queue.nextItem()) === item2)
+        XCTAssert(queue.nextItem() === item2)
 
         let queue2 = AudioItemQueue(items: [item1], mode: .repeat)
-        XCTAssertNotNil(try queue2.nextItem())
+        XCTAssertNotNil(queue2.nextItem())
 
         queue2.mode = .normal
-        XCTAssert((try queue2.nextItem()) === nil)
+        XCTAssert(queue2.nextItem() === nil)
     }
 
     func testQueueInShuffleModeAfterSwitchingItFromNormalMode() {
         let queue = AudioItemQueue(items: [item1, item2, item3], mode: .normal)
-        XCTAssert((try queue.nextItem()) === item1)
+        XCTAssert(queue.nextItem() === item1)
 
         queue.mode = .shuffle
         for _ in 0...100 {
-            XCTAssert((try queue.nextItem()) !== item1)
+            XCTAssert(queue.nextItem() !== item1)
         }
         queue.nextPosition = 0
         queue.mode = .normal
@@ -81,10 +93,10 @@ class AudioItemQueue_Tests: XCTestCase {
 
     func testQueueInShuffleModeCombinedWithRepeatMode() {
         let queue = AudioItemQueue(items: [item1, item2, item3], mode: [.repeat, .shuffle])
-        let item = try! queue.nextItem()
+        let item = queue.nextItem()
 
         for _ in 0...100 {
-            XCTAssert(try queue.nextItem() === item)
+            XCTAssert(queue.nextItem() === item)
         }
     }
 
@@ -93,37 +105,37 @@ class AudioItemQueue_Tests: XCTestCase {
         let queued = queue.queue
 
         for _ in 0...100 {
-            let q = try! [queue.nextItem()!, queue.nextItem()!, queue.nextItem()!]
+            let q = [queue.nextItem()!, queue.nextItem()!, queue.nextItem()!]
             XCTAssertEqual(queued, q)
         }
     }
 
     func testAdaptModeWhenQueueIsEmpty() {
         let queue = AudioItemQueue(items: [], mode: .normal)
-        XCTAssertEqual(try queue.nextItem(), nil)
+        XCTAssertEqual(queue.nextItem(), nil)
         queue.mode = .shuffle
-        XCTAssertEqual(try queue.nextItem(), nil)
+        XCTAssertEqual(queue.nextItem(), nil)
     }
 
     func testHasNextItemInQueue() {
         let queue = AudioItemQueue(items: [item1, item2, item3], mode: .normal)
         XCTAssert(queue.hasNextItem)
-        XCTAssertNotNil(try queue.nextItem())
+        XCTAssertNotNil(queue.nextItem())
         XCTAssert(queue.hasNextItem)
-        XCTAssertNotNil(try queue.nextItem())
+        XCTAssertNotNil(queue.nextItem())
         XCTAssert(queue.hasNextItem)
-        XCTAssertNotNil(try queue.nextItem())
+        XCTAssertNotNil(queue.nextItem())
         XCTAssertFalse(queue.hasNextItem)
 
         queue.mode = .repeat
         for _ in 0...100 {
-            XCTAssertNotNil(try queue.nextItem())
+            XCTAssertNotNil(queue.nextItem())
             XCTAssert(queue.hasNextItem)
         }
 
         queue.mode = .repeatAll
         for _ in 0...100 {
-            XCTAssertNotNil(try queue.nextItem())
+            XCTAssertNotNil(queue.nextItem())
             XCTAssert(queue.hasNextItem)
         }
 
@@ -138,11 +150,11 @@ class AudioItemQueue_Tests: XCTestCase {
     func testPreviousInNormalMode() {
         let queue = AudioItemQueue(items: [item1, item2, item3], mode: .normal)
         XCTAssertFalse(queue.hasPreviousItem)
-        XCTAssertNil(try queue.previousItem())
+        XCTAssertNil(queue.previousItem())
 
-        XCTAssertNotNil(try queue.nextItem())
+        XCTAssertNotNil(queue.nextItem())
         XCTAssert(queue.hasNextItem)
-        XCTAssert((try queue.previousItem()) === item1)
+        XCTAssert(queue.previousItem() === item1)
     }
 
     func testPreviousInRepeatMode() {
@@ -150,15 +162,15 @@ class AudioItemQueue_Tests: XCTestCase {
         XCTAssert(queue.hasPreviousItem)
 
         for _ in 0...100 {
-            XCTAssert((try queue.previousItem()) === item1)
+            XCTAssert(queue.previousItem() === item1)
         }
 
         queue.mode = .normal
-        XCTAssert(try queue.nextItem() === item2)
+        XCTAssert(queue.nextItem() === item2)
 
         queue.mode = .repeat
         for _ in 0...100 {
-            XCTAssert(try queue.previousItem() === item2)
+            XCTAssert(queue.previousItem() === item2)
         }
     }
 
@@ -166,15 +178,15 @@ class AudioItemQueue_Tests: XCTestCase {
         let queue = AudioItemQueue(items: [item1, item2, item3], mode: .repeatAll)
         for _ in 0...100 {
             XCTAssert(queue.hasPreviousItem)
-            XCTAssert((try queue.previousItem()) === item3)
-            XCTAssert((try queue.previousItem()) === item2)
-            XCTAssert((try queue.previousItem()) === item1)
+            XCTAssert(queue.previousItem() === item3)
+            XCTAssert(queue.previousItem() === item2)
+            XCTAssert(queue.previousItem() === item1)
         }
     }
 
     func testPreviousItemWhenQueueIsEmpty() {
         let queue = AudioItemQueue(items: [], mode: .normal)
-        XCTAssertEqual(try queue.previousItem(), nil)
+        XCTAssertEqual(queue.previousItem(), nil)
     }
 
     func testAddItemInQueue() {
@@ -193,5 +205,123 @@ class AudioItemQueue_Tests: XCTestCase {
         let queue = AudioItemQueue(items: [], mode: .normal)
         XCTAssertFalse(queue.hasPreviousItem)
         XCTAssertFalse(queue.hasNextItem)
+    }
+
+    func testPreviousWhenOnItemIsNotAvailableInNormalMode() {
+        let delegate = MockDelegate(ununavailableItems: [item2])
+
+        let queue = AudioItemQueue(items: [item1, item2, item3], mode: .normal)
+        queue.nextPosition = queue.queue.count
+        queue.delegate = delegate
+
+        XCTAssert(queue.previousItem() === item3)
+        XCTAssert(queue.previousItem() === item1)
+        XCTAssertNil(queue.previousItem())
+    }
+
+    func testPreviousWhenOnItemIsNotAvailableInRepeatMode() {
+        let delegate = MockDelegate(ununavailableItems: [item2])
+
+        let queue = AudioItemQueue(items: [item1, item2, item3], mode: .repeat)
+        queue.nextPosition = queue.queue.count - 1
+        queue.delegate = delegate
+
+        for _ in 0...100 {
+            XCTAssert(queue.previousItem() === item2)
+        }
+    }
+
+    func testPreviousWhenOnItemIsNotAvailableInRepeatAllMode() {
+        let delegate = MockDelegate(ununavailableItems: [item2])
+
+        let queue = AudioItemQueue(items: [item1, item2, item3], mode: .repeatAll)
+        queue.delegate = delegate
+
+        for _ in 0...100 {
+            XCTAssert(queue.previousItem() === item3)
+            XCTAssert(queue.previousItem() === item1)
+        }
+    }
+
+    func testPreviousWhenNoItemIsNotAvailableInNormalMode() {
+        let delegate = MockDelegate(ununavailableItems: [item1, item2, item3])
+
+        let queue = AudioItemQueue(items: [item1, item2, item3], mode: .normal)
+        queue.nextPosition = queue.queue.count - 1
+        queue.delegate = delegate
+
+        for _ in 0...100 {
+            XCTAssertNil(queue.previousItem())
+        }
+    }
+
+    func testPreviousWhenNoItemIsNotAvailableInRepeatAllMode() {
+        let delegate = MockDelegate(ununavailableItems: [item1, item2, item3])
+
+        let queue = AudioItemQueue(items: [item1, item2, item3], mode: .repeatAll)
+        queue.nextPosition = queue.queue.count - 1
+        queue.delegate = delegate
+
+        for _ in 0...100 {
+            XCTAssertNil(queue.previousItem())
+        }
+    }
+
+    func testNextWhenOnItemIsNotAvailableInNormalMode() {
+        let delegate = MockDelegate(ununavailableItems: [item2])
+
+        let queue = AudioItemQueue(items: [item1, item2, item3], mode: .normal)
+        queue.delegate = delegate
+
+        XCTAssert(queue.nextItem() === item1)
+        XCTAssert(queue.nextItem() === item3)
+        XCTAssertNil(queue.nextItem())
+    }
+
+    func testNextWhenOnItemIsNotAvailableInRepeatMode() {
+        let delegate = MockDelegate(ununavailableItems: [item2])
+
+        let queue = AudioItemQueue(items: [item1, item2, item3], mode: .normal)
+        _ = queue.nextItem()
+        queue.mode = .repeat
+        queue.delegate = delegate
+
+        for _ in 0...100 {
+            XCTAssert(queue.nextItem() === item2)
+        }
+    }
+
+    func testNextWhenOnItemIsNotAvailableInRepeatAllMode() {
+        let delegate = MockDelegate(ununavailableItems: [item2])
+
+        let queue = AudioItemQueue(items: [item1, item2, item3], mode: .repeatAll)
+        queue.delegate = delegate
+
+        for _ in 0...100 {
+            XCTAssert(queue.nextItem() === item1)
+            XCTAssert(queue.nextItem() === item3)
+        }
+    }
+
+    func testNextWhenNoItemIsNotAvailableInNormalMode() {
+        let delegate = MockDelegate(ununavailableItems: [item1, item2, item3])
+
+        let queue = AudioItemQueue(items: [item1, item2, item3], mode: .normal)
+        queue.delegate = delegate
+
+        for _ in 0...100 {
+            XCTAssertNil(queue.nextItem())
+        }
+    }
+
+    func testNextWhenNoItemIsNotAvailableInRepeatAllMode() {
+        let delegate = MockDelegate(ununavailableItems: [item1, item2, item3])
+
+        let queue = AudioItemQueue(items: [item1, item2, item3], mode: .repeatAll)
+        queue.delegate = delegate
+
+        for _ in 0...100 {
+            XCTAssertNil(queue.nextItem())
+        }
     }
 }
