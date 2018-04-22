@@ -23,6 +23,14 @@ public protocol AudioPlayerDelegate: class {
     ///   - state: The new state.
     func audioPlayer(_ audioPlayer: AudioPlayer, didChangeStateFrom from: AudioPlayerState, to state: AudioPlayerState)
 
+    /// This method is called to ensure an item should be played or not. Default implementation returns `true`.
+    ///
+    /// - Parameters:
+    ///   - audioPlayer: The audio player.
+    ///   - item: The item that is waiting to be played.
+    /// - Returns: A boolean value indicating whether the player should start playing the item or not.
+    func audioPlayer(_ audioPlayer: AudioPlayer, shouldStartPlaying item: AudioItem) -> Bool
+
     /// This method is called when the audio player is about to start playing a new item.
     ///
     /// - Parameters:
@@ -68,15 +76,25 @@ public protocol AudioPlayerDelegate: class {
 
 public extension AudioPlayerDelegate {
     func audioPlayer(_ audioPlayer: AudioPlayer, didChangeStateFrom from: AudioPlayerState,
-                     to state: AudioPlayerState) {}
+                     to state: AudioPlayerState) {
+    }
 
-    func audioPlayer(_ audioPlayer: AudioPlayer, willStartPlaying item: AudioItem) {}
+    func audioPlayer(_ audioPlayer: AudioPlayer, shouldStartPlaying item: AudioItem) -> Bool {
+        return true
+    }
 
-    func audioPlayer(_ audioPlayer: AudioPlayer, didUpdateProgressionTo time: TimeInterval, percentageRead: Float) {}
+    func audioPlayer(_ audioPlayer: AudioPlayer, willStartPlaying item: AudioItem) {
+    }
 
-    func audioPlayer(_ audioPlayer: AudioPlayer, didFindDuration duration: TimeInterval, for item: AudioItem) {}
+    func audioPlayer(_ audioPlayer: AudioPlayer, didUpdateProgressionTo time: TimeInterval, percentageRead: Float) {
+    }
 
-    func audioPlayer(_ audioPlayer: AudioPlayer, didUpdateEmptyMetadataOn item: AudioItem, withData data: Metadata) {}
+    func audioPlayer(_ audioPlayer: AudioPlayer, didFindDuration duration: TimeInterval, for item: AudioItem) {
+    }
 
-    func audioPlayer(_ audioPlayer: AudioPlayer, didLoad range: TimeRange, for item: AudioItem) {}
+    func audioPlayer(_ audioPlayer: AudioPlayer, didUpdateEmptyMetadataOn item: AudioItem, withData data: Metadata) {
+    }
+
+    func audioPlayer(_ audioPlayer: AudioPlayer, didLoad range: TimeRange, for item: AudioItem) {
+    }
 }

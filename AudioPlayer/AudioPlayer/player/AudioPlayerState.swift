@@ -12,9 +12,13 @@ import Foundation
 ///
 /// - maximumRetryCountHit: The player hit the maximum retry count.
 /// - foundationError: The `AVPlayer` failed to play.
+/// - itemNotConsideredPlayable: The current item that should be played is considered unplayable.
+/// - noItemsConsideredPlayable: The queue doesn't contain any item that is considered playable.
 public enum AudioPlayerError: Error {
     case maximumRetryCountHit
     case foundationError(Error)
+    case itemNotConsideredPlayable
+    case noItemsConsideredPlayable
 }
 
 /// `AudioPlayerState` defines 4 state an `AudioPlayer` instance can be in.
