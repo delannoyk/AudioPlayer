@@ -6,6 +6,8 @@
 //  Copyright © 2016 Kevin Delannoy. All rights reserved.
 //
 
+import CoreMedia
+
 extension AudioPlayer {
     /// Handles player events.
     ///
@@ -99,7 +101,7 @@ extension AudioPlayer {
         case .routeChanged:
             //In some route changes, the player pause automatically
             //TODO: there should be a check if state == playing
-            if let player = player, player.rate == 0 {
+            if let currentItemTimebase = player?.currentItem?.timebase, CMTimebaseGetRate(currentItemTimebase) == 0 {
                 state = .paused
             }
 
