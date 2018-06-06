@@ -11,7 +11,7 @@ AudioPlayer is a wrapper around AVPlayer. It also offers cool features such as:
 * Retry if player fails
 * Connection handling
 * Audio item enqueuing
-* Player mode (Repeat, Repeat all, Suffle)
+* Player mode (Repeat, Repeat all, Shuffle)
 * MPNowPlayingInfoCenter
 * A high level of customization
 

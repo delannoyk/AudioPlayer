@@ -21,6 +21,20 @@ private extension Array {
     }
 }
 
+// MARK: - AudioItemQueueDelegate
+
+/// `AudioItemQueueDelegate` defines the behavior of `AudioItem` in certain circumstances and is notified upon notable 
+/// events.
+protocol AudioItemQueueDelegate: class {
+    /// Returns a boolean value indicating whether an item should be consider playable in the queue.
+    ///
+    /// - Parameters:
+    ///   - queue: The queue.
+    ///   - item: The item we ask the information for.
+    /// - Returns: A boolean value indicating whether an item should be consider playable in the queue.
+    func audioItemQueue(_ queue: AudioItemQueue, shouldConsiderItem item: AudioItem) -> Bool
+}
+
 // MARK: - AudioItemQueue
 
 /// `AudioItemQueue` handles queueing items with a playing mode.
@@ -43,6 +57,9 @@ class AudioItemQueue {
             adaptQueue(oldMode: oldValue)
         }
     }
+
+    /// The queue delegate.
+    weak var delegate: AudioItemQueueDelegate?
 
     /// Initializes a queue with a list of items and the mode.
     ///
@@ -71,14 +88,20 @@ class AudioItemQueue {
     /// - Parameter oldMode: The mode before it changed.
     private func adaptQueue(oldMode: AudioPlayerMode) {
         //Early exit if queue is empty
-        guard queue.count > nextPosition else {
+        guard !queue.isEmpty else {
             return
         }
 
-        if oldMode.contains(.repeat) && !mode.contains(.repeat) &&
-            historic.last == queue[nextPosition] {
-            nextPosition += 1
+        if !oldMode.contains(.repeatAll) && mode.contains(.repeatAll) {
+            nextPosition = nextPosition % queue.count
         }
+
+        if oldMode.contains(.repeat) && !mode.contains(.repeat) && historic.last == queue[nextPosition] {
+            nextPosition += 1
+        } else if !oldMode.contains(.repeat) && mode.contains(.repeat) && nextPosition == queue.count {
+            nextPosition -= 1
+        }
+
         if oldMode.contains(.shuffle) && !mode.contains(.shuffle) {
             queue = items
             if let last = historic.last, let index = queue.index(of: last) {
@@ -100,18 +123,29 @@ class AudioItemQueue {
             return nil
         }
 
-        if nextPosition < queue.count {
+        if mode.contains(.repeat) {
+            //No matter if we should still consider this item, the repeat mode will return the current item.
             let item = queue[nextPosition]
-            if !mode.contains(.repeat) {
-                nextPosition += 1
-            }
             historic.append(item)
             return item
         }
 
-        if mode.contains(.repeatAll) {
+        if mode.contains(.repeatAll) && nextPosition >= queue.count {
             nextPosition = 0
-            return nextItem()
+        }
+
+        while nextPosition < queue.count {
+            let item = queue[nextPosition]
+            nextPosition += 1
+
+            if shouldConsiderItem(item: item) {
+                historic.append(item)
+                return item
+            }
+        }
+
+        if mode.contains(.repeatAll) && nextPosition >= queue.count {
+            nextPosition = 0
         }
         return nil
     }
@@ -134,25 +168,30 @@ class AudioItemQueue {
             return nil
         }
 
-        let previousPosition = nextPosition - 1
-
         if mode.contains(.repeat) {
-            let position = max(previousPosition, 0)
-            let item = queue[position]
+            //No matter if we should still consider this item, the repeat mode will return the current item.
+            let item = queue[max(0, nextPosition - 1)]
             historic.append(item)
             return item
         }
 
-        if previousPosition > 0 {
-            let item = queue[previousPosition - 1]
+        if mode.contains(.repeatAll) && nextPosition <= 0 {
+            nextPosition = queue.count
+        }
+
+        while nextPosition > 0 {
+            let previousPosition = nextPosition - 1
             nextPosition = previousPosition
-            historic.append(item)
-            return item
+            let item = queue[previousPosition]
+
+            if shouldConsiderItem(item: item) {
+                historic.append(item)
+                return item
+            }
         }
 
-        if mode.contains(.repeatAll) {
-            nextPosition = queue.count + 1
-            return previousItem()
+        if mode.contains(.repeatAll) && nextPosition <= 0 {
+            nextPosition = queue.count
         }
         return nil
     }
@@ -182,5 +221,12 @@ class AudioItemQueue {
         if let index = items.index(of: item) {
             items.remove(at: index)
         }
+    }
+
+    /// Returns a boolean value indicating whether an item should be consider playable in the queue.
+    ///
+    /// - Returns: A boolean value indicating whether an item should be consider playable in the queue.
+    private func shouldConsiderItem(item: AudioItem) -> Bool {
+        return delegate?.audioItemQueue(self, shouldConsiderItem: item) ?? true
     }
 }
