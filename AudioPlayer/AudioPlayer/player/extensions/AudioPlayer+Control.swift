@@ -93,7 +93,11 @@ extension AudioPlayer {
             queue = nil
         }
 
-        setAudioSession(active: false)
+        if #available(iOS 10.0, *) {
+            setAudioSession(active: false)
+        } else {
+            // Fallback on earlier versions
+        }
         state = .stopped
     }
 
@@ -109,8 +113,8 @@ extension AudioPlayer {
     ///         if the operation has finished.
     public func seek(to time: TimeInterval,
                      byAdaptingTimeToFitSeekableRanges: Bool = false,
-                     toleranceBefore: CMTime = kCMTimePositiveInfinity,
-                     toleranceAfter: CMTime = kCMTimePositiveInfinity,
+                     toleranceBefore: CMTime = CMTime.positiveInfinity,
+                     toleranceAfter: CMTime = CMTime.positiveInfinity,
                      completionHandler: ((Bool) -> Void)? = nil) {
         guard let earliest = currentItemSeekableRange?.earliest,
             let latest = currentItemSeekableRange?.latest else {
@@ -203,8 +207,8 @@ extension AudioPlayer {
 extension AudioPlayer {
     
     fileprivate func seekSafely(to time: TimeInterval,
-              toleranceBefore: CMTime = kCMTimePositiveInfinity,
-              toleranceAfter: CMTime = kCMTimePositiveInfinity,
+                                toleranceBefore: CMTime = CMTime.positiveInfinity,
+                                toleranceAfter: CMTime = CMTime.positiveInfinity,
               completionHandler: ((Bool) -> Void)?) {
         guard let completionHandler = completionHandler else {
             player?.seek(to: CMTime(timeInterval: time), toleranceBefore: toleranceBefore,

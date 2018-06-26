@@ -88,7 +88,11 @@ public class AudioPlayer: NSObject {
                 player = nil
 
                 //Ensures the audio session got started
-                setAudioSession(active: true)
+                if #available(iOS 10.0, *) {
+                    setAudioSession(active: true)
+                } else {
+                    // Fallback on earlier versions
+                }
 
                 //Sets new state
                 let info = currentItem.url(for: currentQuality)
@@ -343,6 +347,8 @@ public class AudioPlayer: NSObject {
     /// Updates the MPNowPlayingInfoCenter with current item's info.
     func updateNowPlayingInfoCenter() {
         return
+        
+        /*
         #if os(iOS) || os(tvOS)
             if let item = currentItem {
                 MPNowPlayingInfoCenter.default().ap_update(
@@ -354,14 +360,16 @@ public class AudioPlayer: NSObject {
                 MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
             }
         #endif
+         */
     }
 
     /// Enables or disables the `AVAudioSession` and sets the right category.
     ///
     /// - Parameter active: A boolean value indicating whether the audio session should be set to active or not.
+    @available(iOS 10.0, *)
     func setAudioSession(active: Bool) {
         #if os(iOS) || os(tvOS)
-            _ = try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+            _ = try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)// .setCategory(AVAudioSession.Category.playback)
             _ = try? AVAudioSession.sharedInstance().setActive(active)
         #endif
     }

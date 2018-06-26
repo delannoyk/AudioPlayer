@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreMedia
 
 public typealias TimeRange = (earliest: TimeInterval, latest: TimeInterval)
 
@@ -23,9 +24,11 @@ extension AudioPlayer {
 
     /// The current seekable range.
     public var currentItemSeekableRange: TimeRange? {
-        let range = player?.currentItem?.seekableTimeRanges.last?.timeRangeValue
-        if let start = range?.start.ap_timeIntervalValue, let end = range?.end.ap_timeIntervalValue {
-            return (start, end)
+        if let range = player?.currentItem?.seekableTimeRanges.last?.timeRangeValue {
+            let start = range.start.ap_timeIntervalValue
+            let end = CMTimeRangeGetEnd(range).ap_timeIntervalValue
+            
+            return (start, end) as? TimeRange
         }
         if let currentItemProgression = currentItemProgression {
             // if there is no start and end point of seekable range
@@ -38,9 +41,12 @@ extension AudioPlayer {
 
     /// The current loaded range.
     public var currentItemLoadedRange: TimeRange? {
-        let range = player?.currentItem?.loadedTimeRanges.last?.timeRangeValue
-        if let start = range?.start.ap_timeIntervalValue, let end = range?.end.ap_timeIntervalValue {
-            return (start, end)
+        if let range = player?.currentItem?.loadedTimeRanges.last?.timeRangeValue {
+            let start = range.start.ap_timeIntervalValue
+            let end = CMTimeRangeGetEnd(range).ap_timeIntervalValue
+            
+            return (start, end) as? TimeRange
+            
         }
         return nil
     }

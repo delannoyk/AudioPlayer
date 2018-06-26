@@ -7,6 +7,7 @@
 //
 
 import AVFoundation
+import CoreMedia
 
 // MARK: - AVPlayer+KVO
 
@@ -110,22 +111,22 @@ class PlayerEventProducer: NSObject, EventProducer {
         #if os(iOS) || os(tvOS)
             center.addObserver(self,
                 selector: .audioSessionInterrupted,
-                name: .AVAudioSessionInterruption,
+                name: AVAudioSession.interruptionNotification,
                 object: nil)
             center.addObserver(
                 self,
                 selector: .audioRouteChanged,
-                name: .AVAudioSessionRouteChange,
+                name: AVAudioSession.routeChangeNotification,
                 object: nil)
             center.addObserver(
                 self,
                 selector: .audioSessionMessedUp,
-                name: .AVAudioSessionMediaServicesWereLost,
+                name: AVAudioSession.mediaServicesWereLostNotification,
                 object: nil)
             center.addObserver(
                 self,
                 selector: .audioSessionMessedUp,
-                name: .AVAudioSessionMediaServicesWereReset,
+                name: AVAudioSession.mediaServicesWereResetNotification,
                 object: nil)
         #endif
         center.addObserver(self, selector: .itemDidEnd, name: .AVPlayerItemDidPlayToEndTime, object: player.currentItem)
@@ -136,7 +137,7 @@ class PlayerEventProducer: NSObject, EventProducer {
         }
 
         //Observing timing event
-        timeObserver = player.addPeriodicTimeObserver(forInterval: CMTimeMake(1, 2), queue: .main) { [weak self] time in
+        timeObserver = player.addPeriodicTimeObserver(forInterval: CMTimeMake(value: 1, timescale: 2), queue: .main) { [weak self] time in
             if let `self` = self {
                 self.eventListener?.onEvent(PlayerEvent.progressed(time: time), generetedBy: self)
             }
@@ -154,10 +155,10 @@ class PlayerEventProducer: NSObject, EventProducer {
         //Unobserving notifications sent through `NSNotificationCenter`
         let center = NotificationCenter.default
         #if os(iOS) || os(tvOS)
-            center.removeObserver(self, name: .AVAudioSessionInterruption, object: nil)
-            center.removeObserver(self, name: .AVAudioSessionRouteChange, object: nil)
-            center.removeObserver(self, name: .AVAudioSessionMediaServicesWereLost, object: nil)
-            center.removeObserver(self, name: .AVAudioSessionMediaServicesWereReset, object: nil)
+        center.removeObserver(self, name: AVAudioSession.interruptionNotification, object: nil)
+        center.removeObserver(self, name: AVAudioSession.routeChangeNotification, object: nil)
+        center.removeObserver(self, name: AVAudioSession.mediaServicesWereLostNotification, object: nil)
+        center.removeObserver(self, name: AVAudioSession.mediaServicesWereResetNotification, object: nil)
         #endif
         center.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: player.currentItem)
 
@@ -214,7 +215,7 @@ class PlayerEventProducer: NSObject, EventProducer {
             case "currentItem.loadedTimeRanges":
                 if let range = currentItem.loadedTimeRanges.last?.timeRangeValue {
                     eventListener?.onEvent(
-                        PlayerEvent.loadedMoreRange(earliest: range.start, latest: range.end), generetedBy: self)
+                        PlayerEvent.loadedMoreRange(earliest: range.start, latest: CMTimeRangeGetEnd(range)), generetedBy: self)
                 }
             
             case "currentItem.timedMetadata":
@@ -236,12 +237,12 @@ class PlayerEventProducer: NSObject, EventProducer {
     @objc fileprivate func audioSessionGotInterrupted(note: NSNotification) {
         if let userInfo = note.userInfo,
             let typeInt = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
-            let type = AVAudioSessionInterruptionType(rawValue: typeInt) {
+            let type = AVAudioSession.InterruptionType(rawValue: typeInt) {
             if type == .began {
                 eventListener?.onEvent(PlayerEvent.interruptionBegan, generetedBy: self)
             } else {
                 if let optionInt = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
-                    let options = AVAudioSessionInterruptionOptions(rawValue: optionInt)
+                    let options = AVAudioSession.InterruptionOptions(rawValue: optionInt)
                     eventListener?.onEvent(
                         PlayerEvent.interruptionEnded(shouldResume: options.contains(.shouldResume)),
                         generetedBy: self

@@ -107,13 +107,19 @@ extension AudioPlayer {
 
         case .sessionMessedUp:
             #if os(iOS) || os(tvOS)
+            if #available(iOS 10.0, *) {
+
                 //We reenable the audio session directly in case we're in background
                 setAudioSession(active: true)
-
+                
                 //Aaaaand we: restart playing/go to next
                 state = .stopped
                 qualityAdjustmentEventProducer.interruptionCount += 1
                 retryOrPlayNext()
+                
+            } else {
+                // Fallback on earlier versions
+            }
             #endif
 
         case .startedBuffering:

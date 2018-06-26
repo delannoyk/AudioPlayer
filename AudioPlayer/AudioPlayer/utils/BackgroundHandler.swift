@@ -71,12 +71,12 @@ class BackgroundHandler: NSObject {
                 return false
             }
 
-            taskIdentifier = backgroundTaskCreator.beginBackgroundTask { [weak self] in
-                if let taskIdentifier = self?.taskIdentifier {
-                    self?.backgroundTaskCreator.endBackgroundTask(taskIdentifier)
-                }
-                self?.taskIdentifier = nil
+        taskIdentifier = backgroundTaskCreator.beginBackgroundTask { [weak self] in
+            if let taskIdentifier = self?.taskIdentifier {
+                self?.backgroundTaskCreator.endBackgroundTask(UIBackgroundTaskIdentifier(rawValue: taskIdentifier))
             }
+            self?.taskIdentifier = nil
+            }.rawValue
             return true
         #endif
     }
@@ -99,8 +99,8 @@ class BackgroundHandler: NSObject {
                 return false
             }
 
-            if taskIdentifier != UIBackgroundTaskInvalid {
-                backgroundTaskCreator.endBackgroundTask(taskIdentifier)
+        if taskIdentifier != UIBackgroundTaskIdentifier.invalid.rawValue {
+            backgroundTaskCreator.endBackgroundTask(UIBackgroundTaskIdentifier(rawValue: taskIdentifier))
             }
             self.taskIdentifier = nil
             return true
