@@ -178,12 +178,14 @@ class AudioItemQueue {
         if mode.contains(.repeatAll) && nextPosition <= 0 {
             nextPosition = queue.count
         }
-
+        
         while nextPosition > 0 {
-            let previousPosition = nextPosition - 1
+            var previousPosition = nextPosition - 1
             nextPosition = previousPosition
+            if previousPosition == queue.count - 1 && mode == .normal {
+                previousPosition -= 1
+            }
             let item = queue[previousPosition]
-
             if shouldConsiderItem(item: item) {
                 historic.append(item)
                 return item
@@ -199,7 +201,7 @@ class AudioItemQueue {
     /// A boolean value indicating whether the queue has a previous item to play or not.
     var hasPreviousItem: Bool {
         if !queue.isEmpty &&
-            (nextPosition > 0 || mode.contains(.repeat) || mode.contains(.repeatAll)) {
+            ((nextPosition > 0 && queue.count > 1) || mode.contains(.repeat) || mode.contains(.repeatAll)) {
             return true
         }
         return false
