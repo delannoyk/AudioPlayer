@@ -157,20 +157,26 @@ class AudioItemQueue_Tests: XCTestCase {
         XCTAssert(queue.previousItem() === item1)
     }
     
-    func testPreviousWithTwoItems() {
+    func testHasPrevious() {
         let queue = AudioItemQueue(items: [item1, item2], mode: .normal)
-        print("1: \(queue.nextPosition)")
         XCTAssertFalse(queue.hasPreviousItem)
         XCTAssert(queue.nextItem() === item1)
-        print("2: \(queue.nextPosition)")
-        XCTAssertTrue(queue.hasPreviousItem)
+        XCTAssertFalse(queue.hasPreviousItem)
         XCTAssert(queue.nextItem() === item2)
-        print("3: \(queue.nextPosition)")
         XCTAssertTrue(queue.hasPreviousItem)
         XCTAssert(queue.previousItem() === item1)
-        print("4: \(queue.nextPosition)")
         XCTAssert(queue.nextItem() === item2)
-        print("5: \(queue.nextPosition)")
+    }
+    
+    func testPreviousWithTwoItems() {
+        let queue = AudioItemQueue(items: [item1, item2], mode: .normal)
+        XCTAssertFalse(queue.hasPreviousItem)
+        XCTAssert(queue.nextItem() === item1)
+        XCTAssertFalse(queue.hasPreviousItem)
+        XCTAssert(queue.nextItem() === item2)
+        XCTAssertTrue(queue.hasPreviousItem)
+        XCTAssert(queue.previousItem() === item1)
+        XCTAssert(queue.nextItem() === item2)
     }
     
     func testPreviousWithOneItem() {

@@ -201,7 +201,7 @@ class AudioItemQueue {
     /// A boolean value indicating whether the queue has a previous item to play or not.
     var hasPreviousItem: Bool {
         if !queue.isEmpty &&
-            ((nextPosition > 0 && queue.count > 1) || mode.contains(.repeat) || mode.contains(.repeatAll)) {
+            (nextPosition > 1 || mode.contains(.repeat) || mode.contains(.repeatAll)) {
             return true
         }
         return false
