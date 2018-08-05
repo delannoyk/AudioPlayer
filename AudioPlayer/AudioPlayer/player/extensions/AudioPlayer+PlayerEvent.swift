@@ -89,6 +89,7 @@ extension AudioPlayer {
                 stateBeforeBuffering = nil
                 state = .playing
                 player?.rate = rate
+                playImmediately()
             } else {
                 player?.rate = 0
                 state = .paused
