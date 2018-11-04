@@ -360,8 +360,13 @@ public class AudioPlayer: NSObject {
     /// - Parameter active: A boolean value indicating whether the audio session should be set to active or not.
     func setAudioSession(active: Bool) {
         #if os(iOS) || os(tvOS)
-            _ = try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
-            _ = try? AVAudioSession.sharedInstance().setActive(active)
+        if #available(iOS 10.0, tvOS 10.0, *) {
+            try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+        } else {
+            // Workaround until https://forums.swift.org/t/using-methods-marked-unavailable-in-swift-4-2/14949 is fixed
+            AVAudioSession.sharedInstance().perform(NSSelectorFromString("setCategory:error:"), with: AVAudioSession.Category.playback)
+        }
+        try? AVAudioSession.sharedInstance().setActive(active)
         #endif
     }
 

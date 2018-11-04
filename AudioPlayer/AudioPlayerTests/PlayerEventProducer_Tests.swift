@@ -81,7 +81,7 @@ class PlayerEventProducer_Tests: XCTestCase {
             }
         }
 
-        NotificationCenter.default.post(name: .AVAudioSessionMediaServicesWereReset, object: AVAudioSession.sharedInstance())
+        NotificationCenter.default.post(name: AVAudioSession.mediaServicesWereResetNotification, object: AVAudioSession.sharedInstance())
 
         waitForExpectations(timeout: 1) { e in
             if let _ = e {
@@ -98,7 +98,7 @@ class PlayerEventProducer_Tests: XCTestCase {
             }
         }
 
-        NotificationCenter.default.post(name: .AVAudioSessionMediaServicesWereLost, object: AVAudioSession.sharedInstance())
+        NotificationCenter.default.post(name: AVAudioSession.mediaServicesWereLostNotification, object: AVAudioSession.sharedInstance())
 
         waitForExpectations(timeout: 1) { e in
             if let _ = e {
@@ -116,7 +116,7 @@ class PlayerEventProducer_Tests: XCTestCase {
             }
         }
 
-        NotificationCenter.default.post(name: .AVAudioSessionRouteChange, object: AVAudioSession.sharedInstance())
+        NotificationCenter.default.post(name: AVAudioSession.routeChangeNotification, object: AVAudioSession.sharedInstance())
 
         waitForExpectations(timeout: 1) { e in
             if let _ = e {
@@ -134,10 +134,10 @@ class PlayerEventProducer_Tests: XCTestCase {
         }
 
         NotificationCenter.default.post(
-            name: .AVAudioSessionInterruption,
+            name: AVAudioSession.interruptionNotification,
             object: player,
             userInfo: [
-                AVAudioSessionInterruptionTypeKey: NSNumber(value: AVAudioSessionInterruptionType.began.rawValue)
+                AVAudioSessionInterruptionTypeKey: NSNumber(value: AVAudioSession.InterruptionType.began.rawValue)
             ])
 
         let expectationEnds = expectation(description: "Waiting for `onEvent` to get called")
@@ -148,11 +148,11 @@ class PlayerEventProducer_Tests: XCTestCase {
         }
 
         NotificationCenter.default.post(
-            name: .AVAudioSessionInterruption,
+            name: AVAudioSession.interruptionNotification,
             object: AVAudioSession.sharedInstance(),
             userInfo: [
-                AVAudioSessionInterruptionTypeKey: NSNumber(value: AVAudioSessionInterruptionType.ended.rawValue),
-                AVAudioSessionInterruptionOptionKey: NSNumber(value: AVAudioSessionInterruptionOptions.shouldResume.rawValue)
+                AVAudioSessionInterruptionTypeKey: NSNumber(value: AVAudioSession.InterruptionType.ended.rawValue),
+                AVAudioSessionInterruptionOptionKey: NSNumber(value: AVAudioSession.InterruptionOptions.shouldResume.rawValue)
             ])
 
         waitForExpectations(timeout: 1) { e in
@@ -223,8 +223,8 @@ class PlayerEventProducer_Tests: XCTestCase {
             }
         }
 
-        item.stat = AVPlayerItemStatus.unknown
-        item.stat = AVPlayerItemStatus.readyToPlay
+        item.stat = AVPlayerItem.Status.unknown
+        item.stat = AVPlayerItem.Status.readyToPlay
     }
 
     func testEventListenerGetsCalledWhenItemStatusChangesToError() {
@@ -235,7 +235,7 @@ class PlayerEventProducer_Tests: XCTestCase {
             }
         }
 
-        item.stat = AVPlayerItemStatus.failed
+        item.stat = AVPlayerItem.Status.failed
 
         waitForExpectations(timeout: 1) { e in
             if let _ = e {
