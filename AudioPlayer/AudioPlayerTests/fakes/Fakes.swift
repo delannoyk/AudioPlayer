@@ -73,7 +73,7 @@ class FakeItem: AVPlayerItem {
         return timeRanges
     }
 
-    var stat = AVPlayerItemStatus.unknown {
+    var stat = AVPlayerItem.Status.unknown {
         willSet {
             willChangeValue(forKey: "status")
         }
@@ -82,7 +82,7 @@ class FakeItem: AVPlayerItem {
         }
     }
 
-    override var status: AVPlayerItemStatus {
+    override var status: AVPlayerItem.Status {
         return stat
     }
 
@@ -164,7 +164,7 @@ class FakeApplication: BackgroundTaskCreator {
     var onEnd: ((UIBackgroundTaskIdentifier) -> Void)?
 
     func beginBackgroundTask(expirationHandler handler: (() -> Void)?) -> UIBackgroundTaskIdentifier {
-        return onBegin?(handler) ?? UIBackgroundTaskInvalid
+        return onBegin?(handler) ?? UIBackgroundTaskIdentifier.invalid
     }
 
     func endBackgroundTask(_ identifier: UIBackgroundTaskIdentifier) {
