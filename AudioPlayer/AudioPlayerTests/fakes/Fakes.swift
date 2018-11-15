@@ -164,7 +164,7 @@ class FakeApplication: BackgroundTaskCreator {
     var onEnd: ((UIBackgroundTaskIdentifier) -> Void)?
 
     func beginBackgroundTask(expirationHandler handler: (() -> Void)?) -> UIBackgroundTaskIdentifier {
-        return onBegin?(handler) ?? UIBackgroundTaskIdentifier.invalid
+        return onBegin?(handler) ?? .invalid
     }
 
     func endBackgroundTask(_ identifier: UIBackgroundTaskIdentifier) {
