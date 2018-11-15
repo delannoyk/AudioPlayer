@@ -40,16 +40,16 @@ class NetworkEventProducer: NSObject, EventProducer {
     private var listening = false
 
     /// The last status received.
-    private var lastStatus: Reachability.NetworkStatus
+    private var lastStatus: Reachability.Connection
 
     /// Initializes a `NetworkEventProducer` with a reachability.
     ///
     /// - Parameter reachability: The reachability to work with.
     init(reachability: Reachability) {
-        lastStatus = reachability.currentReachabilityStatus
+        lastStatus = reachability.connection
         self.reachability = reachability
 
-        if lastStatus == .notReachable {
+        if lastStatus == .none {
             connectionLossDate = NSDate()
         }
     }
@@ -66,15 +66,15 @@ class NetworkEventProducer: NSObject, EventProducer {
         }
 
         //Saving current status
-        lastStatus = reachability.currentReachabilityStatus
+        lastStatus = reachability.connection
 
         //Starting to listen to events
         NotificationCenter.default.addObserver(
             self,
             selector: .reachabilityStatusChanged,
-            name: .ReachabilityChanged,
+            name: .reachabilityChanged,
             object: reachability)
-        reachability.startNotifier()
+        try? reachability.startNotifier()
 
         //Saving that we're currently listening
         listening = true
@@ -88,7 +88,7 @@ class NetworkEventProducer: NSObject, EventProducer {
 
         //Stops listening to events
         NotificationCenter.default.removeObserver(
-            self, name: .ReachabilityChanged, object: reachability)
+            self, name: .reachabilityChanged, object: reachability)
         reachability.stopNotifier()
 
         //Saving that we're not listening anymore
@@ -99,12 +99,12 @@ class NetworkEventProducer: NSObject, EventProducer {
     ///
     /// - Parameter note: The notification information.
     @objc fileprivate func reachabilityStatusChanged(note: NSNotification) {
-        let newStatus = reachability.currentReachabilityStatus
+        let newStatus = reachability.connection
         if newStatus != lastStatus {
-            if newStatus == .notReachable {
+            if newStatus == .none {
                 connectionLossDate = NSDate()
                 eventListener?.onEvent(NetworkEvent.connectionLost, generetedBy: self)
-            } else if lastStatus == .notReachable {
+            } else if lastStatus == .none {
                 eventListener?.onEvent(NetworkEvent.connectionRetrieved, generetedBy: self)
                 connectionLossDate = nil
             } else {
