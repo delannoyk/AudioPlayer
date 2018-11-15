@@ -46,7 +46,9 @@ class BackgroundHandler: NSObject {
     #endif
 
     /// The backround task identifier if a background task started. Nil if not.
+    #if !os(OSX)
     private var taskIdentifier: UIBackgroundTaskIdentifier?
+    #endif
 
     /// The number of background request received. When this counter hits 0, the background task, if any, will be
     /// terminated.
