@@ -45,8 +45,8 @@ class BackgroundHandler: NSObject {
     var backgroundTaskCreator: BackgroundTaskCreator = UIApplication.shared
     #endif
 
-    /// The backround task identifier if a background task started. Nil if not.
     #if !os(OSX)
+    /// The backround task identifier if a background task started. Nil if not.
     private var taskIdentifier: UIBackgroundTaskIdentifier?
     #endif
 
