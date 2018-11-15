@@ -20,13 +20,13 @@ class FakeEventListener: EventListener {
 }
 
 class FakeReachability: Reachability {
-    var reachabilityStatus = Reachability.NetworkStatus.notReachable {
+    var reachabilityStatus = Reachability.Connection.none {
         didSet {
-            NotificationCenter.default.post(name: .ReachabilityChanged, object: self)
+            NotificationCenter.default.post(name: .reachabilityChanged, object: self)
         }
     }
 
-    override var currentReachabilityStatus: Reachability.NetworkStatus {
+    override var connection: Reachability.Connection {
         get {
             return reachabilityStatus
         }
@@ -73,7 +73,7 @@ class FakeItem: AVPlayerItem {
         return timeRanges
     }
 
-    var stat = AVPlayerItemStatus.unknown {
+    var stat = AVPlayerItem.Status.unknown {
         willSet {
             willChangeValue(forKey: "status")
         }
@@ -82,7 +82,7 @@ class FakeItem: AVPlayerItem {
         }
     }
 
-    override var status: AVPlayerItemStatus {
+    override var status: AVPlayerItem.Status {
         return stat
     }
 
@@ -164,7 +164,7 @@ class FakeApplication: BackgroundTaskCreator {
     var onEnd: ((UIBackgroundTaskIdentifier) -> Void)?
 
     func beginBackgroundTask(expirationHandler handler: (() -> Void)?) -> UIBackgroundTaskIdentifier {
-        return onBegin?(handler) ?? UIBackgroundTaskInvalid
+        return onBegin?(handler) ?? UIBackgroundTaskIdentifier.invalid
     }
 
     func endBackgroundTask(_ identifier: UIBackgroundTaskIdentifier) {
