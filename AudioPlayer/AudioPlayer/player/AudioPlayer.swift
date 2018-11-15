@@ -360,9 +360,9 @@ public class AudioPlayer: NSObject {
     /// - Parameter active: A boolean value indicating whether the audio session should be set to active or not.
     func setAudioSession(active: Bool) {
         #if os(iOS) || os(tvOS)
-            if #available(iOS 11.0, *) {
+            if #available(iOS 11.0, tvOS 11.0, *) {
                 _ = try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, policy: .longForm, options: [])
-            } else if #available(iOS 10.0, *) {
+            } else if #available(iOS 10.0, tvOS 10.0, *) {
                 _ = try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [])
             } else {
                 // A workaround until the issue is fixed: http://www.openradar.me/42382075
