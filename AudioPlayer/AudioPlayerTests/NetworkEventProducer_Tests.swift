@@ -39,7 +39,7 @@ class NetworkEventProducer_Tests: XCTestCase {
             e.fulfill()
         }
 
-        reachability.reachabilityStatus = .reachableViaWiFi
+        reachability.reachabilityStatus = .wifi
 
         waitForExpectations(timeout: 1) { e in
             if let _ = e {
@@ -52,7 +52,7 @@ class NetworkEventProducer_Tests: XCTestCase {
         listener.eventClosure = { event, producer in
             XCTFail()
         }
-        reachability.reachabilityStatus = reachability.currentReachabilityStatus
+        reachability.reachabilityStatus = reachability.connection
 
         let e = expectation(description: "Waiting for `onEvent` to get called")
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(200)) {
@@ -67,7 +67,7 @@ class NetworkEventProducer_Tests: XCTestCase {
     }
 
     func testConnectionLostEvent() {
-        reachability.reachabilityStatus = .reachableViaWiFi
+        reachability.reachabilityStatus = .wifi
 
         let e = expectation(description: "Waiting for `onEvent` to get called")
         listener.eventClosure = { event, producer in
@@ -76,7 +76,7 @@ class NetworkEventProducer_Tests: XCTestCase {
             e.fulfill()
         }
 
-        reachability.reachabilityStatus = .notReachable
+        reachability.reachabilityStatus = .none
 
         waitForExpectations(timeout: 1) { e in
             if let _ = e {
@@ -86,7 +86,7 @@ class NetworkEventProducer_Tests: XCTestCase {
     }
 
     func testConnectionChangedEvent() {
-        reachability.reachabilityStatus = .reachableViaWiFi
+        reachability.reachabilityStatus = .wifi
 
         let e = expectation(description: "Waiting for `onEvent` to get called")
         listener.eventClosure = { event, producer in
@@ -95,7 +95,7 @@ class NetworkEventProducer_Tests: XCTestCase {
             e.fulfill()
         }
 
-        reachability.reachabilityStatus = .reachableViaWWAN
+        reachability.reachabilityStatus = .cellular
 
         waitForExpectations(timeout: 1) { e in
             if let _ = e {
