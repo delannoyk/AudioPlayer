@@ -19,18 +19,6 @@ class FakeEventListener: EventListener {
     }
 }
 
-class FakeReachability: Reachability {
-    var reachabilityStatus = Reachability.NetworkStatus.notReachable {
-        didSet {
-            NotificationCenter.default.post(name: .ReachabilityChanged, object: self)
-        }
-    }
-
-    override var currentReachabilityStatus: Reachability.NetworkStatus {
-        return reachabilityStatus
-    }
-}
-
 class FakeItem: AVPlayerItem {
     var bufferEmpty = true {
         willSet {

@@ -21,15 +21,10 @@ public class AudioPlayer: NSObject {
     /// The background handler.
     let backgroundHandler = BackgroundHandler()
 
-    /// Reachability for network connection.
-    let reachability = Reachability()
-
     // MARK: Event producers
 
     /// The network event producer.
-    lazy var networkEventProducer: NetworkEventProducer = {
-        NetworkEventProducer(reachability: self.reachability)
-    }()
+    let networkEventProducer = NetworkEventProducer()
 
     /// The player event producer.
     let playerEventProducer = PlayerEventProducer()
@@ -92,7 +87,7 @@ public class AudioPlayer: NSObject {
 
                 //Sets new state
                 let info = currentItem.url(for: currentQuality)
-                if reachability.isReachable() || info.url.ap_isOfflineURL {
+                if networkEventProducer.status.isReachable || info.url.ap_isOfflineURL {
                     state = .buffering
                     backgroundHandler.beginBackgroundTask()
                 } else {

@@ -99,8 +99,10 @@ class AudioItem_Tests: XCTestCase {
     }
 
     func testParseMetadata() {
-        let imageURL = Bundle(for: type(of: self)).url(forResource: "image", withExtension: "png")!
-        let imageData = NSData(contentsOf: imageURL)!
+        let thisSourceFile = URL(fileURLWithPath: #file)
+        let thisDirectory = thisSourceFile.deletingLastPathComponent()
+        let imageUrl = thisDirectory.appendingPathComponent("fakes/image.png")
+        let imageData = NSData(contentsOf: imageUrl)!
 
         let metadata = [
             FakeMetadataItem(commonKey: AVMetadataKey.commonKeyTitle, value: "title" as NSString),
