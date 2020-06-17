@@ -99,11 +99,11 @@ extension AudioPlayer {
             retryEventProducer.stopProducingEvents()
             backgroundHandler.endBackgroundTask()
 
-        case .routeChanged(let reason):
+        case .routeChanged(let deviceDisconnected):
             // When a route changes because a device got disconnected (e.g. unplugged headphones)
             // the player can be paused. This interruption must respect interruptionBegan.
             //TODO: Handle other reasons.
-            if reason == .oldDeviceUnavailable,
+            if deviceDisconnected,
                 let currentItemTimebase = player?.currentItem?.timebase,
                 CMTimebaseGetRate(currentItemTimebase) == 0 {
                 state = .paused
