@@ -72,7 +72,7 @@ class PlayerEventProducer: NSObject, EventProducer {
         case endedPlaying(error: Error?)
         case interruptionBegan
         case interruptionEnded(shouldResume: Bool)
-        case routeChanged
+        case routeChanged(reason: AVAudioSession.RouteChangeReason)
         case sessionMessedUp
     }
 
@@ -260,7 +260,10 @@ class PlayerEventProducer: NSObject, EventProducer {
     ///
     /// - Parameter note: The notification information.
     @objc fileprivate func audioSessionRouteChanged(note: NSNotification) {
-        eventListener?.onEvent(PlayerEvent.routeChanged, generetedBy: self)
+        let reason = note.userInfo
+            .flatMap({ $0[AVAudioSessionRouteChangeReasonKey] as? UInt })
+            .map(AVAudioSession.RouteChangeReason.init) as? AVAudioSession.RouteChangeReason ?? .unknown
+        eventListener?.onEvent(PlayerEvent.routeChanged(reason: reason), generetedBy: self)
     }
 
     /// Audio session got messed up (media services lost or reset). We gotta reactive the audio session and reset

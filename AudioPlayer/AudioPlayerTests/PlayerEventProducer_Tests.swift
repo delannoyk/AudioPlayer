@@ -111,8 +111,8 @@ class PlayerEventProducer_Tests: XCTestCase {
         let e = expectation(description: "Waiting for `onEvent` to get called")
         listener.eventClosure = { event, producer in
             if let event = event as? PlayerEventProducer.PlayerEvent,
-                case PlayerEventProducer.PlayerEvent.routeChanged = event {
-                    e.fulfill()
+                case PlayerEventProducer.PlayerEvent.routeChanged(let reason) = event {
+                if reason == .unknown { e.fulfill() }
             }
         }
 
