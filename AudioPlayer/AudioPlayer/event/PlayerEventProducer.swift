@@ -32,13 +32,14 @@ private extension Selector {
     /// The selector to call when the audio session is interrupted.
     static let audioSessionInterrupted =
         #selector(PlayerEventProducer.audioSessionGotInterrupted(note:))
-    #endif
-
+    
     /// The selector to call when the audio session route changes.
     static let audioRouteChanged = #selector(PlayerEventProducer.audioSessionRouteChanged(note:))
-
+    
     /// The selector to call when the audio session get messed up.
     static let audioSessionMessedUp = #selector(PlayerEventProducer.audioSessionMessedUp(note:))
+    
+    #endif
 
     /// The selector to call when an audio item ends playing.
     static let itemDidEnd = #selector(PlayerEventProducer.playerItemDidEnd(note:))
@@ -72,7 +73,7 @@ class PlayerEventProducer: NSObject, EventProducer {
         case endedPlaying(error: Error?)
         case interruptionBegan
         case interruptionEnded(shouldResume: Bool)
-        case routeChanged
+        case routeChanged(deviceDisconnected: Bool)
         case sessionMessedUp
     }
 
@@ -234,27 +235,36 @@ class PlayerEventProducer: NSObject, EventProducer {
     ///
     /// - Parameter note: The notification information.
     @objc fileprivate func audioSessionGotInterrupted(note: NSNotification) {
-        if let userInfo = note.userInfo,
-            let type = userInfo[AVAudioSessionInterruptionTypeKey] as? AVAudioSession.InterruptionType {
-            if type == .began {
-                eventListener?.onEvent(PlayerEvent.interruptionBegan, generetedBy: self)
-            } else {
-                if let options = userInfo[AVAudioSessionInterruptionOptionKey] as? AVAudioSession.InterruptionOptions {
-                    eventListener?.onEvent(
-                        PlayerEvent.interruptionEnded(shouldResume: options.contains(.shouldResume)),
-                        generetedBy: self
-                    )
-                }
+        guard let userInfo = note.userInfo,
+            let type = (userInfo[AVAudioSessionInterruptionTypeKey] as? UInt)
+                .map(AVAudioSession.InterruptionType.init) else {
+                    return
+        }
+        switch type {
+        case .began:
+            eventListener?.onEvent(PlayerEvent.interruptionBegan, generetedBy: self)
+        case .ended:
+            if let options = (userInfo[AVAudioSessionInterruptionOptionKey] as? UInt)
+                .map(AVAudioSession.InterruptionOptions.init) {
+                eventListener?.onEvent(
+                    PlayerEvent.interruptionEnded(shouldResume: options.contains(.shouldResume)),
+                    generetedBy: self
+                )
             }
+        default:
+            break
         }
     }
-    #endif
-
+    
     /// Audio session route changed (ex: earbuds plugged in/out). This can change the player state, so we just adapt it.
     ///
     /// - Parameter note: The notification information.
     @objc fileprivate func audioSessionRouteChanged(note: NSNotification) {
-        eventListener?.onEvent(PlayerEvent.routeChanged, generetedBy: self)
+        let reason = note.userInfo
+            .flatMap({ $0[AVAudioSessionRouteChangeReasonKey] as? UInt })
+            .map(AVAudioSession.RouteChangeReason.init) as? AVAudioSession.RouteChangeReason ?? .unknown
+        let deviceDisconnected = reason == .oldDeviceUnavailable
+        eventListener?.onEvent(PlayerEvent.routeChanged(deviceDisconnected: deviceDisconnected), generetedBy: self)
     }
 
     /// Audio session got messed up (media services lost or reset). We gotta reactive the audio session and reset
@@ -264,6 +274,7 @@ class PlayerEventProducer: NSObject, EventProducer {
     @objc fileprivate func audioSessionMessedUp(note: NSNotification) {
         eventListener?.onEvent(PlayerEvent.sessionMessedUp, generetedBy: self)
     }
+    #endif
 
     /// Playing item did end. We can play next or stop the player if queue is empty.
     ///
