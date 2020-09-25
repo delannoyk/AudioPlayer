@@ -22,7 +22,7 @@ public struct AudioPlayerMode: OptionSet {
     }
 
     /// In this mode, player's queue will be played as given.
-    public static let normal = AudioPlayerMode(rawValue: 0)
+    public static let normal = AudioPlayerMode([])
 
     /// In this mode, player's queue is shuffled randomly.
     public static let shuffle = AudioPlayerMode(rawValue: 0b001)
