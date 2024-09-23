@@ -35,7 +35,7 @@
         func endBackgroundTask(_ identifier: UIBackgroundTaskIdentifier)
     }
 
-    extension UIApplication: BackgroundTaskCreator { }
+    extension UIApplication: BackgroundTaskCreator {}
 #endif
 
 /// A `BackgroundHandler` handles background.
