@@ -22,7 +22,7 @@
         /// - Returns: A unique identifier for the new background task. You must pass this value to the
         ///     `endBackgroundTask:` method to mark the end of this task. This method returns `UIBackgroundTaskInvalid`
         ///     if running in the background is not possible.
-        func beginTask(expirationHandler handler: (() -> Void)?) -> UIBackgroundTaskIdentifier
+        func beginBackgroundTask(expirationHandler handler: (@MainActor @Sendable () -> Void)?) -> UIBackgroundTaskIdentifier
 
         /// Marks the end of a specific long-running background task.
         ///
@@ -32,20 +32,10 @@
         /// This method can be safely called on a non-main thread.
         ///
         /// - Parameter identifier: An identifier returned by the `beginBackgroundTask(expirationHandler:)` method.
-        func endTask(_ identifier: UIBackgroundTaskIdentifier)
+        func endBackgroundTask(_ identifier: UIBackgroundTaskIdentifier)
     }
 
-    extension UIApplication: BackgroundTaskCreator {
-        func beginTask(expirationHandler handler: (() -> Void)?) -> UIBackgroundTaskIdentifier {
-            return beginBackgroundTask {
-                handler?()
-            }
-        }
-
-        func endTask(_ identifier: UIBackgroundTaskIdentifier) {
-            endBackgroundTask(identifier)
-        }
-    }
+    extension UIApplication: BackgroundTaskCreator { }
 #endif
 
 /// A `BackgroundHandler` handles background.
@@ -82,9 +72,9 @@ class BackgroundHandler: NSObject {
                 return false
             }
 
-            taskIdentifier = backgroundTaskCreator.beginTask { [weak self] in
+            taskIdentifier = backgroundTaskCreator.beginBackgroundTask { [weak self] in
                 if let taskIdentifier = self?.taskIdentifier {
-                    self?.backgroundTaskCreator.endTask(taskIdentifier)
+                    self?.backgroundTaskCreator.endBackgroundTask(taskIdentifier)
                 }
                 self?.taskIdentifier = nil
             }
@@ -111,7 +101,7 @@ class BackgroundHandler: NSObject {
             }
 
             if taskIdentifier != UIBackgroundTaskIdentifier.invalid {
-                backgroundTaskCreator.endTask(taskIdentifier)
+                backgroundTaskCreator.endBackgroundTask(taskIdentifier)
             }
             self.taskIdentifier = nil
             return true
