@@ -159,10 +159,10 @@ class FakeMetadataItem: AVMetadataItem {
 }
 
 class FakeApplication: BackgroundTaskCreator {
-    var onBegin: (((() -> Void)?) -> UIBackgroundTaskIdentifier)?
+    var onBegin: (((@MainActor () -> Void)?) -> UIBackgroundTaskIdentifier)?
     var onEnd: ((UIBackgroundTaskIdentifier) -> Void)?
 
-    func beginBackgroundTask(expirationHandler handler: (() -> Void)?) -> UIBackgroundTaskIdentifier {
+    func beginBackgroundTask(expirationHandler handler: (@MainActor @Sendable () -> Void)?) -> UIBackgroundTaskIdentifier {
         return onBegin?(handler) ?? UIBackgroundTaskIdentifier.invalid
     }
 
