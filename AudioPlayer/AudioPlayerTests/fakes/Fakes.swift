@@ -162,7 +162,7 @@ class FakeApplication: BackgroundTaskCreator {
     var onBegin: (((@MainActor () -> Void)?) -> UIBackgroundTaskIdentifier)?
     var onEnd: ((UIBackgroundTaskIdentifier) -> Void)?
 
-  #if compiler(>=6.0) // Adjust this based on your Xcode 16+ version
+  #if compiler(>=6.0)
     func beginBackgroundTask(expirationHandler handler: (@MainActor @Sendable () -> Void)?) -> UIBackgroundTaskIdentifier {
         return onBegin?(handler) ?? UIBackgroundTaskIdentifier.invalid
     }
