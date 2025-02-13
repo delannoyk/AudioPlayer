@@ -22,7 +22,11 @@
         /// - Returns: A unique identifier for the new background task. You must pass this value to the
         ///     `endBackgroundTask:` method to mark the end of this task. This method returns `UIBackgroundTaskInvalid`
         ///     if running in the background is not possible.
+      #if compiler(>=6.0)
         func beginBackgroundTask(expirationHandler handler: (@MainActor @Sendable () -> Void)?) -> UIBackgroundTaskIdentifier
+      #else
+        func beginBackgroundTask(expirationHandler handler: (() -> Void)?) -> UIBackgroundTaskIdentifier
+      #endif
 
         /// Marks the end of a specific long-running background task.
         ///
