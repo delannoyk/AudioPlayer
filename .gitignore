@@ -36,3 +36,5 @@ Carthage/Build
 sonar*
 .sonar
 
+# DS Store banned
+.DS_Store
