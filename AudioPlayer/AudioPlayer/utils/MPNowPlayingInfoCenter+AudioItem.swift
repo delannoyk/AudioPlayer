@@ -5,7 +5,7 @@
 //  Created by Kevin DELANNOY on 27/03/16.
 //  Copyright © 2016 Kevin Delannoy. All rights reserved.
 //
-
+#if !os(macOS)
 import MediaPlayer
 
 extension MPNowPlayingInfoCenter {
@@ -47,3 +47,4 @@ extension MPNowPlayingInfoCenter {
         nowPlayingInfo = info
     }
 }
+#endif

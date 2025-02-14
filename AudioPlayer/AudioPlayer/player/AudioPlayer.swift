@@ -342,7 +342,7 @@ public class AudioPlayer: NSObject {
 
     /// Updates the MPNowPlayingInfoCenter with current item's info.
     func updateNowPlayingInfoCenter() {
-        #if os(iOS) || os(tvOS)
+        #if !os(macOS)
             if let item = currentItem {
                 MPNowPlayingInfoCenter.default().ap_update(
                     with: item,
